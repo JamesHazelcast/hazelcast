@@ -89,6 +89,7 @@ public class InvocationFuture_AndThenTest extends HazelcastTestSupport {
 
         InternalCompletableFuture<Object> future = operationService.invokeOnTarget(null, op, getAddress(local));
 
+        // TODO: Mocking non-owned class
         future.whenCompleteAsync(null, mock(Executor.class));
     }
 
@@ -122,6 +123,7 @@ public class InvocationFuture_AndThenTest extends HazelcastTestSupport {
 
     @SuppressWarnings("unchecked")
     private static BiConsumer<Object, Throwable> getExecutionCallbackMock() {
+        // TODO: Mocking non-owned class
         return mock(BiConsumer.class);
     }
 }

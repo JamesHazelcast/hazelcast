@@ -82,6 +82,7 @@ public class PhoneHomeIntegrationTest extends HazelcastTestSupport {
     private PhoneHome phoneHome;
     private CloudInfoCollector cloudInfoCollector;
 
+    // TODO: Mocking non-owned class
     @Mock
     private Path kubernetesTokenPath;
 

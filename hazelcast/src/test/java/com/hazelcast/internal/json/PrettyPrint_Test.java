@@ -121,6 +121,7 @@ public class PrettyPrint_Test {
 
   @Test
   public void testIndentWithSpaces_createsIndependentInstances() {
+    // TODO: Mocking non-owned class
     Writer writer = mock(Writer.class);
 
     WriterConfig config = indentWithSpaces(1);
@@ -139,6 +140,7 @@ public class PrettyPrint_Test {
 
   @Test
   public void testIndentWithTabs_createsIndependentInstances() {
+    // TODO: Mocking non-owned class
     Writer writer = mock(Writer.class);
 
     WriterConfig config = indentWithTabs();
@@ -166,6 +168,7 @@ public class PrettyPrint_Test {
 
   @Test
   public void testSingleLine_createsIndependentInstances() {
+    // TODO: Mocking non-owned class
     Writer writer = mock(Writer.class);
 
     WriterConfig config = singleLine();

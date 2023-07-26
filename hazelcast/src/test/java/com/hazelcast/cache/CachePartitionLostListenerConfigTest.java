@@ -125,6 +125,7 @@ public class CachePartitionLostListenerConfigTest extends HazelcastTestSupport {
     public void testCachePartitionLostListenerReadOnlyConfig_withEventListenerImplementation() {
         CachePartitionLostListenerConfigReadOnly readOnly
                 = new CachePartitionLostListenerConfigReadOnly(new CachePartitionLostListenerConfig());
+        // TODO: Internal class mock
         readOnly.setImplementation(mock(EventListener.class));
     }
 

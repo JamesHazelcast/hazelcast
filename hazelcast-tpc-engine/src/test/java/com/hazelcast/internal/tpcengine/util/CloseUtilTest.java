@@ -39,6 +39,7 @@ public class CloseUtilTest {
 
     @Test
     public void test_closeQuietly_whenNoException() throws Exception {
+        // TODO: Mocking non-owned class
         AutoCloseable closeable = mock(Closeable.class);
         closeQuietly(closeable);
         verify(closeable).close();
@@ -46,6 +47,7 @@ public class CloseUtilTest {
 
     @Test
     public void test_closeResource_whenException() throws Exception {
+        // TODO: Mocking non-owned class
         Closeable closeable = mock(Closeable.class);
         doThrow(new IOException("expected")).when(closeable).close();
 
@@ -57,6 +59,7 @@ public class CloseUtilTest {
 
     @Test
     public void test_closeQuietly_whenException() throws Exception {
+        // TODO: Mocking non-owned class
         Closeable closeable = mock(Closeable.class);
         doThrow(new IOException("expected")).when(closeable).close();
 
@@ -73,6 +76,7 @@ public class CloseUtilTest {
 
     @Test
     public void test_closeAllQuietly_whenItemNullCollection() throws IOException {
+        // TODO: Mocking non-owned class
         Closeable closeable1 = mock(Closeable.class);
         Closeable closeable2 = mock(Closeable.class);
 

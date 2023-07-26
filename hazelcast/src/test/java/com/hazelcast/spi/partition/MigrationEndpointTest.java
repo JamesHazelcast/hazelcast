@@ -39,6 +39,7 @@ import static org.mockito.Mockito.when;
 @Category({QuickTest.class, ParallelJVMTest.class})
 public class MigrationEndpointTest {
 
+    // TODO: Mocking non-owned class
     private DataOutput dataOutput = mock(DataOutput.class);
     private DataInput dataInput = mock(DataInput.class);
 

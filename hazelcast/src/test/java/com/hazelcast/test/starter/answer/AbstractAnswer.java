@@ -20,6 +20,7 @@ import com.hazelcast.spi.impl.NodeEngine;
 import com.hazelcast.test.starter.HazelcastAPIDelegatingClassloader;
 import com.hazelcast.test.starter.ReflectionUtils;
 import org.mockito.invocation.InvocationOnMock;
+import org.mockito.plugins.DoNotMockEnforcer;
 import org.mockito.stubbing.Answer;
 
 import java.lang.reflect.InvocationTargetException;
@@ -246,6 +247,7 @@ abstract class AbstractAnswer implements Answer {
         Class<?> resultClass = ReflectionUtils.getClass(result);
         Class<?> delegateReturnType = delegateMethod.getReturnType();
         if (Map.Entry.class.isAssignableFrom(delegateReturnType)) {
+            // TODO: Mocking non-owned class
             return mock(Map.Entry.class, new MapEntryAnswer(result, delegateClassloader));
         } else if (Map.class.isAssignableFrom(delegateReturnType)) {
             return createMapMock(resultClass, result);
@@ -347,6 +349,7 @@ abstract class AbstractAnswer implements Answer {
     static Object createMockForTargetClass(Object delegate, AbstractAnswer answer) throws Exception {
         Class<?> delegateClass = ReflectionUtils.getClass(delegate);
         Class<?> targetClass = targetClassloader.loadClass(delegateClass.getName());
+        // TODO: Investigate: Mocking non-owned class?
         return mock(targetClass, answer);
     }
 
@@ -357,6 +360,7 @@ abstract class AbstractAnswer implements Answer {
      * @return {@code true} if the class is mockable, {@code false} otherwise
      */
     private static boolean isNotMockable(Class<?> targetClass) {
+        // TODO: Investigate: Mocking non-owned class?
         int modifiers = targetClass.getModifiers();
         return isFinal(modifiers) || isPrivate(modifiers) || isProtected(modifiers);
     }

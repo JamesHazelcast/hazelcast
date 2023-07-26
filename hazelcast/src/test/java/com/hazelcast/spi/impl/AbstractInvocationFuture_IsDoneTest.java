@@ -81,6 +81,7 @@ public class AbstractInvocationFuture_IsDoneTest extends AbstractInvocationFutur
 
     @Test
     public void whenCallbackWithoutCustomExecutor() {
+        // TODO: Mocking non-owned class
         future.thenAccept(mock(Consumer.class));
 
         assertFalse(future.isDone());
@@ -88,6 +89,7 @@ public class AbstractInvocationFuture_IsDoneTest extends AbstractInvocationFutur
 
     @Test
     public void whenCallbackWithCustomExecutor() {
+        // TODO: Mocking non-owned class
         future.thenAcceptAsync(mock(Consumer.class), mock(Executor.class));
 
         assertFalse(future.isDone());
@@ -95,6 +97,7 @@ public class AbstractInvocationFuture_IsDoneTest extends AbstractInvocationFutur
 
     @Test
     public void whenMultipleWaiters() {
+        // TODO: Mocking non-owned class
         future.thenAcceptAsync(mock(Consumer.class), mock(Executor.class));
         future.thenAcceptAsync(mock(Consumer.class), mock(Executor.class));
 

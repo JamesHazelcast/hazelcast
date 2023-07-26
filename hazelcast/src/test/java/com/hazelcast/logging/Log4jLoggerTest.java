@@ -51,6 +51,7 @@ public class Log4jLoggerTest extends AbstractLoggerTest {
 
     @Before
     public void setUp() {
+        // TODO: Mocking non-owned class
         mockLogger = mock(org.apache.log4j.Logger.class);
         hazelcastLogger = new Log4jLogger(mockLogger);
         Mockito.verify(mockLogger).getLevel();

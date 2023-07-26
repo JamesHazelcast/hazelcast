@@ -323,6 +323,7 @@ public class Invocation_TimeoutTest extends HazelcastTestSupport {
 
     @SuppressWarnings("unchecked")
     private static BiConsumer<Object, Throwable> getExecutionCallbackMock() {
+        // TODO: Mocking non-owned class
         return mock(BiConsumer.class);
     }
 

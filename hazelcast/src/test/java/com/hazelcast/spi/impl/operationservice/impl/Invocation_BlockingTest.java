@@ -519,6 +519,7 @@ public class Invocation_BlockingTest extends HazelcastTestSupport {
 
     @SuppressWarnings("unchecked")
     private static BiConsumer<Object, Throwable> getExecutionCallbackMock() {
+        // TODO: Mocking non-owned class
         return mock(BiConsumer.class);
     }
 

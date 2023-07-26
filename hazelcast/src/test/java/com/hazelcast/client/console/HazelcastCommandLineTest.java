@@ -523,6 +523,7 @@ public class HazelcastCommandLineTest extends JetTestSupport {
     @Test
     public void test_submit_job_with_hazelcast_classes() throws IOException {
         Logger logger = (Logger) LogManager.getLogger(MainClassNameFinder.class);
+        // TODO: Mocking non-owned class
         Appender appender = mock(Appender.class);
         when(appender.getName()).thenReturn("Mock Appender");
         when(appender.isStarted()).thenReturn(true);

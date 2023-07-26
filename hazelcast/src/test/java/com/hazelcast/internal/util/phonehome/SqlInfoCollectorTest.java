@@ -40,6 +40,7 @@ public class SqlInfoCollectorTest {
 
     SqlInfoCollector sqlInfoCollector;
 
+    // TODO: Mocking non-owned class
     @Mock
     BiConsumer<PhoneHomeMetrics, String> metricsConsumer;
 

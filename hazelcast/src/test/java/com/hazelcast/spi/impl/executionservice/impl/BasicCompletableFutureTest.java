@@ -259,6 +259,7 @@ public class BasicCompletableFutureTest {
 
     @SuppressWarnings("unchecked")
     private static BiConsumer<String, Throwable> getStringExecutionCallback() {
+        // TODO: Mocking non-owned class
         return mock(BiConsumer.class);
     }
 

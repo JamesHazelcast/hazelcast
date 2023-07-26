@@ -112,6 +112,7 @@ public class HazelcastOSGiScriptEngineTest extends HazelcastOSGiScriptingTest {
 
     private void verifyThatPutAndGetContextSuccessfully(ScriptEngine scriptEngine) {
         assertNotNull(scriptEngine.getContext());
+        // TODO: Mocking non-owned class
         ScriptContext mockScriptContext = mock(ScriptContext.class);
         scriptEngine.setContext(mockScriptContext);
         assertEquals(mockScriptContext, scriptEngine.getContext());

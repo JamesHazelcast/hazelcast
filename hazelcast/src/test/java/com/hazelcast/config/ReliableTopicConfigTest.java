@@ -60,6 +60,7 @@ public class ReliableTopicConfigTest {
     public void testCopyConstructorWithName() {
         ReliableTopicConfig original = new ReliableTopicConfig("original")
                 .setTopicOverloadPolicy(TopicOverloadPolicy.ERROR)
+                // TODO: Mocking non-owned class
                 .setExecutor(mock(Executor.class))
                 .setReadBatchSize(1)
                 .setStatisticsEnabled(!DEFAULT_STATISTICS_ENABLED);
@@ -77,6 +78,7 @@ public class ReliableTopicConfigTest {
     public void testCopyConstructor() {
         ReliableTopicConfig original = new ReliableTopicConfig("original")
                 .setTopicOverloadPolicy(TopicOverloadPolicy.ERROR)
+                // TODO: Mocking non-owned class
                 .setExecutor(mock(Executor.class))
                 .setReadBatchSize(1)
                 .setStatisticsEnabled(!DEFAULT_STATISTICS_ENABLED);
@@ -159,6 +161,7 @@ public class ReliableTopicConfigTest {
     public void setExecutor() {
         ReliableTopicConfig config = new ReliableTopicConfig("foo");
 
+        // TODO: Mocking non-owned class
         Executor executor = mock(Executor.class);
         config.setExecutor(executor);
 
@@ -171,6 +174,7 @@ public class ReliableTopicConfigTest {
 
     @Test
     public void testReadonly() {
+        // TODO: Mocking non-owned class
         Executor executor = mock(Executor.class);
         ReliableTopicConfig config = new ReliableTopicConfig("foo")
                 .setReadBatchSize(201)

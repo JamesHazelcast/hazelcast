@@ -65,11 +65,13 @@ public class PipeliningTest extends HazelcastTestSupport {
     @Test
     public void testInterrupt() throws Exception {
         final Pipelining<String> pipelining = new Pipelining<>(1);
+        // TODO: Mocking non-owned class
         pipelining.add(mock(CompletionStage.class));
 
         TestThread t = new TestThread() {
             @Override
             public void doRun() throws Throwable {
+                // TODO: Mocking non-owned class
                 pipelining.add(mock(CompletionStage.class));
             }
         };
@@ -81,11 +83,13 @@ public class PipeliningTest extends HazelcastTestSupport {
     @Test
     public void testSpuriousWakeup() throws Exception {
         final Pipelining<String> pipelining = new Pipelining<>(1);
+        // TODO: Mocking non-owned class
         pipelining.add(mock(CompletionStage.class));
 
         TestThread t = new TestThread() {
             @Override
             public void doRun() throws Throwable {
+                // TODO: Mocking non-owned class
                 pipelining.add(mock(CompletionStage.class));
             }
         };

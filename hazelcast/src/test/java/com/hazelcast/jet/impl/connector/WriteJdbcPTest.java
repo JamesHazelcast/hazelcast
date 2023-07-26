@@ -449,6 +449,7 @@ public class WriteJdbcPTest extends SimpleTestInClusterSupport {
             @Override
             public DataSource getEx() throws SQLException {
                 DataSource realDs = (DataSource) createDataSource(false);
+                // TODO: Mocking non-owned class
                 DataSource mockDs = mock(DataSource.class);
                 doAnswer(invocation -> {
                     if (remainingFailures-- > 0) {

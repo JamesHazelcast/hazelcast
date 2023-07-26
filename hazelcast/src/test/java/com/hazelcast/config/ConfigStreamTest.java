@@ -139,6 +139,7 @@ public class ConfigStreamTest {
     }
 
     private InputStream givenMockedInputStream(boolean markable) throws IOException {
+        // TODO: Mocking non-owned class
         InputStream mockIs = mock(InputStream.class);
         when(mockIs.markSupported()).thenReturn(markable);
         stubReadByteArr(mockIs);

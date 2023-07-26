@@ -70,6 +70,7 @@ public class NotPredicateTest {
     public void apply(Predicate inner, boolean expected) {
         NotPredicate notPredicate = new NotPredicate(inner);
 
+        // TODO: Mocking non-owned class
         boolean result = notPredicate.apply(mock(Map.Entry.class));
 
         assertEquals(expected, result);

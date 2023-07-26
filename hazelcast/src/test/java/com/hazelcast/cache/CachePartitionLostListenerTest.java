@@ -197,6 +197,7 @@ public class CachePartitionLostListenerTest extends AbstractPartitionLostListene
     public void test_cachePartitionEventData_deserialization() throws IOException {
         CachePartitionEventData cachePartitionEventData = new CachePartitionEventData("", 0, null);
 
+        // TODO any concern?
         ObjectDataInput input = mock(ObjectDataInput.class,
                 withSettings().extraInterfaces(DataReader.class));
         when(input.readString()).thenReturn("cacheName");

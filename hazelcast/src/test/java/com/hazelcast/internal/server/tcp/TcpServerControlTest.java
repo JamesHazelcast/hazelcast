@@ -182,6 +182,7 @@ public class TcpServerControlTest {
         lifecycleListener = getFieldValueReflectively(connectionManager, "connectionLifecycleListener");
         addressRegistry = node.getLocalAddressRegistry();
         // setup mock channel & socket
+        // TODO: Mocking non-owned class
         Socket socket = mock(Socket.class);
         when(socket.getRemoteSocketAddress()).thenReturn(CLIENT_SOCKET_ADDRESS);
 

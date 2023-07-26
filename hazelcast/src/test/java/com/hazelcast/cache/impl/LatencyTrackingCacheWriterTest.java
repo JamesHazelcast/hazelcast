@@ -54,6 +54,7 @@ public class LatencyTrackingCacheWriterTest extends HazelcastTestSupport {
     public void setup() {
         HazelcastInstance hz = createHazelcastInstance();
         plugin = new StoreLatencyPlugin(getNodeEngineImpl(hz));
+        // TODO: Mocking non-owned class
         delegate = mock(CacheWriter.class);
         TenantContextual<CacheWriter<Integer, String>> contextual = TenantContextual.create(() -> delegate,
                 () -> true, TenantControl.NOOP_TENANT_CONTROL);

@@ -38,9 +38,11 @@ public class ExceptionHandlerTest {
 
     @Before
     public void setup() {
+        // TODO: Mocking non-owned class
         exception = mock(Exception.class);
         commandLine = mock(CommandLine.class);
         parseResult = mock(CommandLine.ParseResult.class);
+        // TODO: Mocking non-owned class
         err = mock(PrintWriter.class);
         colorScheme = mock(CommandLine.Help.ColorScheme.class);
         when(commandLine.getErr()).thenReturn(err);

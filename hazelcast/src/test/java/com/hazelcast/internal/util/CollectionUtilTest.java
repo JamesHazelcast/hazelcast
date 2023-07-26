@@ -143,6 +143,7 @@ public class CollectionUtilTest extends HazelcastTestSupport {
     public void testGetItemAsPositionOrNull_whenInputImplementsList_thenDoNotUserIterator() {
         Object obj = new Object();
 
+        // TODO: Mocking non-owned class
         List<Object> src = mock(List.class);
         when(src.size()).thenReturn(1);
         when(src.get(0)).thenReturn(obj);

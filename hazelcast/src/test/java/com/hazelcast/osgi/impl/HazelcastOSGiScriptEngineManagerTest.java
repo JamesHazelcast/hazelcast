@@ -54,6 +54,7 @@ public class HazelcastOSGiScriptEngineManagerTest extends HazelcastOSGiScripting
 
         assertNotNull(scriptEngineManager.getBindings());
 
+        // TODO: Mocking non-owned class
         Bindings mockBindings = mock(Bindings.class);
         scriptEngineManager.setBindings(mockBindings);
         assertEquals(mockBindings, scriptEngineManager.getBindings());

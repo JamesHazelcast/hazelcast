@@ -60,6 +60,7 @@ public class HazelcastManifestTransformerTest {
     @Before
     public void setUp() throws Exception {
         is = new FileInputStream(manifestFile);
+        // TODO: Mocking non-owned class
         os = mock(JarOutputStream.class);
 
         transformer = new HazelcastManifestTransformer();

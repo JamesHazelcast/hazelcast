@@ -68,6 +68,7 @@ public class AbstractCompletableFutureTest extends HazelcastTestSupport {
     @Test
     public void future_notExecuted_callbackRegistered_notDoneNotCancelled() {
         TestFutureImpl future = new TestFutureImpl();
+        // TODO: Mocking non-owned class
         future.whenCompleteAsync(mock(BiConsumer.class));
 
         assertFalse("New future should not be done", future.isDone());
@@ -316,6 +317,7 @@ public class AbstractCompletableFutureTest extends HazelcastTestSupport {
 
     public void setResult_whenPendingCallback_callbacksExecutedCorrectly(final Object result) {
         TestFutureImpl future = new TestFutureImpl();
+        // TODO: Mocking non-owned class
         final BiConsumer callback1 = mock(BiConsumer.class);
         final BiConsumer callback2 = mock(BiConsumer.class);
         future.whenCompleteAsync(callback1);
@@ -358,12 +360,14 @@ public class AbstractCompletableFutureTest extends HazelcastTestSupport {
     @Test(expected = NullPointerException.class)
     public void andThen_whenNullExecutor_exceptionThrown() {
         TestFutureImpl future = new TestFutureImpl();
+        // TODO: Mocking non-owned class
         future.whenCompleteAsync(mock(BiConsumer.class), null);
     }
 
     @Test
     public void andThen_whenInitialState() {
         TestFutureImpl future = new TestFutureImpl();
+        // TODO: Mocking non-owned class
         BiConsumer callback = mock(BiConsumer.class);
 
         future.whenCompleteAsync(callback, executor);
@@ -374,6 +378,7 @@ public class AbstractCompletableFutureTest extends HazelcastTestSupport {
     @Test
     public void andThen_whenCancelled() {
         TestFutureImpl future = new TestFutureImpl();
+        // TODO: Mocking non-owned class
         BiConsumer callback = mock(BiConsumer.class);
 
         future.cancel(false);
@@ -385,6 +390,7 @@ public class AbstractCompletableFutureTest extends HazelcastTestSupport {
     @Test
     public void andThen_whenPendingCallback() {
         TestFutureImpl future = new TestFutureImpl();
+        // TODO: Mocking non-owned class
         BiConsumer callback1 = mock(BiConsumer.class);
         BiConsumer callback2 = mock(BiConsumer.class);
 
@@ -398,6 +404,7 @@ public class AbstractCompletableFutureTest extends HazelcastTestSupport {
     @Test
     public void andThen_whenPendingCallback_andCancelled() {
         TestFutureImpl future = new TestFutureImpl();
+        // TODO: Mocking non-owned class
         BiConsumer callback1 = mock(BiConsumer.class);
         BiConsumer callback2 = mock(BiConsumer.class);
 
@@ -413,6 +420,7 @@ public class AbstractCompletableFutureTest extends HazelcastTestSupport {
     public void andThen_whenResultAvailable() throws Exception {
         TestFutureImpl future = new TestFutureImpl();
         final Object result = "result";
+        // TODO: Mocking non-owned class
         final BiConsumer callback = mock(BiConsumer.class);
 
         future.complete(result);

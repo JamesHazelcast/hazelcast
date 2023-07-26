@@ -312,6 +312,7 @@ public class TpcChannelConnectorTest {
     }
 
     private ExecutorService setupMockExecutorService() {
+        // TODO: Mocking non-owned class
         ExecutorService executorService = mock(ExecutorService.class);
         doAnswer(invocation -> {
             Runnable runnable = invocation.getArgument(0);
@@ -335,6 +336,7 @@ public class TpcChannelConnectorTest {
     }
 
     private BiFunction<Address, TcpClientConnection, Channel> setupMockChannelCreator(Channel[] tpcChannels) {
+        // TODO: Mocking non-owned class
         BiFunction<Address, TcpClientConnection, Channel> channelCreator = mock(BiFunction.class);
         OngoingStubbing<Channel> stubbing = when(channelCreator.apply(any(), any()));
         for (Channel channel : tpcChannels) {

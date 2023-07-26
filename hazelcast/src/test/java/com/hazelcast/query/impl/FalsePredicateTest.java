@@ -51,6 +51,7 @@ public class FalsePredicateTest extends HazelcastTestSupport {
 
     @Test
     public void apply() {
+        // TODO: Mocking non-owned class
         Map.Entry entry = mock(Map.Entry.class);
         boolean result = FalsePredicate.INSTANCE.apply(entry);
         assertFalse(result);

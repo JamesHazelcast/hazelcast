@@ -42,6 +42,7 @@ public class Slf4jLoggerTest extends AbstractLoggerTest {
 
     @Before
     public void setUp() {
+        // TODO: Mocking non-owned class
         mockLogger = mock(Logger.class);
         hazelcastLogger = new Slf4jFactory.Slf4jLogger(mockLogger);
     }

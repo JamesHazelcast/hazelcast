@@ -78,6 +78,7 @@ public class JobUploadStoreTest {
 
         JobMetaDataParameterObject jobMetaDataParameterObject = new JobMetaDataParameterObject();
         //Create a mock clock
+        // TODO: Mocking non-owned class
         Clock mock = mock(Clock.class);
         when(mock.instant()).thenReturn(expiredTime, now);
         JobUploadStatus jobUploadStatus = new JobUploadStatus(jobMetaDataParameterObject, mock);

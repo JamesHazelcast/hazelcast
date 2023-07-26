@@ -46,6 +46,7 @@ public class SocketTest {
     public void test_setCloseListener_whenAlreadySet() {
         MockChannel channel = new MockChannel();
         AbstractAsyncSocket.CloseListener oldCloseListener = mock(AbstractAsyncSocket.CloseListener.class);
+        // TODO: Mocking non-owned class
         Executor oldExecutor = mock(Executor.class);
         channel.setCloseListener(oldCloseListener, oldExecutor);
 
@@ -56,6 +57,7 @@ public class SocketTest {
     public void test_setCloseListener_whenListenerNull() {
         MockChannel channel = new MockChannel();
 
+        // TODO: Mocking non-owned class
         assertThrows(NullPointerException.class, () -> channel.setCloseListener(null, mock(Executor.class)));
     }
 

@@ -236,6 +236,7 @@ public class MetricDescriptorImplTest {
 
     @Test
     public void testEqualsDifferentNumberOfTags() {
+        // TODO: Mocking non-owned class
         MetricDescriptorImpl metricDescriptor1 = new MetricDescriptorImpl(mock(Supplier.class));
         MetricDescriptorImpl metricDescriptor2 = new MetricDescriptorImpl(mock(Supplier.class));
 
@@ -256,6 +257,7 @@ public class MetricDescriptorImplTest {
 
     @Test
     public void testEqualsDifferentUnits() {
+        // TODO: Mocking non-owned class
         MetricDescriptorImpl metricDescriptor1 = new MetricDescriptorImpl(mock(Supplier.class));
         MetricDescriptorImpl metricDescriptor2 = new MetricDescriptorImpl(mock(Supplier.class));
 

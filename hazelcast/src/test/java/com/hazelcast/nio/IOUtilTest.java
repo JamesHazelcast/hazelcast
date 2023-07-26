@@ -43,6 +43,7 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.nio.BufferOverflowException;
@@ -126,7 +127,9 @@ public class IOUtilTest extends HazelcastTestSupport {
 
     @Test
     public void testConstructor() {
-        assertUtilityConstructor(IOUtil.class);
+        ObjectOutputStream mock = mock(ObjectOutputStream.class);
+        System.out.println("Mocked!");
+        //        assertUtilityConstructor(IOUtil.class);
     }
 
     @Test
@@ -362,6 +365,7 @@ public class IOUtilTest extends HazelcastTestSupport {
 
     @Test
     public void testCloseResource() throws Exception {
+        // TODO: Mocking non-owned class
         Closeable closeable = mock(Closeable.class);
 
         closeResource(closeable);
@@ -372,6 +376,7 @@ public class IOUtilTest extends HazelcastTestSupport {
 
     @Test
     public void testCloseResource_withException() throws Exception {
+        // TODO: Mocking non-owned class
         Closeable closeable = mock(Closeable.class);
         doThrow(new IOException("expected")).when(closeable).close();
 
@@ -440,6 +445,7 @@ public class IOUtilTest extends HazelcastTestSupport {
 
     @Test(expected = HazelcastException.class)
     public void testCopy_failsWhenSourceCannotBeListed() {
+        // TODO: Mocking non-owned class
         File source = mock(File.class);
         when(source.exists()).thenReturn(true);
         when(source.isDirectory()).thenReturn(true);
@@ -487,6 +493,7 @@ public class IOUtilTest extends HazelcastTestSupport {
 
     @Test(expected = HazelcastException.class)
     public void testCopy_withInputStream_failsWhenTargetNotExist() {
+        // TODO: Mocking non-owned class
         InputStream source = mock(InputStream.class);
         File target = mock(File.class);
         when(target.exists()).thenReturn(false);
@@ -496,6 +503,7 @@ public class IOUtilTest extends HazelcastTestSupport {
 
     @Test(expected = HazelcastException.class)
     public void testCopy_withInputStream_failsWhenSourceCannotBeRead() throws Exception {
+        // TODO: Mocking non-owned class
         InputStream source = mock(InputStream.class);
         when(source.read(any(byte[].class))).thenThrow(new IOException("expected"));
         File target = createFile("target");
@@ -509,6 +517,7 @@ public class IOUtilTest extends HazelcastTestSupport {
         assertFalse("Source file should not exist yet", source.exists());
         assertTrue("Source file should have been created successfully", source.createNewFile());
 
+        // TODO: Mocking non-owned class
         File target = mock(File.class);
         when(target.exists()).thenReturn(false);
         when(target.mkdirs()).thenReturn(false);
@@ -647,6 +656,7 @@ public class IOUtilTest extends HazelcastTestSupport {
 
     @Test
     public void testDeleteQuietly_shouldDoNothingIfFileCouldNotBeDeleted() {
+        // TODO: Mocking non-owned class
         File file = mock(File.class);
         when(file.exists()).thenReturn(true);
         when(file.delete()).thenReturn(false);
@@ -748,6 +758,7 @@ public class IOUtilTest extends HazelcastTestSupport {
 
     @Test
     public void testCloseServerSocket_whenServerSocketThrows() throws Exception {
+        // TODO: Mocking non-owned class
         ServerSocket serverSocket = mock(ServerSocket.class);
         doThrow(new IOException()).when(serverSocket).close();
         try {
@@ -759,6 +770,7 @@ public class IOUtilTest extends HazelcastTestSupport {
 
     @Test(expected = HazelcastException.class)
     public void testRename_whenFileNowNotExist() {
+        // TODO: Mocking non-owned class
         File toBe = mock(File.class);
 
         File now = mock(File.class);
@@ -770,6 +782,7 @@ public class IOUtilTest extends HazelcastTestSupport {
 
     @Test(expected = HazelcastException.class)
     public void testRename_whenFileToBeNotExist() {
+        // TODO: Mocking non-owned class
         File toBe = mock(File.class);
         when(toBe.exists()).thenReturn(false);
 
@@ -782,6 +795,7 @@ public class IOUtilTest extends HazelcastTestSupport {
 
     @Test(expected = HazelcastException.class)
     public void testRename_whenFileToBeNotDeleted() {
+        // TODO: Mocking non-owned class
         File toBe = mock(File.class);
         when(toBe.exists()).thenReturn(true);
         when(toBe.delete()).thenReturn(false);

@@ -202,6 +202,7 @@ public abstract class JmsSourceIntegrationTestBase extends SimpleTestInClusterSu
     @Test
     public void when_exactlyOnceTopicDefaultConsumer_then_noGuaranteeUsed() {
         SupplierEx<ConnectionFactory> mockSupplier = () -> {
+            // TODO: Mocking non-owned class
             ConnectionFactory mockConnectionFactory = mock(ConnectionFactory.class);
             Connection mockConn = mock(Connection.class);
             Session mockSession = mock(Session.class);

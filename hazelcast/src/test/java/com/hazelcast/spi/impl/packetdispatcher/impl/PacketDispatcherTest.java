@@ -54,6 +54,7 @@ public class PacketDispatcherTest extends HazelcastTestSupport {
     @Before
     public void setup() {
         ILogger logger = Logger.getLogger(getClass());
+        // TODO: Mocking non-owned class
         operationExecutor = mock(Consumer.class);
         responseHandler = mock(Consumer.class);
         eventService = mock(Consumer.class);

@@ -33,6 +33,7 @@ public class RetryUtilsTest {
     private static final String RESULT = "result string";
     private static final String NON_RETRYABLE_KEYWORDS = "Non retryable keywords";
 
+    // TODO: Mocking non-owned class
     private Callable<String> callable = mock(Callable.class);
 
     @Test

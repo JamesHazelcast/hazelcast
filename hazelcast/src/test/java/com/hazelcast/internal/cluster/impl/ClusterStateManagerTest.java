@@ -73,6 +73,7 @@ public class ClusterStateManagerTest {
     private final InternalPartitionService partitionService = mock(InternalPartitionService.class);
     private final MembershipManager membershipManager = mock(MembershipManager.class);
     private final ClusterServiceImpl clusterService = mock(ClusterServiceImpl.class);
+    // TODO: Mocking non-owned class
     private final Lock lock = mock(Lock.class);
 
     private ClusterStateManager clusterStateManager;
