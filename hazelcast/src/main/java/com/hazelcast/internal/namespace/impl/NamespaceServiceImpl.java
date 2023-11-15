@@ -27,6 +27,7 @@ import com.hazelcast.internal.serialization.SerializationClassNameFilter;
 import com.hazelcast.internal.util.ExceptionUtil;
 import com.hazelcast.jet.impl.JobRepository;
 import com.hazelcast.jet.impl.deployment.MapResourceClassLoader;
+import com.hazelcast.jet.impl.util.ReflectionUtils;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -199,7 +200,7 @@ public final class NamespaceServiceImpl implements NamespaceService {
                 handleJarInZip(resource.id(), resource.payload(), resourceMap);
                 break;
             case CLASS:
-                handleClass(resource.id(), resource.url(), resource.payload(), resourceMap);
+                handleClass(resource.id(), resource.payload(), resourceMap);
                 break;
             default:
                 throw new IllegalArgumentException("Cannot handle resource type " + resource.type());
@@ -219,7 +220,7 @@ public final class NamespaceServiceImpl implements NamespaceService {
      * <p>
      * Caller is responsible for closing stream.
      * @param id
-     * @param jarBytes
+     * @param inputStream
      * @param resourceMap
      * @see     com.hazelcast.jet.impl.util.ReflectionUtils#toClassResourceId(String)
      * @see     JobRepository#classKeyName(String)
@@ -258,19 +259,26 @@ public final class NamespaceServiceImpl implements NamespaceService {
     }
 
     /**
-     * Add the class with given {@code resourceId} to the {@code resourceMap}, after performing deflate compression on its
-     * payload.
-     * @param resourceId the resource ID for the class, ie fully qualified class name converted to path, suffixed with ".class"
+     * Add the class to the {@code resourceMap}, extracting and using the class' binary name (package and class) as the
+     * {@code resourceMap} key, after performing deflate compression on its payload.
+     * @param id the resource ID, used for reference in exceptions
      * @param classBytes the class binary content
      * @param resourceMap resource map to add resource to
      * @see com.hazelcast.jet.impl.util.ReflectionUtils#toClassResourceId
+     * @see com.hazelcast.jet.impl.util.ReflectionUtils#getInternalBinaryName
      */
-    private void handleClass(String resourceId, String resourceUrl, byte[] classBytes, Map<String, byte[]> resourceMap) {
-        // TODO: Ensure we have a fully qualified class name available
-        if (classFilter != null) {
-//            classFilter.filter(className);
+    private void handleClass(String id, byte[] classBytes, Map<String, byte[]> resourceMap) {
+        try {
+            // Extract a fully qualified class name - ID can be user customized, and URL can be anything
+            String fqClassName = ReflectionUtils.getInternalBinaryName(classBytes);
+            if (classFilter != null) {
+                classFilter.filter(fqClassName);
+            }
+            // We need to append `.class` as per ReflectionUtils#toClassResourceId, but we don't need the path replacement
+            resourceMap.put(classKeyName(fqClassName + ".class"), IOUtil.compress(classBytes));
+        } catch (Exception ex) {
+            throw new IllegalArgumentException("Failed to read from CLASS bytes for resource with id " + id, ex);
         }
-        resourceMap.put(classKeyName(resourceId), IOUtil.compress(classBytes));
     }
 
     /** @see #handleJar(String, InputStream, Map<String, byte[]>) */

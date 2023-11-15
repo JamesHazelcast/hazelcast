@@ -32,6 +32,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URL;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
@@ -307,6 +310,92 @@ public final class ReflectionUtils {
         } catch (IllegalAccessException ignored) {
             return null;
         }
+    }
+
+    /**
+     * Reads only the necessary amount of bytes for the provided {@link Class} to find and return
+     * the internal binary name for this class, as determined by the first {@code CONSTANT_Class}
+     * tag encountered while reading the constants pool.
+     *
+     * @see <a href="https://docs.oracle.com/javase/specs/jvms/se21/html/jvms-4.html">Java Class file format</a>
+     *
+     * @param classBytes the bytes of a Java {@link Class} to extract binary name from
+     * @return           the binary name of the class
+     */
+    public static String getInternalBinaryName(byte[] classBytes) {
+        try {
+            ByteBuffer buffer = ByteBuffer.wrap(classBytes);
+            buffer.order(ByteOrder.BIG_ENDIAN);
+
+            // Skip magic number and major/minor versions
+            buffer.position(8);
+
+            int constantPoolCount = buffer.getShort() & 0xFFFF;
+            String[] constantPool = new String[constantPoolCount];
+            int classNameIndex = -1;
+
+            // Iterate constant pool, collecting UTF8 strings (could be our class name) and looking for CONSTANT_Class tags
+            //   to identify our desired UTF8 string representing the class name. Skips appropriate bytes for all other tags.
+            // While it is generally convention for the index referenced by a CONSTANT_Class value to already be populated in
+            //   the constant pool (forward references), it is not forbidden by JVM Spec to use backward references.
+            for (int i = 1; i < constantPoolCount; i++) {
+                int tag = buffer.get() & 0xFF;
+                switch (tag) {
+                    case 1: // CONSTANT_Utf8
+                        int length = buffer.getShort() & 0xFFFF;
+                        byte[] bytes = new byte[length];
+                        buffer.get(bytes);
+                        constantPool[i] = new String(bytes, StandardCharsets.UTF_8);
+                        if (classNameIndex >= 0 && i >= classNameIndex) {
+                            // Our class name string is now available to return
+                            return constantPool[classNameIndex];
+                        }
+                        break;
+                    case 7: // CONSTANT_Class
+                        if (classNameIndex < 0) {
+                            // The first CONSTANT_Class encountered is for the FQ class name
+                            classNameIndex = buffer.getShort() & 0xFFFF;
+                            if (classNameIndex <= i) {
+                                // The index referenced has already been populated in the constant pool
+                                return constantPool[classNameIndex];
+                            }
+                        } else {
+                            skipBytes(buffer, 2);
+                        }
+                        break;
+                    case 8: // CONSTANT_String
+                    case 16: // CONSTANT_MethodType
+                    case 19: // CONSTANT_Module
+                    case 20: // CONSTANT_Package
+                        skipBytes(buffer, 2);
+                        break;
+                    case 3: // CONSTANT_Integer
+                    case 4: // CONSTANT_Float
+                    case 9: // CONSTANT_Fieldref
+                    case 10: // CONSTANT_Methodref
+                    case 11: // CONSTANT_InterfaceMethodref
+                    case 12: // CONSTANT_NameAndType
+                    case 18: // CONSTANT_InvokeDynamic
+                        skipBytes(buffer, 4);
+                        break;
+                    case 5: // CONSTANT_Long
+                    case 6: // CONSTANT_Double
+                        skipBytes(buffer, 8);
+                        i++;
+                        break;
+                    default:
+                        throw new IllegalArgumentException("Invalid constant pool tag: " + tag);
+                }
+            }
+
+            throw new IllegalArgumentException("Unable to local package/class names from class bytes");
+        } catch (Exception e) {
+            throw sneakyThrow(e);
+        }
+    }
+
+    private static void skipBytes(ByteBuffer buffer, int toSkip) {
+        buffer.position(buffer.position() + toSkip);
     }
 
     public static final class Resources {
