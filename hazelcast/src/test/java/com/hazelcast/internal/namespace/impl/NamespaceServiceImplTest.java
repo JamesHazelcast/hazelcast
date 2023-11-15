@@ -29,6 +29,7 @@ import com.hazelcast.jet.config.ResourceType;
 import com.hazelcast.spi.impl.NodeEngineImpl;
 import com.hazelcast.test.annotation.NamespaceTest;
 import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.Named;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -41,8 +42,8 @@ import java.lang.reflect.Constructor;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -57,19 +58,24 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class NamespaceServiceImplTest {
     public static Stream<Arguments> testLoadClasses() throws IOException {
         return Stream.of(
-                Arguments.of(ResourceType.CLASS,
-                        classResourcesFromClassPath("usercodedeployment/ChildClass.class",
-                                "usercodedeployment/ParentClass.class"),
+                Arguments.of(
+                        Named.of(ResourceType.CLASS.toString(),
+                                classResourcesFromClassPath("usercodedeployment/ChildClass.class",
+                                        "usercodedeployment/ParentClass.class")),
                         new String[] {"usercodedeployment.ParentClass", "usercodedeployment.ChildClass"}),
-                Arguments.of(ResourceType.JAR, singletonJarResourceFromBinaries("usercodedeployment/ChildParent.jar"),
+                Arguments.of(
+                        Named.of(ResourceType.JAR.toString(),
+                                singletonJarResourceFromBinaries("usercodedeployment/ChildParent.jar")),
                         new String[] {"usercodedeployment.ParentClass", "usercodedeployment.ChildClass"}),
-                Arguments.of(ResourceType.JARS_IN_ZIP, jarResourcesFromBinaries("/zip-resources/person-car-jar.zip"),
+                Arguments.of(
+                        Named.of(ResourceType.JARS_IN_ZIP.toString(),
+                                jarResourcesFromBinaries("/zip-resources/person-car-jar.zip")),
                         new String[] {"com.sample.pojo.car.Car"}));
     }
 
     @ParameterizedTest
     @MethodSource
-    void testLoadClasses(ResourceType type, Set<ResourceDefinition> resources, String... expectedClasses) throws Exception {
+    void testLoadClasses(Collection<ResourceDefinition> resources, String... expectedClasses) throws Exception {
         NamespaceServiceImpl namespaceService =
                 new NamespaceServiceImpl(NamespaceServiceImplTest.class.getClassLoader(), Collections.emptyMap(), new Config());
 
@@ -89,7 +95,7 @@ public class NamespaceServiceImplTest {
         }
     }
 
-    private static Set<ResourceDefinition> classResourcesFromClassPath(String... classIdPaths) {
+    private static Collection<ResourceDefinition> classResourcesFromClassPath(String... classIdPaths) {
         return Arrays.stream(classIdPaths).map(idPath -> {
             try {
                 final byte[] bytes = Files.toByteArray(fileRelativeToBinariesFolder(idPath));
@@ -100,14 +106,13 @@ public class NamespaceServiceImplTest {
         }).collect(Collectors.toSet());
     }
 
-    private static Set<ResourceDefinition> singletonJarResourceFromBinaries(final String idPath) throws IOException {
+    private static Collection<ResourceDefinition> singletonJarResourceFromBinaries(final String idPath) throws IOException {
         final byte[] bytes = Files.toByteArray(fileRelativeToBinariesFolder(idPath));
         return Collections.singleton(new ResourceDefinitionImpl(idPath, bytes, ResourceType.JAR, idPath));
     }
 
-    private static Set<ResourceDefinition> jarResourcesFromBinaries(final String idPath) throws IOException {
-        try (InputStream stream =
-                NamespaceServiceImplTest.class.getResource("/zip-resources/person-car-jar.zip").openStream()) {
+    private static Collection<ResourceDefinition> jarResourcesFromBinaries(final String idPath) throws IOException {
+        try (InputStream stream = NamespaceServiceImplTest.class.getResource(idPath).openStream()) {
             return Collections
                     .singleton(new ResourceDefinitionImpl(idPath, stream.readAllBytes(), ResourceType.JARS_IN_ZIP, idPath));
         }
