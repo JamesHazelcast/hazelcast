@@ -27,14 +27,12 @@ import com.hazelcast.internal.namespace.ResourceDefinition;
 import com.hazelcast.internal.util.OsHelper;
 import com.hazelcast.jet.config.ResourceType;
 import com.hazelcast.spi.impl.NodeEngineImpl;
-import com.hazelcast.test.HazelcastParametrizedRunner;
 import com.hazelcast.test.annotation.NamespaceTest;
-import org.junit.Before;
-import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,55 +42,37 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.hazelcast.test.Accessors.getNodeEngineImpl;
 import static com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig;
 import static com.hazelcast.test.UserCodeUtil.fileRelativeToBinariesFolder;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@RunWith(HazelcastParametrizedRunner.class)
 @Category(NamespaceTest.class)
 public class NamespaceServiceImplTest {
-
-    // TODO JUNIT 5
-
-    @Parameter(0)
-    public String name;
-
-    @Parameter(1)
-    public Set<ResourceDefinition> resources;
-
-    @Parameter(2)
-    public String[] expectedClasses;
-
-    private NamespaceServiceImpl namespaceService;
-
-    @Parameters(name = "Source: {0}")
-    public static Iterable<Object[]> parameters() throws IOException {
-        return List.of(
-                new Object[] {"Class",
+    public static Stream<Arguments> testLoadClasses() throws IOException {
+        return Stream.of(
+                Arguments.of(ResourceType.CLASS,
                         classResourcesFromClassPath("usercodedeployment/ChildClass.class",
                                 "usercodedeployment/ParentClass.class"),
-                        new String[] {"usercodedeployment.ParentClass", "usercodedeployment.ChildClass"}},
-                new Object[] {"JAR", singletonJarResourceFromBinaries("usercodedeployment/ChildParent.jar"),
-                        new String[] {"usercodedeployment.ParentClass", "usercodedeployment.ChildClass"}},
-                new Object[] {"JAR in ZIP", jarResourcesFromBinaries("/zip-resources/person-car-jar.zip"),
-                        new String[] {"com.sample.pojo.car.Car"}});
+                        new String[] {"usercodedeployment.ParentClass", "usercodedeployment.ChildClass"}),
+                Arguments.of(ResourceType.JAR, singletonJarResourceFromBinaries("usercodedeployment/ChildParent.jar"),
+                        new String[] {"usercodedeployment.ParentClass", "usercodedeployment.ChildClass"}),
+                Arguments.of(ResourceType.JARS_IN_ZIP, jarResourcesFromBinaries("/zip-resources/person-car-jar.zip"),
+                        new String[] {"com.sample.pojo.car.Car"}));
     }
 
-    @Before
-    public void setup() {
-        namespaceService = new NamespaceServiceImpl(NamespaceServiceImplTest.class.getClassLoader(), Collections.emptyMap(),
-                new Config());
-    }
+    @ParameterizedTest
+    @MethodSource
+    void testLoadClasses(ResourceType type, Set<ResourceDefinition> resources, String... expectedClasses) throws Exception {
+        NamespaceServiceImpl namespaceService =
+                new NamespaceServiceImpl(NamespaceServiceImplTest.class.getClassLoader(), Collections.emptyMap(), new Config());
 
-    @Test
-    public void testLoadClasses() throws Exception {
         namespaceService.addNamespace("ns1", resources);
         ClassLoader classLoader = namespaceService.namespaceToClassLoader.get("ns1");
 
@@ -134,9 +114,8 @@ public class NamespaceServiceImplTest {
     }
 
     // TODO This test is hacky and probably does not belong here - we should refactor/move it eventually
-    // TODO This test needs to move as it's being run parameterized multiple times
     @Test
-    public void testXmlConfigLoadingForNamespacesWithIMap() {
+    void testXmlConfigLoadingForNamespacesWithIMap() {
         Path pathToJar = Paths.get("src", "test", "class", "usercodedeployment", "ChildParent.jar");
         String stringPath =
                 OsHelper.ensureUnixSeparators(UrlEscapers.urlFragmentEscaper().escape(pathToJar.toAbsolutePath().toString()));
@@ -170,9 +149,8 @@ public class NamespaceServiceImplTest {
 
     // "No-op" implementation test
     // TODO Should this be in a separate test class? It would only be the 1 test...
-    // TODO This test needs to move as it's being run parameterized multiple times
     @Test
-    public void testNoOpImplementation() {
+    void testNoOpImplementation() {
         // Do not enable Namespaces in any form, results in No-Op implementation being used
         HazelcastInstance instance = Hazelcast.newHazelcastInstance(smallInstanceConfig());
         try {
