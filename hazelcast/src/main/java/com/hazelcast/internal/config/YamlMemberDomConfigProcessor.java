@@ -76,6 +76,7 @@ import com.hazelcast.config.WanBatchPublisherConfig;
 import com.hazelcast.config.WanCustomPublisherConfig;
 import com.hazelcast.config.WanReplicationConfig;
 import com.hazelcast.config.WanReplicationRef;
+import com.hazelcast.config.cp.CPMapConfig;
 import com.hazelcast.config.cp.CPSubsystemConfig;
 import com.hazelcast.config.cp.FencedLockConfig;
 import com.hazelcast.config.cp.SemaphoreConfig;
@@ -932,6 +933,21 @@ public class YamlMemberDomConfigProcessor extends MemberDomConfigProcessor {
 //            }
 //        }
 //    }
+
+    @Override
+    void handleCPMaps(CPSubsystemConfig cpSubsystemConfig, Node node) {
+        for (Node child : childElements(node)) {
+            CPMapConfig cpMapConfig = new CPMapConfig();
+            cpMapConfig.setName(child.getNodeName());
+            for (Node subChild : childElements(child)) {
+                String nodeName = cleanNodeName(subChild);
+                if (matches("max-size-mb", nodeName)) {
+                    cpMapConfig.setMaxSizeMb(Integer.parseInt(getTextContent(subChild)));
+                }
+            }
+            cpSubsystemConfig.addCPMapConfig(cpMapConfig);
+        }
+    }
 
     @Override
     protected void handleRealms(Node node) {

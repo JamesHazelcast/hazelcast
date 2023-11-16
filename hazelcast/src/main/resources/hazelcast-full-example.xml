@@ -23,7 +23,7 @@
   the directory where you start your Hazelcast member.
 
   To learn how to configure Hazelcast, please see the schema at
-  https://hazelcast.com/schema/config/hazelcast-config-5.3.xsd
+  https://hazelcast.com/schema/config/hazelcast-config-5.4.xsd
   or the Reference Manual at https://docs.hazelcast.com/
 -->
 
@@ -3662,6 +3662,14 @@
                 call will not succeed.
                 If lock-acquire-limit is set to 1, then the lock becomes non-reentrant.
 
+        * <maps>:
+            Configurations for CPMap instances. The CPMaps can be configured
+            under <map> elements with the following sub-elements:
+            * <name>:
+                Name of the CPMap.
+            * <max-size-mb>:
+                Maximum size in MB that the key-value pairs can total.
+
     -->
     <cp-subsystem>
         <cp-member-count>10</cp-member-count>
@@ -3705,6 +3713,16 @@
                 <lock-acquire-limit>2</lock-acquire-limit>
             </fenced-lock>
         </locks>
+        <maps>
+            <map>
+                <name>map1</name>
+                <max-size-mb>50</max-size-mb>
+            </map>
+            <map>
+                <name>map2</name>
+                <max-size-mb>25</max-size-mb>
+            </map>
+        </maps>
     </cp-subsystem>
 
     <!--

@@ -129,6 +129,7 @@ import com.hazelcast.config.WanQueueFullBehavior;
 import com.hazelcast.config.WanReplicationConfig;
 import com.hazelcast.config.WanReplicationRef;
 import com.hazelcast.config.WanSyncConfig;
+import com.hazelcast.config.cp.CPMapConfig;
 import com.hazelcast.config.tpc.TpcConfig;
 import com.hazelcast.config.tpc.TpcSocketConfig;
 import com.hazelcast.config.cp.CPSubsystemConfig;
@@ -3098,6 +3099,8 @@ public class MemberDomConfigProcessor extends AbstractDomConfigProcessor {
                 handleSemaphores(cpSubsystemConfig, child);
             } else if (matches("locks", nodeName)) {
                 handleFencedLocks(cpSubsystemConfig, child);
+            } else if (matches("maps", nodeName)) {
+                handleCPMaps(cpSubsystemConfig, child);
             } else {
                 if (matches("cp-member-count", nodeName)) {
                     cpSubsystemConfig.setCPMemberCount(Integer.parseInt(getTextContent(child)));
@@ -3121,6 +3124,21 @@ public class MemberDomConfigProcessor extends AbstractDomConfigProcessor {
                     cpSubsystemConfig.setCPMemberPriority(Integer.parseInt(getTextContent(child)));
                 }
             }
+        }
+    }
+
+    void handleCPMaps(CPSubsystemConfig cpSubsystemConfig, Node node) {
+        for (Node child : childElements(node)) {
+            CPMapConfig cpMapConfig = new CPMapConfig();
+            for (Node subChild : childElements(child)) {
+                String nodeName = cleanNodeName(subChild);
+                if (matches("name", nodeName)) {
+                    cpMapConfig.setName(getTextContent(subChild));
+                } else if (matches("max-size-mb", nodeName)) {
+                    cpMapConfig.setMaxSizeMb(Integer.parseInt(getTextContent(subChild)));
+                }
+            }
+            cpSubsystemConfig.addCPMapConfig(cpMapConfig);
         }
     }
 
