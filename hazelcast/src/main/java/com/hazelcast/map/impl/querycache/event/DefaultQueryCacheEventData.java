@@ -183,7 +183,7 @@ public class DefaultQueryCacheEventData implements QueryCacheEventData, Versione
         out.writeInt(eventType);
         out.writeInt(partitionId);
 
-        // RU_COMPAT_5_4
+        // RU_COMPAT_5_3
         if (out.getVersion().isGreaterOrEqual(V5_4)) {
             out.writeString(mapName);
         }
@@ -197,7 +197,7 @@ public class DefaultQueryCacheEventData implements QueryCacheEventData, Versione
         this.eventType = in.readInt();
         this.partitionId = in.readInt();
 
-        // RU_COMPAT_5_4
+        // RU_COMPAT_5_3
         if (in.getVersion().isGreaterOrEqual(V5_4)) {
             this.mapName = in.readString();
         }

@@ -304,7 +304,7 @@ public class TopicConfig implements IdentifiedDataSerializable, NamedConfig, Ver
         out.writeBoolean(multiThreadingEnabled);
         writeNullableList(listenerConfigs, out);
 
-        // RU_COMPAT_5_4
+        // RU_COMPAT_5_3
         if (out.getVersion().isGreaterOrEqual(V5_4)) {
             out.writeString(namespace);
         }
@@ -318,7 +318,7 @@ public class TopicConfig implements IdentifiedDataSerializable, NamedConfig, Ver
         multiThreadingEnabled = in.readBoolean();
         listenerConfigs = readNullableList(in);
 
-        // RU_COMPAT_5_4
+        // RU_COMPAT_5_3
         if (in.getVersion().isGreaterOrEqual(V5_4)) {
             namespace = in.readString();
         }

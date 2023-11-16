@@ -374,7 +374,7 @@ public class MultiMapConfig implements IdentifiedDataSerializable, NamedConfig, 
         out.writeString(splitBrainProtectionName);
         out.writeObject(mergePolicyConfig);
 
-        // RU_COMPAT_5_4
+        // RU_COMPAT_5_3
         if (out.getVersion().isGreaterOrEqual(V5_4)) {
             out.writeString(namespace);
         }
@@ -400,7 +400,7 @@ public class MultiMapConfig implements IdentifiedDataSerializable, NamedConfig, 
         splitBrainProtectionName = in.readString();
         mergePolicyConfig = in.readObject();
 
-        // RU_COMPAT_5_4
+        // RU_COMPAT_5_3
         if (in.getVersion().isGreaterOrEqual(V5_4)) {
             namespace = in.readString();
         }

@@ -499,7 +499,7 @@ public class QueryCacheConfig implements IdentifiedDataSerializable, NamespaceAw
         writeNullableList(indexConfigs, out);
         out.writeBoolean(serializeKeys);
 
-        // RU_COMPAT_5_4
+        // RU_COMPAT_5_3
         if (out.getVersion().isGreaterOrEqual(V5_4)) {
             out.writeString(namespace);
         }
@@ -521,7 +521,7 @@ public class QueryCacheConfig implements IdentifiedDataSerializable, NamespaceAw
         indexConfigs = readNullableList(in);
         serializeKeys = in.readBoolean();
 
-        // RU_COMPAT_5_4
+        // RU_COMPAT_5_3
         if (in.getVersion().isGreaterOrEqual(V5_4)) {
             namespace = in.readString();
         }

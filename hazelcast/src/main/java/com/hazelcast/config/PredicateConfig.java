@@ -230,7 +230,7 @@ public class PredicateConfig implements IdentifiedDataSerializable, NamespaceAwa
         out.writeString(sql);
         out.writeObject(implementation);
 
-        // RU_COMPAT_5_4
+        // RU_COMPAT_5_3
         if (out.getVersion().isGreaterOrEqual(V5_4)) {
             out.writeString(namespace);
         }
@@ -242,7 +242,7 @@ public class PredicateConfig implements IdentifiedDataSerializable, NamespaceAwa
         sql = in.readString();
         implementation = in.readObject();
 
-        // RU_COMPAT_5_4
+        // RU_COMPAT_5_3
         if (in.getVersion().isGreaterOrEqual(V5_4)) {
             namespace = in.readString();
         }

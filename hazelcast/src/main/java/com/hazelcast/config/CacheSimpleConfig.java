@@ -810,7 +810,7 @@ public class CacheSimpleConfig implements IdentifiedDataSerializable, NamedConfi
         out.writeObject(merkleTreeConfig);
         out.writeObject(dataPersistenceConfig);
 
-        // RU_COMPAT_5_4
+        // RU_COMPAT_5_3
         if (out.getVersion().isGreaterOrEqual(V5_4)) {
             out.writeString(namespace);
         }
@@ -846,7 +846,7 @@ public class CacheSimpleConfig implements IdentifiedDataSerializable, NamedConfi
         merkleTreeConfig = in.readObject();
         setDataPersistenceConfig(in.readObject());
 
-        // RU_COMPAT_5_4
+        // RU_COMPAT_5_3
         if (in.getVersion().isGreaterOrEqual(V5_4)) {
             namespace = in.readString();
         }

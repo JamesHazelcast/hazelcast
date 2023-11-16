@@ -44,6 +44,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 
+import static com.hazelcast.config.ConfigAccessor.getResourceDefinitions;
 import static com.hazelcast.jet.impl.JobRepository.classKeyName;
 import static com.hazelcast.jet.impl.util.ReflectionUtils.toClassResourceId;
 
@@ -64,7 +65,7 @@ public final class NamespaceServiceImpl implements NamespaceService {
         } else {
             this.classFilter = null;
         }
-        nsConfigs.forEach((nsName, nsConfig) -> addNamespace(nsName, nsConfig.getResourceConfigs()));
+        nsConfigs.forEach((nsName, nsConfig) -> addNamespace(nsName, getResourceDefinitions(nsConfig)));
     }
 
     @Override

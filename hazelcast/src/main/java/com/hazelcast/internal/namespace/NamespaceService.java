@@ -16,6 +16,7 @@
 
 package com.hazelcast.internal.namespace;
 
+import com.hazelcast.config.ConfigAccessor;
 import com.hazelcast.config.NamespaceConfig;
 
 import javax.annotation.Nonnull;
@@ -70,7 +71,7 @@ public interface NamespaceService {
     <V> V callWithNamespace(@Nullable String namespace, Callable<V> callable);
 
     default void addNamespaceConfig(NamespaceConfig config) {
-        addNamespace(config.getName(), config.getResourceConfigs());
+        addNamespace(config.getName(), ConfigAccessor.getResourceDefinitions(config));
     }
 
     default void removeNamespaceConfig(NamespaceConfig config) {

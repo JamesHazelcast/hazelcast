@@ -16,7 +16,6 @@
 
 package com.hazelcast.jet.impl.deployment;
 
-import com.hazelcast.internal.namespace.impl.NamespaceServiceImpl;
 import com.hazelcast.internal.nio.IOUtil;
 import com.hazelcast.jet.impl.util.ReflectionUtils;
 import com.hazelcast.jet.impl.util.Util;

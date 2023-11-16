@@ -341,7 +341,7 @@ public class ReliableTopicConfig implements IdentifiedDataSerializable, NamedCon
         writeNullableList(listenerConfigs, out);
         out.writeString(topicOverloadPolicy.name());
 
-        // RU_COMPAT_5_4
+        // RU_COMPAT_5_3
         if (out.getVersion().isGreaterOrEqual(V5_4)) {
             out.writeString(namespace);
         }
@@ -356,7 +356,7 @@ public class ReliableTopicConfig implements IdentifiedDataSerializable, NamedCon
         listenerConfigs = readNullableList(in);
         topicOverloadPolicy = TopicOverloadPolicy.valueOf(in.readString());
 
-        // RU_COMPAT_5_4
+        // RU_COMPAT_5_3
         if (in.getVersion().isGreaterOrEqual(V5_4)) {
             namespace = in.readString();
         }
