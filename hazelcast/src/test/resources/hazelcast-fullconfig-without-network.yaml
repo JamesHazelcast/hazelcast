@@ -1047,6 +1047,21 @@ hazelcast:
 
   namespaces:
     enabled: false
+    java-serialization-filter:
+      defaults-disabled: false
+      blacklist:
+        class:
+          - com.acme.app.BeanComparator
+      whitelist:
+        class:
+          - java.lang.String
+          - example.Foo
+        package:
+          - com.acme.app
+          - com.acme.app.subpkg
+        prefix:
+          - com.hazelcast.
+          - java
     namespace1:
       - jar:
           id: "test"

@@ -4800,6 +4800,7 @@ public class XMLConfigBuilderTest extends AbstractConfigBuilderTest {
         // Validate filtering config
         assertNotNull(namespacesConfig.getJavaSerializationFilterConfig());
         JavaSerializationFilterConfig filterConfig = namespacesConfig.getJavaSerializationFilterConfig();
+        assertTrue(filterConfig.isDefaultsDisabled());
         assertTrue(filterConfig.getWhitelist().isListed("com.acme.app.FakeClass"));
         assertTrue(filterConfig.getWhitelist().isListed("com.hazelcast.fake.place.MagicClass"));
         assertFalse(filterConfig.getWhitelist().isListed("not.in.the.whitelist.ClassName"));

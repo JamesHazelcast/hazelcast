@@ -1754,5 +1754,15 @@ public class TestFullApplicationContext extends HazelcastTestSupport {
         assertEquals(expectedZipURL, jarResource.get().url());
         //check the bytes[] are equal
         assertArrayEquals(getTestFileBytes(zipPath.toFile()), jarResource.get().payload());
+
+        // Validate filtering config
+        assertNotNull(namespacesConfig.getJavaSerializationFilterConfig());
+        JavaSerializationFilterConfig filterConfig = namespacesConfig.getJavaSerializationFilterConfig();
+        assertTrue(filterConfig.isDefaultsDisabled());
+        assertTrue(filterConfig.getWhitelist().isListed("com.acme.app.FakeClass"));
+        assertTrue(filterConfig.getWhitelist().isListed("com.hazelcast.fake.place.MagicClass"));
+        assertFalse(filterConfig.getWhitelist().isListed("not.in.the.whitelist.ClassName"));
+        assertTrue(filterConfig.getBlacklist().isListed("com.acme.app.BeanComparator"));
+        assertFalse(filterConfig.getBlacklist().isListed("not.in.the.blacklist.ClassName"));
     }
 }

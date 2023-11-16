@@ -2413,7 +2413,9 @@ public class HazelcastConfigBeanDefinitionParser extends AbstractHazelcastBeanDe
 
             ManagedMap<String, BeanDefinition> namespaces = new ManagedMap<>();
             for (Node child : childElements(node)) {
-                if ("namespace".equals(cleanNodeName(child))) {
+                if ("java-serialization-filter".equals(cleanNodeName(child))) {
+                    handleJavaSerializationFilter(child, namespacesBuilder);
+                } else if ("namespace".equals(cleanNodeName(child))) {
                     handleNamespace(child, namespaces);
                 }
             }
