@@ -18,11 +18,11 @@ package com.hazelcast.client.impl.clientside;
 import com.hazelcast.client.impl.protocol.codec.DynamicConfigAddNamespaceConfigCodec;
 import com.hazelcast.client.impl.protocol.codec.DynamicConfigRemoveNamespaceConfigCodec;
 import com.hazelcast.client.impl.protocol.task.dynamicconfig.ResourceDefinitionHolder;
+import com.hazelcast.config.ConfigAccessor;
 import com.hazelcast.config.NamespaceConfig;
 import com.hazelcast.config.NamespacesConfig;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 public class ClientDynamicClusterNamespaceConfig extends NamespacesConfig {
@@ -56,12 +56,8 @@ public class ClientDynamicClusterNamespaceConfig extends NamespacesConfig {
         return this;
     }
 
-    @Override
-    public Map<String, NamespaceConfig> getNamespaceConfigs() {
-        throw new UnsupportedOperationException(ClientDynamicClusterConfig.UNSUPPORTED_ERROR_MESSAGE);
-    }
-
     private static List<ResourceDefinitionHolder> toResourceDefinitionHolders(NamespaceConfig namespaceConfig) {
-        return namespaceConfig.getResourceConfigs().stream().map(ResourceDefinitionHolder::new).collect(Collectors.toList());
+        return ConfigAccessor.getResourceDefinitions(namespaceConfig)
+                .stream().map(ResourceDefinitionHolder::new).collect(Collectors.toList());
     }
 }

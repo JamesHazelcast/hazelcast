@@ -57,13 +57,8 @@ public class NamespacesConfig {
         return this;
     }
 
-    public Map<String, NamespaceConfig> getNamespaceConfigs() {
+    Map<String, NamespaceConfig> getNamespaceConfigs() {
         return Collections.unmodifiableMap(namespaceConfigs);
-    }
-
-    public void setNamespaceConfigs(Map<String, NamespaceConfig> namespaceConfigs) {
-        this.namespaceConfigs.clear();
-        this.namespaceConfigs.putAll(namespaceConfigs);
     }
 
     @Override
