@@ -30,16 +30,16 @@ public class RingBufferUCDTest extends UCDTest {
         RingbufferConfig ringBufferConfig = instance.getConfig().getRingbufferConfig(randomName());
         ringBufferConfig.setNamespace(namespaceConfig.getName());
 
+        String clazz = "usercodedeployment.AcceptAllIFunction";
+
+        registerClass(clazz);
+
         Ringbuffer<Byte> ringBuffer = instance.getRingbuffer(ringBufferConfig.getName());
 
         ringBuffer.add(Byte.MIN_VALUE);
 
-        assertEquals(1, ringBuffer.readManyAsync(ringBuffer.headSequence(), 0, 1, (IFunction<Byte, Boolean>) getClassInstance())
-                .toCompletableFuture().get().size());
-    }
-
-    @Override
-    protected String classNameToLoad() {
-        return "usercodedeployment.AcceptAllIFunction";
+        assertEquals(1,
+                ringBuffer.readManyAsync(ringBuffer.headSequence(), 0, 1, (IFunction<Byte, Boolean>) getClassInstance(clazz))
+                        .toCompletableFuture().get().size());
     }
 }

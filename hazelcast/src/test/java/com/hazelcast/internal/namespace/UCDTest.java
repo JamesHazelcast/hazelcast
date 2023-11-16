@@ -29,6 +29,7 @@ import org.junit.Before;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -41,28 +42,30 @@ import java.nio.file.Paths;
 public abstract class UCDTest extends HazelcastTestSupport {
     protected NamespaceConfig namespaceConfig;
     protected HazelcastInstance instance;
+    protected MapResourceClassLoader mapResourceClassLoader;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() throws IOException {
         Config config = new Config();
 
         Path classRoot = Paths.get("src/test/class");
-        MapResourceClassLoader mapResourceClassLoader =
-                NamespaceAwareClassLoaderIntegrationTest.generateMapResourceClassLoaderForDirectory(classRoot);
-        namespaceConfig = new NamespaceConfig("ns1").addClass(mapResourceClassLoader.loadClass(classNameToLoad()));
+        mapResourceClassLoader = NamespaceAwareClassLoaderIntegrationTest.generateMapResourceClassLoaderForDirectory(classRoot);
+        namespaceConfig = new NamespaceConfig("ns1");
 
         config.getNamespacesConfig().setEnabled(true).addNamespaceConfig(namespaceConfig);
 
         instance = createHazelcastInstance(config);
     }
 
-    protected abstract String classNameToLoad();
-
-    protected Class<?> tryLoadClass() throws ClassNotFoundException {
-        return NamespaceAwareClassLoaderIntegrationTest.tryLoadClass(instance, namespaceConfig.getName(), classNameToLoad());
+    protected void registerClass(String clazz) throws ClassNotFoundException {
+        namespaceConfig.addClass(mapResourceClassLoader.loadClass(clazz));
     }
 
-    protected Object getClassInstance() throws ReflectiveOperationException {
-        return tryLoadClass().getDeclaredConstructor().newInstance();
+    protected Class<?> tryLoadClass(String clazz) throws ClassNotFoundException {
+        return NamespaceAwareClassLoaderIntegrationTest.tryLoadClass(instance, namespaceConfig.getName(), clazz);
+    }
+
+    protected Object getClassInstance(String clazz) throws ReflectiveOperationException {
+        return tryLoadClass(clazz).getDeclaredConstructor().newInstance();
     }
 }
