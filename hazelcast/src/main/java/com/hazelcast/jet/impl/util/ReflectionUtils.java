@@ -322,6 +322,7 @@ public final class ReflectionUtils {
      * @param classBytes the bytes of a Java {@link Class} to extract binary name from
      * @return           the binary name of the class
      */
+    @SuppressWarnings("checkstyle:magicnumber")
     public static String getInternalBinaryName(byte[] classBytes) {
         try {
             ByteBuffer buffer = ByteBuffer.wrap(classBytes);
