@@ -83,7 +83,6 @@ public class NamespaceAwareClassLoaderIntegrationTest extends HazelcastTestSuppo
     private static Artifact h2V204Artifact;
 
     protected Config config;
-    private ClassLoader nodeClassLoader;
 
     @BeforeClass
     public static void setUpClass() throws IOException {
@@ -139,14 +138,13 @@ public class NamespaceAwareClassLoaderIntegrationTest extends HazelcastTestSuppo
         }
 
         HazelcastInstance hazelcastInstance = createHazelcastInstance(config);
-        nodeClassLoader = Accessors.getNode(hazelcastInstance).getConfigClassLoader();
 
         // "I can run a customer entry processor and configure an IMap in that namespace"
         // "to execute that entry processor on that IMap"
         // "I can configure N > 1 namespaces with simple Java class resources of same name and different behavior"
         Map<CaseValueProcessor, IMap<Object, String>> processorToMap =
                 Arrays.stream(CaseValueProcessor.values()).collect(Collectors.toMap(Function.identity(),
-                        processor -> processor.createExecuteAssertOnMap(this, hazelcastInstance)));
+                        processor -> processor.createExecuteAssertOnMap(hazelcastInstance)));
 
         // "IMaps configured in the respective namespaces will correctly load and execute the respective EntryProcessor defined
         // in their namespace, without class name clashes."
@@ -187,7 +185,6 @@ public class NamespaceAwareClassLoaderIntegrationTest extends HazelcastTestSuppo
                 .setClassName(className);
 
         HazelcastInstance hazelcastInstance = createHazelcastInstance(config);
-        nodeClassLoader = Accessors.getNode(hazelcastInstance).getConfigClassLoader();
 
         String mapped = executeMapLoader(hazelcastInstance, mapName);
         assertNotNull("Was the MapStore executed?", mapped);
@@ -225,7 +222,6 @@ public class NamespaceAwareClassLoaderIntegrationTest extends HazelcastTestSuppo
                 .setClassName(className);
 
         HazelcastInstance hazelcastInstance = createHazelcastInstance(config);
-        nodeClassLoader = Accessors.getNode(hazelcastInstance).getConfigClassLoader();
 
         String namespaceH2Version = executeMapLoader(hazelcastInstance, mapName);
 
@@ -245,22 +241,21 @@ public class NamespaceAwareClassLoaderIntegrationTest extends HazelcastTestSuppo
     @Test
     public void testMilestone2TestCase1() {
         HazelcastInstance hazelcastInstance = createHazelcastInstance(config);
-        nodeClassLoader = Accessors.getNode(hazelcastInstance).getConfigClassLoader();
 
         CaseValueProcessor processor = CaseValueProcessor.LOWER_CASE_VALUE_ENTRY_PROCESSOR;
 
         // Set the map up, but catch a failure because we haven't configured the processor
-        assertThrows(Exception.class, () -> processor.createExecuteAssertOnMap(this, hazelcastInstance));
+        assertThrows(Exception.class, () -> processor.createExecuteAssertOnMap(hazelcastInstance));
 
         // Then dynamically configure
         processor.addNamespaceToConfig(hazelcastInstance.getConfig());
 
         // And re-run the test expecting success
-        processor.createExecuteAssertOnMap(this, hazelcastInstance);
+        processor.createExecuteAssertOnMap(hazelcastInstance);
 
         // And able to roll back by removing it again
         hazelcastInstance.getConfig().getNamespacesConfig().removeNamespaceConfig(processor.namespace);
-        assertThrows(Exception.class, () -> processor.createExecuteAssertOnMap(this, hazelcastInstance));
+        assertThrows(Exception.class, () -> processor.createExecuteAssertOnMap(hazelcastInstance));
     }
 
     /**
@@ -278,10 +273,9 @@ public class NamespaceAwareClassLoaderIntegrationTest extends HazelcastTestSuppo
         processor.addNamespaceToConfig(config);
 
         HazelcastInstance hazelcastInstance = createHazelcastInstance(config);
-        nodeClassLoader = Accessors.getNode(hazelcastInstance).getConfigClassLoader();
 
         // Assert the basic functionality
-        processor.createExecuteAssertOnMap(this, hazelcastInstance);
+        processor.createExecuteAssertOnMap(hazelcastInstance);
 
         // Now swap the class in the namespace
         String namespace = processor.namespace.getName();
@@ -289,7 +283,7 @@ public class NamespaceAwareClassLoaderIntegrationTest extends HazelcastTestSuppo
                 .addNamespaceConfig(new NamespaceConfig(namespace).addClass(otherProcessor.clazz));
 
         // Now assert the behavior has swapped, too
-        otherProcessor.createExecuteAssertOnMap(namespace, processor.mapName, this, hazelcastInstance);
+        otherProcessor.createExecuteAssertOnMap(namespace, processor.mapName, hazelcastInstance);
     }
 
     /**
@@ -316,7 +310,6 @@ public class NamespaceAwareClassLoaderIntegrationTest extends HazelcastTestSuppo
         }
 
         HazelcastInstance hazelcastInstance = createHazelcastInstance(config);
-        nodeClassLoader = Accessors.getNode(hazelcastInstance).getConfigClassLoader();
 
         assertEquals("Fixture setup of JDBC with explicit driver declaration", h2V202Artifact.getVersion(),
                 executeMapLoader(hazelcastInstance, dataSource.getRight()));
@@ -523,8 +516,9 @@ public class NamespaceAwareClassLoaderIntegrationTest extends HazelcastTestSuppo
         }
     }
 
+    // TODO Put somewhere more sensible
     /** Find & load all {@code .class} files in the scope of this test */
-    private static MapResourceClassLoader generateMapResourceClassLoaderForDirectory(Path root) throws IOException {
+    public static MapResourceClassLoader generateMapResourceClassLoaderForDirectory(Path root) throws IOException {
         try (Stream<Path> stream = Files.walk(root.resolve("usercodedeployment"))) {
             final Map<String, byte[]> classNameToContent = stream
                     .filter(path -> FilenameUtils.isExtension(path.getFileName().toString(), "class"))
@@ -546,12 +540,13 @@ public class NamespaceAwareClassLoaderIntegrationTest extends HazelcastTestSuppo
         return OsHelper.ensureUnixSeparators(classKeyName);
     }
 
-    Class<?> tryLoadClass(HazelcastInstance instance, String namespace, String className) throws Exception {
+    // TODO Put somewhere more sensible
+    public static Class<?> tryLoadClass(HazelcastInstance instance, String namespace, String className) throws ClassNotFoundException  {
         if (namespace != null) {
             NamespaceUtil.setupNamespace(getNodeEngineImpl(instance), namespace);
         }
         try {
-            return nodeClassLoader.loadClass(className);
+            return Accessors.getNode(instance).getConfigClassLoader().loadClass(className);
         } catch (ClassNotFoundException e) {
             throw new ClassNotFoundException(
                     MessageFormat.format("\"{0}\" class not found in \"{1}\" namespace", className, namespace), e);
@@ -608,12 +603,11 @@ public class NamespaceAwareClassLoaderIntegrationTest extends HazelcastTestSuppo
             config.getMapConfig(mapName).setNamespace(namespace.getName());
         }
 
-        private IMap<Object, String> createExecuteAssertOnMap(NamespaceAwareClassLoaderIntegrationTest instance,
-                HazelcastInstance hazelcastInstance)  {
-            return createExecuteAssertOnMap(namespace.getName(), mapName, instance, hazelcastInstance);
+        private IMap<Object, String> createExecuteAssertOnMap(HazelcastInstance hazelcastInstance) {
+            return createExecuteAssertOnMap(namespace.getName(), mapName, hazelcastInstance);
         }
 
-        private IMap<Object, String> createExecuteAssertOnMap(String namespace, String mapName, NamespaceAwareClassLoaderIntegrationTest instance,
+        private IMap<Object, String> createExecuteAssertOnMap(String namespace, String mapName, 
                 HazelcastInstance hazelcastInstance) {
             // Create a map
             IMap<Object, String> map = hazelcastInstance.getMap(mapName);
@@ -623,7 +617,7 @@ public class NamespaceAwareClassLoaderIntegrationTest extends HazelcastTestSuppo
                 // Execute the EntryProcessor
                 Class<? extends EntryProcessor<Object, String, String>> clazz =
                         (Class<? extends EntryProcessor<Object, String, String>>)
-                                instance.tryLoadClass(hazelcastInstance, namespace, className);
+                                tryLoadClass(hazelcastInstance, namespace, className);
                 map.executeOnKey(Void.TYPE, clazz.getDeclaredConstructor().newInstance());
             } catch (Exception e) {
                 throw new RuntimeException(e);
