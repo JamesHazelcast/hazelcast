@@ -75,7 +75,7 @@
         "message": "3 schema violations found"
       },
       {
-        "schemaLocation": "#/definitions/NamespacesConfig/properties/java-serialization-filter",
+        "schemaLocation": "#/definitions/JavaSerializationFilter",
         "pointerToViolation": "#/hazelcast/namespaces/java-serialization-filter",
         "causingExceptions": [
           {
@@ -114,7 +114,7 @@
             "message": "expected type: JSONObject, found: JSONArray"
           },
           {
-            "schemaLocation": "#/definitions/NamespacesConfig/properties/java-serialization-filter/properties/defaults-disabled",
+            "schemaLocation": "#/definitions/JavaSerializationFilter/properties/defaults-disabled",
             "pointerToViolation": "#/hazelcast/namespaces/java-serialization-filter/defaults-disabled",
             "causingExceptions": [],
             "keyword": "type",

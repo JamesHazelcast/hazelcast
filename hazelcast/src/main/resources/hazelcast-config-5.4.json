@@ -3206,6 +3206,23 @@
         ]
       }
     },
+    "JavaSerializationFilter": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Allows to configure blacklisting and whitelisting for deserialized classes when Java serialization is used.",
+      "properties": {
+        "defaults-disabled": {
+          "type": "boolean",
+          "default": false
+        },
+        "whitelist": {
+          "$ref": "#/definitions/ClassFilter"
+        },
+        "blacklist": {
+          "$ref": "#/definitions/ClassFilter"
+        }
+      }
+    },
     "Serialization": {
       "type": "object",
       "additionalProperties": false,
@@ -3302,21 +3319,8 @@
           "description": "If set to true, serialization system will check the class definitions error at the start of serialization process and throw a Serialization Exception with the error definition.s"
         },
         "java-serialization-filter": {
-          "type": "object",
-          "additionalProperties": false,
+          "$ref": "#/definitions/JavaSerializationFilter",
           "description": "Allows to configure blacklisting and whitelisting for deserialized classes when Java serialization is used.",
-          "properties": {
-            "defaults-disabled": {
-              "type": "boolean",
-              "default": false
-            },
-            "whitelist": {
-              "$ref": "#/definitions/ClassFilter"
-            },
-            "blacklist": {
-              "$ref": "#/definitions/ClassFilter"
-            }
-          }
         },
         "allow-override-default-serializers": {
           "type": "boolean",
@@ -5140,21 +5144,8 @@
           "description": "Indicates whether the namespace configuration is enabled or not."
         },
         "java-serialization-filter": {
-          "type": "object",
-          "additionalProperties": false,
+          "$ref": "#/definitions/JavaSerializationFilter",
           "description": "Allows to configure blacklisting and whitelisting for deserialized classes from Resource definitions.",
-          "properties": {
-            "defaults-disabled": {
-              "type": "boolean",
-              "default": false
-            },
-            "whitelist": {
-              "$ref": "#/definitions/ClassFilter"
-            },
-            "blacklist": {
-              "$ref": "#/definitions/ClassFilter"
-            }
-          }
         }
       },
       "additionalProperties": {
