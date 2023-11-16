@@ -217,7 +217,7 @@ public class ExecutorConfig implements IdentifiedDataSerializable, NamedConfig, 
         out.writeBoolean(statisticsEnabled);
         out.writeString(splitBrainProtectionName);
 
-        // RU_COMPAT_5_4
+        // RU_COMPAT_5_3
         if (out.getVersion().isGreaterOrEqual(V5_4)) {
             out.writeString(namespace);
         }
@@ -231,7 +231,7 @@ public class ExecutorConfig implements IdentifiedDataSerializable, NamedConfig, 
         statisticsEnabled = in.readBoolean();
         splitBrainProtectionName = in.readString();
 
-        // RU_COMPAT_5_4
+        // RU_COMPAT_5_3
         if (in.getVersion().isGreaterOrEqual(V5_4)) {
             namespace = in.readString();
         }

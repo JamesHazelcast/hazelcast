@@ -568,7 +568,7 @@ public class CacheConfig<K, V> extends AbstractCacheConfig<K, V> implements Vers
         out.writeObject(merkleTreeConfig);
         out.writeObject(dataPersistenceConfig);
 
-        // RU_COMPAT_5_4
+        // RU_COMPAT_5_3
         if (out.getVersion().isGreaterOrEqual(V5_4)) {
             out.writeString(namespace);
         }
@@ -635,7 +635,7 @@ public class CacheConfig<K, V> extends AbstractCacheConfig<K, V> implements Vers
         merkleTreeConfig = in.readObject();
         setDataPersistenceConfig(in.readObject());
 
-        // RU_COMPAT_5_4
+        // RU_COMPAT_5_3
         if (in.getVersion().isGreaterOrEqual(V5_4)) {
             namespace = in.readString();
         }

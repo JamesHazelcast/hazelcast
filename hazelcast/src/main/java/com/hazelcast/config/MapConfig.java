@@ -1064,7 +1064,7 @@ public class MapConfig implements IdentifiedDataSerializable, NamedConfig, Versi
         out.writeObject(tieredStoreConfig);
         writeNullableList(partitioningAttributeConfigs, out);
 
-        // RU_COMPAT_5_4
+        // RU_COMPAT_5_3
         if (out.getVersion().isGreaterOrEqual(Versions.V5_4)) {
             out.writeString(namespace);
         }
@@ -1102,7 +1102,7 @@ public class MapConfig implements IdentifiedDataSerializable, NamedConfig, Versi
         setTieredStoreConfig(in.readObject());
         partitioningAttributeConfigs = readNullableList(in);
 
-        // RU_COMPAT_5_4
+        // RU_COMPAT_5_3
         if (in.getVersion().isGreaterOrEqual(Versions.V5_4)) {
             namespace = in.readString();
         }

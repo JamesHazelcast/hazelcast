@@ -431,7 +431,7 @@ public class QueueConfig implements IdentifiedDataSerializable, NamedConfig, Ver
         out.writeObject(mergePolicyConfig);
         out.writeString(priorityComparatorClassName);
 
-        // RU_COMPAT_5_4
+        // RU_COMPAT_5_3
         if (out.getVersion().isGreaterOrEqual(V5_4)) {
             out.writeString(namespace);
         }
@@ -451,7 +451,7 @@ public class QueueConfig implements IdentifiedDataSerializable, NamedConfig, Ver
         mergePolicyConfig = in.readObject();
         priorityComparatorClassName = in.readString();
 
-        // RU_COMPAT_5_4
+        // RU_COMPAT_5_3
         if (in.getVersion().isGreaterOrEqual(V5_4)) {
             namespace = in.readString();
         }

@@ -257,7 +257,7 @@ public class DurableExecutorConfig implements IdentifiedDataSerializable, NamedC
         out.writeString(splitBrainProtectionName);
         out.writeBoolean(statisticsEnabled);
 
-        // RU_COMPAT_5_4
+        // RU_COMPAT_5_3
         if (out.getVersion().isGreaterOrEqual(V5_4)) {
             out.writeString(namespace);
         }
@@ -272,7 +272,7 @@ public class DurableExecutorConfig implements IdentifiedDataSerializable, NamedC
         splitBrainProtectionName = in.readString();
         statisticsEnabled = in.readBoolean();
 
-        // RU_COMPAT_5_4
+        // RU_COMPAT_5_3
         if (in.getVersion().isGreaterOrEqual(V5_4)) {
             namespace = in.readString();
         }
