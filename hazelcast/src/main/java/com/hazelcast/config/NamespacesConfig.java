@@ -34,6 +34,11 @@ public class NamespacesConfig {
         namespaceConfigs.putAll(config.getNamespaceConfigs());
     }
 
+    public NamespacesConfig(boolean enabled, Map<String, NamespaceConfig> namespaceConfigs) {
+        this.enabled = enabled;
+        this.namespaceConfigs.putAll(namespaceConfigs);
+    }
+
     public boolean isEnabled() {
         return enabled;
     }
@@ -57,7 +62,7 @@ public class NamespacesConfig {
         return this;
     }
 
-    Map<String, NamespaceConfig> getNamespaceConfigs() {
+    public Map<String, NamespaceConfig> getNamespaceConfigs() {
         return Collections.unmodifiableMap(namespaceConfigs);
     }
 

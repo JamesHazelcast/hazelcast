@@ -1275,7 +1275,7 @@ public class DynamicConfigurationAwareConfig extends Config {
     @SuppressWarnings("squid:S1185")
     @Override
     public Config setNamespacesConfig(NamespacesConfig namespacesConfig) {
-        return super.setNamespacesConfig(namespacesConfig);
+        throw new UnsupportedOperationException("Unsupported operation");
     }
 
     private DataConnectionConfig getDataConnectionConfigInternal(String name, String fallbackName) {

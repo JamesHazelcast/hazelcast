@@ -55,6 +55,11 @@ public class NamespaceConfig implements NamedConfig, IdentifiedDataSerializable 
         this.resourceDefinitions.putAll(config.resourceDefinitions);
     }
 
+    public NamespaceConfig(@Nonnull String name, @Nonnull Map<String, ResourceDefinition> resources) {
+        this.name = name;
+        this.resourceDefinitions.putAll(resources);
+    }
+
     @Override
     public NamespaceConfig setName(String name) {
         this.name = name;
@@ -95,19 +100,8 @@ public class NamespaceConfig implements NamedConfig, IdentifiedDataSerializable 
 
     // TODO this returns a Collection, but the client-protocl declares this as a List - I don't think it supports Collections -
     // https://github.com/hazelcast/hazelcast-client-protocol/issues/486
-    Collection<ResourceDefinition> getResourceConfigs() {
+    public Collection<ResourceDefinition> getResourceConfigs() {
         return Set.copyOf(resourceDefinitions.values());
-    }
-
-    /**
-     * Required for spring configuration processing.
-     * @param resourceDefinitions the resource definitions to set.
-     */
-    public void setResourceDefinitions(Map<String, ResourceDefinition> resourceDefinitions) {
-        this.resourceDefinitions.clear();
-        if (resourceDefinitions != null) {
-            this.resourceDefinitions.putAll(resourceDefinitions);
-        }
     }
 
     @Override

@@ -1187,7 +1187,7 @@ public class ClientDynamicClusterConfig extends Config {
     @Nonnull
     @Override
     public Config setNamespacesConfig(@Nonnull NamespacesConfig namespacesConfig) {
-        return super.setNamespacesConfig(namespacesConfig);
+        throw new UnsupportedOperationException(UNSUPPORTED_ERROR_MESSAGE);
     }
 
     @Override

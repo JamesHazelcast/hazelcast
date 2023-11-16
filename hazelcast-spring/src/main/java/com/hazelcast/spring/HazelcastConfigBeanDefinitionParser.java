@@ -2404,22 +2404,22 @@ public class HazelcastConfigBeanDefinitionParser extends AbstractHazelcastBeanDe
 
         private void handleNamespaces(Node node) {
             BeanDefinitionBuilder namespacesBuilder = createBeanBuilder(NamespacesConfig.class);
-            namespacesBuilder.addPropertyValue("enabled", getAttribute(node, "enabled"));
 
             if (!parseBoolean(getAttribute(node, "enabled"))) {
+                namespacesBuilder.addPropertyValue("enabled", false);
                 configBuilder.addPropertyValue("namespacesConfig", namespacesBuilder.getBeanDefinition());
                 return;
             }
 
             ManagedMap<String, BeanDefinition> namespaces = new ManagedMap<>();
             for (Node child : childElements(node)) {
-                String nodeName = cleanNodeName(child);
-                if ("namespace".equals(nodeName)) {
+                if ("namespace".equals(cleanNodeName(child))) {
                     handleNamespace(child, namespaces);
                 }
             }
 
-            namespacesBuilder.addPropertyValue("namespaceConfigs", namespaces);
+            namespacesBuilder.addConstructorArgValue(true);
+            namespacesBuilder.addConstructorArgValue(namespaces);
             configBuilder.addPropertyValue("namespacesConfig", namespacesBuilder.getBeanDefinition());
         }
 
@@ -2437,8 +2437,9 @@ public class HazelcastConfigBeanDefinitionParser extends AbstractHazelcastBeanDe
                 }
             }
 
-            namespaceConfigBuilder.addPropertyValue("resourceDefinitions", resources);
-            namespaceConfigBuilder.addPropertyValue("name", name);
+            namespaceConfigBuilder.addConstructorArgValue(name);
+            namespaceConfigBuilder.addConstructorArgValue(resources);
+
             namespaces.put(name, namespaceConfigBuilder.getBeanDefinition());
         }
 
@@ -2457,15 +2458,16 @@ public class HazelcastConfigBeanDefinitionParser extends AbstractHazelcastBeanDe
 
             resourceDefBuilder.addConstructorArgValue(resourceConfigBeanDef);
 
-            // Add to resources map
-            resources.put(resolveResourceId(resourceId, url), resourceDefBuilder.getBeanDefinition());
+            // User supplied ID may be null, in which case object construction may
+            // resolve the ID from the URL.
+            String resolvedId = resolveResourceId(resourceId, url);
+            resources.put(resolvedId, resourceDefBuilder.getBeanDefinition());
         }
 
         private URL getNamespaceResourceUrl(Node node) {
             URL url = null;
             for (Node n : childElements(node)) {
-                String nodeName = cleanNodeName(n);
-                if (matches(nodeName, "url")) {
+                if (matches(cleanNodeName(n), "url")) {
                     try {
                         url = new URI(getTextContent(n)).toURL();
                         break;

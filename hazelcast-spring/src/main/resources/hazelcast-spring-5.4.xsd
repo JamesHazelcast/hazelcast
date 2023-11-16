@@ -3029,6 +3029,8 @@
                                     maxOccurs="unbounded"/>
                         <xs:element name="sql-permission" type="instance-permission" minOccurs="0"
                                     maxOccurs="unbounded"/>
+                        <xs:element name="namespace-permission" type="instance-permission" minOccurs="0"
+                                    maxOccurs="unbounded"/>
                     </xs:choice>
                     <xs:attribute name="on-join-operation" type="permission-on-join-operation" default="RECEIVE"/>
                     <xs:attribute name="priority-grant" type="xs:boolean" default="false">

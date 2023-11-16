@@ -963,6 +963,11 @@
                             <hz:action>all</hz:action>
                         </hz:actions>
                     </hz:sql-permission>
+                    <hz:namespace-permission name="*">
+                        <hz:actions>
+                            <hz:action>all</hz:action>
+                        </hz:actions>
+                    </hz:namespace-permission>
                 </hz:client-permissions>
                 <hz:client-block-unmapped-actions>false</hz:client-block-unmapped-actions>
             </hz:security>
