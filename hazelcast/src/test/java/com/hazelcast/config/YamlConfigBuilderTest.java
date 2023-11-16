@@ -4658,6 +4658,16 @@ public class YamlConfigBuilderTest extends AbstractConfigBuilderTest {
         String yamlTestString = "hazelcast:\n"
                 + "  namespaces:\n"
                 + "    enabled: true\n"
+                + "    java-serialization-filter:\n"
+                + "      defaults-disabled: false\n"
+                + "      blacklist:\n"
+                + "        class:\n"
+                + "          - com.acme.app.BeanComparator\n"
+                + "      whitelist:\n"
+                + "        package:\n"
+                + "          - com.acme.app\n"
+                + "        prefix:\n"
+                + "          - com.hazelcast.\n"
                 + "    ns1:\n"
                 + "      - jar:\n"
                 + "          id: \"jarId\"\n"
@@ -4669,7 +4679,6 @@ public class YamlConfigBuilderTest extends AbstractConfigBuilderTest {
                 + "      - jar:\n"
                 + "          id: \"jarId2\"\n"
                 + "          url: " + tempJar.toURI().toURL() + "\n";
-
 
         final NamespacesConfig namespacesConfig = buildConfig(yamlTestString).getNamespacesConfig();
         assertThat(namespacesConfig.isEnabled()).isTrue();
@@ -4709,6 +4718,15 @@ public class YamlConfigBuilderTest extends AbstractConfigBuilderTest {
         assertEquals(ResourceType.JAR, jarId2Resource.get().type());
         //check the bytes[] are equal
         assertArrayEquals(getTestFileBytes(tempJar), jarId2Resource.get().payload());
+
+        // Validate filtering config
+        assertNotNull(namespacesConfig.getJavaSerializationFilterConfig());
+        JavaSerializationFilterConfig filterConfig = namespacesConfig.getJavaSerializationFilterConfig();
+        assertTrue(filterConfig.getWhitelist().isListed("com.acme.app.FakeClass"));
+        assertTrue(filterConfig.getWhitelist().isListed("com.hazelcast.fake.place.MagicClass"));
+        assertFalse(filterConfig.getWhitelist().isListed("not.in.the.whitelist.ClassName"));
+        assertTrue(filterConfig.getBlacklist().isListed("com.acme.app.BeanComparator"));
+        assertFalse(filterConfig.getBlacklist().isListed("not.in.the.blacklist.ClassName"));
     }
 
     @Override

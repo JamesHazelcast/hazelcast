@@ -16,6 +16,7 @@
 
 package com.hazelcast.config;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
@@ -25,13 +26,15 @@ import java.util.concurrent.ConcurrentHashMap;
 public class NamespacesConfig {
     private boolean enabled;
     private final Map<String, NamespaceConfig> namespaceConfigs = new ConcurrentHashMap<>();
+    private @Nullable JavaSerializationFilterConfig javaSerializationFilterConfig;
 
     public NamespacesConfig() {
     }
 
     public NamespacesConfig(NamespacesConfig config) {
         this.enabled = config.enabled;
-        namespaceConfigs.putAll(config.getNamespaceConfigs());
+        this.namespaceConfigs.putAll(config.namespaceConfigs);
+        this.javaSerializationFilterConfig = config.javaSerializationFilterConfig;
     }
 
     public NamespacesConfig(boolean enabled, Map<String, NamespaceConfig> namespaceConfigs) {
@@ -66,10 +69,22 @@ public class NamespacesConfig {
         return Collections.unmodifiableMap(namespaceConfigs);
     }
 
+    @Nullable
+    public JavaSerializationFilterConfig getJavaSerializationFilterConfig() {
+        return javaSerializationFilterConfig;
+    }
+
+    public void setJavaSerializationFilterConfig(@Nullable JavaSerializationFilterConfig javaSerializationFilterConfig) {
+        this.javaSerializationFilterConfig = javaSerializationFilterConfig;
+    }
+
     @Override
     public String toString() {
-        return "NamespacesConfig{" + "enabled=" + enabled + ", "
-                + "namespaceConfigs=" + namespaceConfigs + '}';
+        return "NamespacesConfig{"
+                + "enabled=" + enabled
+                + ", namespaceConfigs=" + namespaceConfigs + '}'
+                + ", javaSerializationFilterConfig=" + javaSerializationFilterConfig
+                + '}';
     }
 
     @Override
@@ -81,11 +96,12 @@ public class NamespacesConfig {
             return false;
         }
         NamespacesConfig that = (NamespacesConfig) o;
-        return enabled == that.enabled && Objects.equals(namespaceConfigs, that.namespaceConfigs);
+        return enabled == that.enabled && Objects.equals(namespaceConfigs, that.namespaceConfigs)
+                && Objects.equals(javaSerializationFilterConfig, that.javaSerializationFilterConfig);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(enabled, namespaceConfigs);
+        return Objects.hash(enabled, namespaceConfigs, javaSerializationFilterConfig);
     }
 }

@@ -1552,6 +1552,10 @@ public class ConfigXmlGeneratorTest extends HazelcastTestSupport {
         NamespacesConfig namespacesConfig = new NamespacesConfig();
         namespacesConfig.addNamespaceConfig(namespaceConfig);
         namespacesConfig.setEnabled(true);
+        JavaSerializationFilterConfig filterConfig = new JavaSerializationFilterConfig();
+        filterConfig.getWhitelist().addClasses("com.foo.bar.MyClass");
+        filterConfig.getBlacklist().addPackages("magic.collection.of.code");
+        namespacesConfig.setJavaSerializationFilterConfig(filterConfig);
         expectedConfig.setNamespacesConfig(namespacesConfig);
 
         Config actualConfig = getNewConfigViaXMLGenerator(expectedConfig);

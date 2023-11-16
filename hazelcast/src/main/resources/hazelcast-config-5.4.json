@@ -3302,21 +3302,8 @@
           "description": "If set to true, serialization system will check the class definitions error at the start of serialization process and throw a Serialization Exception with the error definition.s"
         },
         "java-serialization-filter": {
-          "type": "object",
-          "additionalProperties": false,
-          "description": "Allows to configure blacklisting and whitelisting for deserialized classes when Java serialization is used.",
-          "properties": {
-            "defaults-disabled": {
-              "type": "boolean",
-              "default": false
-            },
-            "whitelist": {
-              "$ref": "#/definitions/ClassFilter"
-            },
-            "blacklist": {
-              "$ref": "#/definitions/ClassFilter"
-            }
-          }
+          "$ref": "#/definitions/JavaSerializationFilter",
+          "description": "Allows to configure blacklisting and whitelisting for deserialized classes when Java serialization is used."
         },
         "allow-override-default-serializers": {
           "type": "boolean",
@@ -3396,6 +3383,22 @@
           "items": {
             "type": "string"
           }
+        }
+      }
+    },
+    "JavaSerializationFilter": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "defaults-disabled": {
+          "type": "boolean",
+          "default": false
+        },
+        "whitelist": {
+          "$ref": "#/definitions/ClassFilter"
+        },
+        "blacklist": {
+          "$ref": "#/definitions/ClassFilter"
         }
       }
     },
@@ -5138,6 +5141,10 @@
         "enabled": {
           "type": "boolean",
           "description": "Indicates whether the namespace configuration is enabled or not."
+        },
+        "java-serialization-filter": {
+          "$ref": "#/definitions/JavaSerializationFilter",
+          "description": "Allows to configure blacklisting and whitelisting for deserialized classes from Resource definitions."
         }
       },
       "additionalProperties": {

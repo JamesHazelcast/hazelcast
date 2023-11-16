@@ -315,7 +315,9 @@ public class YamlMemberDomConfigProcessor extends MemberDomConfigProcessor {
     protected void handleNamespacesNode(Node node) {
         for (Node n : childElements(node)) {
             String nodeName = cleanNodeName(n);
-            if (!matches("enabled", nodeName)) {
+            if (matches(nodeName, "java-serialization-filter")) {
+                fillJavaSerializationFilter(n, config.getNamespacesConfig());
+            } else if (!matches("enabled", nodeName)) {
                 NamespaceConfig ns = new NamespaceConfig(nodeName);
                 //get list of resources
                 for (Node subChild : childElements(n)) {

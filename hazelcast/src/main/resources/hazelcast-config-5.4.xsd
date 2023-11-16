@@ -6298,6 +6298,7 @@
             </xs:documentation>
         </xs:annotation>
         <xs:sequence>
+            <xs:element name="java-serialization-filter" type="java-serialization-filter" minOccurs="0"/>
             <xs:element name="namespace" type="namespace-type" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
         <xs:attribute name="enabled" type="xs:boolean" use="required"/>

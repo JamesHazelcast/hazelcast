@@ -2697,6 +2697,8 @@ public class MemberDomConfigProcessor extends AbstractDomConfigProcessor {
                 NamespaceConfig nsConfig = new NamespaceConfig(name);
                 handleResources(n, nsConfig);
                 config.getNamespacesConfig().addNamespaceConfig(nsConfig);
+            } else if (matches(nodeName, "java-serialization-filter")) {
+                fillJavaSerializationFilter(n, config.getNamespacesConfig());
             }
         }
     }

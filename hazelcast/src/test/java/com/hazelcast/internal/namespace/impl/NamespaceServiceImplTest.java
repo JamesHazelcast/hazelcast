@@ -19,6 +19,7 @@ package com.hazelcast.internal.namespace.impl;
 import com.google.common.io.Files;
 import com.google.common.net.UrlEscapers;
 import com.hazelcast.config.Config;
+import com.hazelcast.config.JavaSerializationFilterConfig;
 import com.hazelcast.config.MapConfig;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
@@ -50,8 +51,10 @@ import java.util.stream.Stream;
 import static com.hazelcast.test.Accessors.getNodeEngineImpl;
 import static com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig;
 import static com.hazelcast.test.UserCodeUtil.fileRelativeToBinariesFolder;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Category(NamespaceTest.class)
@@ -77,7 +80,7 @@ public class NamespaceServiceImplTest {
     @MethodSource
     void testLoadClasses(Collection<ResourceDefinition> resources, String... expectedClasses) throws Exception {
         NamespaceServiceImpl namespaceService =
-                new NamespaceServiceImpl(NamespaceServiceImplTest.class.getClassLoader(), Collections.emptyMap(), new Config());
+                new NamespaceServiceImpl(NamespaceServiceImplTest.class.getClassLoader(), Collections.emptyMap(), null);
 
         namespaceService.addNamespace("ns1", resources);
         ClassLoader classLoader = namespaceService.namespaceToClassLoader.get("ns1");
@@ -85,13 +88,11 @@ public class NamespaceServiceImplTest {
         for (String expectedClass : expectedClasses) {
             Class<?> clazz = classLoader.loadClass(expectedClass);
 
-            Constructor<?> constructor = clazz.getDeclaredConstructors()[0];
-
             // Workaround the fact that the "Car" class doesn't have a default constructor
+            Constructor<?> constructor = clazz.getDeclaredConstructors()[0];
             Object[] parameters = new Object[constructor.getParameterCount()];
 
-            // TODO Assert does not throw
-            constructor.newInstance(parameters);
+            assertDoesNotThrow(() -> constructor.newInstance(parameters));
         }
     }
 
@@ -121,21 +122,26 @@ public class NamespaceServiceImplTest {
     // TODO This test is hacky and probably does not belong here - we should refactor/move it eventually
     @Test
     void testXmlConfigLoadingForNamespacesWithIMap() {
-        Path pathToJar = Paths.get("src", "test", "class", "usercodedeployment", "ChildParent.jar");
         String stringPath =
-                OsHelper.ensureUnixSeparators(UrlEscapers.urlFragmentEscaper().escape(pathToJar.toAbsolutePath().toString()));
+                getCorrectedPathString(Paths.get("src", "test", "class", "usercodedeployment", "ChildParent.jar"));
 
-        stringPath = stringPath.replace("\\", "/");
-        String xmlPayload =
-                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + "<hazelcast xmlns=\"http://www.hazelcast.com/schema/config\"\n"
-                        + "           xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n"
-                        + "           xsi:schemaLocation=\"http://www.hazelcast.com/schema/config\n"
-                        + "           http://www.hazelcast.com/schema/config/hazelcast-config-5.4.xsd\">\n" + "\n"
-                        + "    <cluster-name>cluster</cluster-name>\n\n" + "    <namespaces enabled=\"true\">\n"
-                        + "        <namespace name=\"myNamespace\">\n" + "          <jar>\n" + "              <url>file:///"
-                        + stringPath + "</url>\n" + "          </jar>\n" + "      </namespace>\n" + "    </namespaces>\n\n"
-                        + "    <map name=\"myMap\">\n" + "        <namespace>myNamespace</namespace>\n" + "    </map>\n"
-                        + "</hazelcast>\n" + "\n";
+        String xmlPayload = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+                + "<hazelcast xmlns=\"http://www.hazelcast.com/schema/config\"\n"
+                + "           xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n"
+                + "           xsi:schemaLocation=\"http://www.hazelcast.com/schema/config\n"
+                + "           http://www.hazelcast.com/schema/config/hazelcast-config-5.4.xsd\">\n" + "\n"
+                + "    <cluster-name>cluster</cluster-name>\n\n"
+                + "    <namespaces enabled=\"true\">\n"
+                + "      <namespace name=\"myNamespace\">\n"
+                + "          <jar>\n"
+                + "              <url>file:///" + stringPath + "</url>\n"
+                + "          </jar>\n"
+                + "      </namespace>\n"
+                + "    </namespaces>\n\n"
+                + "    <map name=\"myMap\">\n"
+                + "        <namespace>myNamespace</namespace>\n"
+                + "    </map>\n"
+                + "</hazelcast>\n" + "\n";
 
         HazelcastInstance instance = Hazelcast.newHazelcastInstance(Config.loadFromString(xmlPayload));
         try {
@@ -150,6 +156,108 @@ public class NamespaceServiceImplTest {
         } finally {
             instance.shutdown();
         }
+    }
+
+    // TODO These tests are hacky and probably does not belong here (should be programmatic even, since we have
+    //      coverage in XMLConfigBuilderTest & YamlConfigBuilderTest?) We should refactor/move it eventually
+    @Test
+    void testXmlConfigDefinedFiltering_ClassBlacklist() {
+        assertThrows(SecurityException.class, () -> testXmlConfigDefinedFiltering(
+                "<class>usercodedeployment.ParentClass</class>", "<package>com.foo.bar</package>"));
+    }
+
+    @Test
+    void testXmlConfigDefinedFiltering_PackageBlacklist() {
+        assertThrows(SecurityException.class, () -> testXmlConfigDefinedFiltering(
+                "<package>usercodedeployment</package>", "<package>com.foo.bar</package>"));
+    }
+
+    @Test
+    void testXmlConfigDefinedFiltering_PrefixBlacklist() {
+        assertThrows(SecurityException.class, () -> testXmlConfigDefinedFiltering(
+                "<package>usercodedeployment.Child</package>", "<package>com.foo.bar</package>"));
+    }
+
+    @Test
+    void testXmlConfigDefinedFiltering_PrefixBlacklist_NotApplicable() {
+        assertDoesNotThrow(() -> testXmlConfigDefinedFiltering(
+                "<package>com.foo.bar</package>", null));
+    }
+
+    @Test
+    void testXmlConfigDefinedFiltering_ClassWhitelist() {
+        assertDoesNotThrow(() -> testXmlConfigDefinedFiltering(
+                "<package>com.foo.bar</package>", "<class>usercodedeployment.ParentClass</class>\n"
+                        + "<class>usercodedeployment.ChildClass</class>"));
+    }
+
+    @Test
+    void testXmlConfigDefinedFiltering_PackageWhitelist() {
+        assertDoesNotThrow(() -> testXmlConfigDefinedFiltering(
+                "<package>com.foo.bar</package>", "<package>usercodedeployment</package>"));
+    }
+
+    @Test
+    void testXmlConfigDefinedFiltering_PrefixWhitelist_NotMatching() {
+        assertThrows(SecurityException.class, () -> testXmlConfigDefinedFiltering(
+                null, "<package>com.foo.bar</package>"));
+    }
+
+    @Test
+    void testXmlConfigDefinedFiltering_PrefixWhitelist() {
+        assertDoesNotThrow(() -> testXmlConfigDefinedFiltering(
+                "<package>com.foo.bar</package>", "<prefix>usercodedeployment.</prefix>"));
+    }
+
+    @Test
+    void testXmlConfigDefinedFiltering_NoneDefined() {
+        assertDoesNotThrow(() -> testXmlConfigDefinedFiltering(
+                null, null));
+    }
+
+    private void testXmlConfigDefinedFiltering(String blacklistLine, String whitelistLine) {
+        String stringPath =
+                getCorrectedPathString(Paths.get("src", "test", "class", "usercodedeployment", "ChildParent.jar"));
+
+        String xmlPayload = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+                + "<hazelcast xmlns=\"http://www.hazelcast.com/schema/config\"\n"
+                + "           xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n"
+                + "           xsi:schemaLocation=\"http://www.hazelcast.com/schema/config\n"
+                + "           http://www.hazelcast.com/schema/config/hazelcast-config-5.4.xsd\">\n" + "\n"
+                + "    <cluster-name>cluster</cluster-name>\n\n"
+                + "    <namespaces enabled=\"true\">\n"
+                + "      <java-serialization-filter defaults-disabled=\"true\">\n"
+                + (blacklistLine == null ? ""
+                : "          <blacklist>\n"
+                + "              " + blacklistLine + "\n"
+                + "          </blacklist>\n")
+                + (whitelistLine == null ? ""
+                : "          <whitelist>\n"
+                + "              " + whitelistLine + "\n"
+                + "          </whitelist>\n")
+                + "      </java-serialization-filter>"
+                + "      <namespace name=\"myNamespace\">\n"
+                + "          <jar>\n"
+                + "              <url>file:///" + stringPath + "</url>\n"
+                + "          </jar>\n"
+                + "      </namespace>\n"
+                + "    </namespaces>\n"
+                + "</hazelcast>\n" + "\n";
+
+        // Start an instance & confirm that our namespaces were loaded
+        HazelcastInstance instance = Hazelcast.newHazelcastInstance(Config.loadFromString(xmlPayload));
+        try {
+            NodeEngineImpl nodeEngine = getNodeEngineImpl(instance);
+            NamespaceService service = nodeEngine.getNamespaceService();
+            assertTrue(service.isEnabled());
+            assertTrue(service.hasNamespace("myNamespace"));
+        } finally {
+            instance.shutdown();
+        }
+    }
+
+    private String getCorrectedPathString(Path path) {
+        return OsHelper.ensureUnixSeparators(UrlEscapers.urlFragmentEscaper().escape(path.toAbsolutePath().toString()));
     }
 
     // "No-op" implementation test

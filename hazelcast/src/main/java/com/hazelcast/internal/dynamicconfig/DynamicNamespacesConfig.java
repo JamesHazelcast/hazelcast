@@ -16,9 +16,11 @@
 
 package com.hazelcast.internal.dynamicconfig;
 
+import com.hazelcast.config.JavaSerializationFilterConfig;
 import com.hazelcast.config.NamespaceConfig;
 import com.hazelcast.config.NamespacesConfig;
 
+import javax.annotation.Nullable;
 import java.util.function.Supplier;
 
 /** {@link NamespacesConfig} wrapper that supports dynamically updating */
@@ -44,6 +46,11 @@ public class DynamicNamespacesConfig extends NamespacesConfig {
         super.removeNamespaceConfig(namespaceConfig);
         configurationServiceAccessor.get().unbroadcastConfig(namespaceConfig);
         return this;
+    }
+
+    @Override
+    public void setJavaSerializationFilterConfig(@Nullable JavaSerializationFilterConfig javaSerializationFilterConfig) {
+        throw new UnsupportedOperationException("Cannot define JavaSerializationFilterConfig for NamespacesConfig at runtime.");
     }
 
     @Override

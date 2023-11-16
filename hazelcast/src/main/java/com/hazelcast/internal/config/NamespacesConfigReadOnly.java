@@ -16,8 +16,11 @@
 
 package com.hazelcast.internal.config;
 
+import com.hazelcast.config.JavaSerializationFilterConfig;
 import com.hazelcast.config.NamespaceConfig;
 import com.hazelcast.config.NamespacesConfig;
+
+import javax.annotation.Nullable;
 
 public class NamespacesConfigReadOnly extends NamespacesConfig {
 
@@ -37,6 +40,11 @@ public class NamespacesConfigReadOnly extends NamespacesConfig {
 
     @Override
     public NamespacesConfig removeNamespaceConfig(NamespaceConfig namespaceConfig) {
+        throw new UnsupportedOperationException("This config is read-only name-spaces");
+    }
+
+    @Override
+    public void setJavaSerializationFilterConfig(@Nullable JavaSerializationFilterConfig javaSerializationFilterConfig) {
         throw new UnsupportedOperationException("This config is read-only name-spaces");
     }
 }

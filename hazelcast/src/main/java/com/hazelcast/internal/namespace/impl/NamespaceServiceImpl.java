@@ -57,9 +57,8 @@ public final class NamespaceServiceImpl implements NamespaceService {
     private boolean hasDefaultNamespace;
 
     public NamespaceServiceImpl(ClassLoader configClassLoader, Map<String, NamespaceConfig> nsConfigs,
-                                Config nodeConfig) {
+                                JavaSerializationFilterConfig filterConfig) {
         this.configClassLoader = configClassLoader;
-        JavaSerializationFilterConfig filterConfig = nodeConfig.getSerializationConfig().getJavaSerializationFilterConfig();
         if (filterConfig != null) {
             this.classFilter = new SerializationClassNameFilter(filterConfig);
         } else {

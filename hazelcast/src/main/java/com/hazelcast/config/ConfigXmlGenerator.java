@@ -1258,6 +1258,14 @@ public class ConfigXmlGenerator {
             return;
         }
         gen.open("namespaces", "enabled", namespacesConfig.isEnabled());
+        JavaSerializationFilterConfig filterConfig = namespacesConfig.getJavaSerializationFilterConfig();
+        if (filterConfig != null) {
+            gen.open("java-serialization-filter", "defaults-disabled", filterConfig.isDefaultsDisabled());
+            appendFilterList(gen, "blacklist", filterConfig.getBlacklist());
+            appendFilterList(gen, "whitelist", filterConfig.getWhitelist());
+            gen.close();
+        }
+
         Map<String, NamespaceConfig> namespaces = namespacesConfig.getNamespaceConfigs();
         for (Map.Entry<String, NamespaceConfig> entry : namespaces.entrySet()) {
             NamespaceConfig namespaceConfig = entry.getValue();

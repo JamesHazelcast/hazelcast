@@ -4724,7 +4724,6 @@ public class XMLConfigBuilderTest extends AbstractConfigBuilderTest {
 
     @Override
     public void testNamespaceConfigs() throws IOException {
-
         File tempJar = tempFolder.newFile("tempJar.jar");
         try (FileOutputStream out = new FileOutputStream(tempJar)) {
             out.write(new byte[]{0x50, 0x4B, 0x03, 0x04});
@@ -4733,19 +4732,28 @@ public class XMLConfigBuilderTest extends AbstractConfigBuilderTest {
 
         String xml = HAZELCAST_START_TAG
                 + "<namespaces enabled=\"true\">"
-                + "     <namespace name=\"ns1\">"
-                + "         <jar id=\"jarId\">"
-                + "             <url>" + tempJar.toURI().toURL() + "</url>"
-                + "         </jar>"
-                + "         <jars-in-zip id=\"zipId\">"
-                + "             <url>" + tempJarZip.toURI().toURL() + "</url>"
-                + "         </jars-in-zip>"
-                + "     </namespace>"
-                + "     <namespace name=\"ns2\">"
-                + "         <jar id=\"jarId2\">"
-                + "             <url>" + tempJar.toURI().toURL() + "</url>"
-                + "         </jar>"
-                + "     </namespace>"
+                + "    <java-serialization-filter defaults-disabled=\"true\">\n"
+                + "        <blacklist>\n"
+                + "            <class>com.acme.app.BeanComparator</class>\n"
+                + "        </blacklist>\n"
+                + "        <whitelist>\n"
+                + "            <package>com.acme.app</package>\n"
+                + "            <prefix>com.hazelcast.</prefix>\n"
+                + "        </whitelist>\n"
+                + "    </java-serialization-filter>"
+                + "    <namespace name=\"ns1\">"
+                + "        <jar id=\"jarId\">"
+                + "            <url>" + tempJar.toURI().toURL() + "</url>"
+                + "        </jar>"
+                + "        <jars-in-zip id=\"zipId\">"
+                + "            <url>" + tempJarZip.toURI().toURL() + "</url>"
+                + "        </jars-in-zip>"
+                + "    </namespace>"
+                + "    <namespace name=\"ns2\">"
+                + "        <jar id=\"jarId2\">"
+                + "            <url>" + tempJar.toURI().toURL() + "</url>"
+                + "        </jar>"
+                + "    </namespace>"
                 + "</namespaces>"
                 + HAZELCAST_END_TAG;
 
@@ -4788,6 +4796,15 @@ public class XMLConfigBuilderTest extends AbstractConfigBuilderTest {
         assertEquals(ResourceType.JAR, jarId2Resource.get().type());
         //check the bytes[] are equal
         assertArrayEquals(getTestFileBytes(tempJar), jarId2Resource.get().payload());
+
+        // Validate filtering config
+        assertNotNull(namespacesConfig.getJavaSerializationFilterConfig());
+        JavaSerializationFilterConfig filterConfig = namespacesConfig.getJavaSerializationFilterConfig();
+        assertTrue(filterConfig.getWhitelist().isListed("com.acme.app.FakeClass"));
+        assertTrue(filterConfig.getWhitelist().isListed("com.hazelcast.fake.place.MagicClass"));
+        assertFalse(filterConfig.getWhitelist().isListed("not.in.the.whitelist.ClassName"));
+        assertTrue(filterConfig.getBlacklist().isListed("com.acme.app.BeanComparator"));
+        assertFalse(filterConfig.getBlacklist().isListed("not.in.the.blacklist.ClassName"));
     }
 
     @Override
