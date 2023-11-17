@@ -151,8 +151,8 @@ public abstract class UCDTest extends HazelcastTestSupport {
                 .addNamespaceConfig(namespaceConfig);
     }
 
-    protected Object getClassInstance(String clazz) throws ReflectiveOperationException {
-        return NamespaceAwareClassLoaderIntegrationTest.tryLoadClass(member, getNamespaceName(), clazz).getDeclaredConstructor()
+    protected Object getClassInstance() throws ReflectiveOperationException {
+        return NamespaceAwareClassLoaderIntegrationTest.tryLoadClass(member, getNamespaceName(), getUserDefinedClassNames()[0]).getDeclaredConstructor()
                 .newInstance();
     }
 

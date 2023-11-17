@@ -14,25 +14,25 @@
  * limitations under the License.
  */
 
-package com.hazelcast.internal.namespace.ringbuffer;
+package com.hazelcast.internal.namespace.imap;
 
-import com.hazelcast.core.IFunction;
+import com.hazelcast.map.EntryProcessor;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class RingbufferIFunctionUCDTest extends RingbufferUCDTest {
+public class IMapEntryProcessorUCDTest extends IMapUCDTest {
     @Test
     public void test() throws Exception {
-        ringBuffer.add(Byte.MIN_VALUE);
+        Object KEY = 1;
 
-        assertEquals(1,
-                ringBuffer.readManyAsync(ringBuffer.headSequence(), 0, 1, (IFunction<Object, Boolean>) getClassInstance())
-                        .toCompletableFuture().get().size());
+        map.put(KEY, 1);
+
+        assertEquals(Integer.valueOf(2), map.executeOnKey(KEY, (EntryProcessor<Object, Object, Integer>) getClassInstance()));
     }
 
     @Override
     protected String[] getUserDefinedClassNames() {
-        return new String[] {"usercodedeployment.AcceptAllIFunction"};
+        return new String[] {"usercodedeployment.IncrementingEntryProcessor"};
     }
 }
