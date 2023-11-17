@@ -607,7 +607,7 @@ public class NamespaceAwareClassLoaderIntegrationTest extends HazelcastTestSuppo
             return createExecuteAssertOnMap(namespace.getName(), mapName, hazelcastInstance);
         }
 
-        private IMap<Object, String> createExecuteAssertOnMap(String namespace, String mapName, 
+        private IMap<Object, String> createExecuteAssertOnMap(String namespace, String mapName,
                 HazelcastInstance hazelcastInstance) {
             // Create a map
             IMap<Object, String> map = hazelcastInstance.getMap(mapName);

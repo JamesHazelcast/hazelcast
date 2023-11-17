@@ -19,7 +19,6 @@ package com.hazelcast.internal.namespace.impl;
 import com.google.common.io.Files;
 import com.google.common.net.UrlEscapers;
 import com.hazelcast.config.Config;
-import com.hazelcast.config.JavaSerializationFilterConfig;
 import com.hazelcast.config.MapConfig;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
