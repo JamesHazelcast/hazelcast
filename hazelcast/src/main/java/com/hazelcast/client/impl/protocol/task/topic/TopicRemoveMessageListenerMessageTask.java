@@ -23,10 +23,13 @@ import com.hazelcast.instance.impl.Node;
 import com.hazelcast.internal.nio.Connection;
 import com.hazelcast.security.SecurityInterceptorConstants;
 import com.hazelcast.security.permission.ActionConstants;
+import com.hazelcast.security.permission.NamespacePermission;
 import com.hazelcast.security.permission.TopicPermission;
 import com.hazelcast.topic.impl.TopicService;
 
 import java.security.Permission;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.UUID;
 import java.util.concurrent.Future;
 
@@ -66,7 +69,21 @@ public class TopicRemoveMessageListenerMessageTask
 
     @Override
     public Permission getRequiredPermission() {
-        return new TopicPermission(parameters.name, ActionConstants.ACTION_LISTEN);
+        return null;
+    }
+
+    @Override
+    public Permission[] getRequiredPermissions() {
+        Collection<Permission> permissions = new ArrayList<>();
+        permissions.add(new TopicPermission(getDistributedObjectName(), ActionConstants.ACTION_LISTEN));
+
+        String namespace = TopicService.getNamespace(nodeEngine, getDistributedObjectName());
+
+        if (namespace != null) {
+            permissions.add(new NamespacePermission(namespace, ActionConstants.ACTION_USE));
+        }
+
+        return permissions.toArray(Permission[]::new);
     }
 
     @Override
