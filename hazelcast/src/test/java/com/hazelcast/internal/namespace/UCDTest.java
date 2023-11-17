@@ -137,18 +137,23 @@ public abstract class UCDTest extends HazelcastTestSupport {
         testHazelcastFactory.shutdownAll();
     }
 
-    protected abstract String getUserDefinedClassName();
+    // TODO Should this be a Collection?
+    protected abstract String[] getUserDefinedClassNames();
 
     protected abstract void mutateConfig(Config config);
 
     private void registerClass(Config config) throws ClassNotFoundException {
+        for(String clazz : getUserDefinedClassNames()) {
+            namespaceConfig.addClass(mapResourceClassLoader.loadClass(clazz));
+        }
+        
         config.getNamespacesConfig()
-                .addNamespaceConfig(namespaceConfig.addClass(mapResourceClassLoader.loadClass(getUserDefinedClassName())));
+                .addNamespaceConfig(namespaceConfig);
     }
 
-    protected Object getClassInstance() throws ReflectiveOperationException {
-        return NamespaceAwareClassLoaderIntegrationTest.tryLoadClass(member, getNamespaceName(), getUserDefinedClassName())
-                .getDeclaredConstructor().newInstance();
+    protected Object getClassInstance(String clazz) throws ReflectiveOperationException {
+        return NamespaceAwareClassLoaderIntegrationTest.tryLoadClass(member, getNamespaceName(), clazz).getDeclaredConstructor()
+                .newInstance();
     }
 
     protected String getNamespaceName() {

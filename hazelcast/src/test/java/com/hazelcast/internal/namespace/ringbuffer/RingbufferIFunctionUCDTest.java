@@ -27,12 +27,14 @@ public class RingbufferIFunctionUCDTest extends RingbufferUCDTest {
         ringBuffer.add(Byte.MIN_VALUE);
 
         assertEquals(1,
-                ringBuffer.readManyAsync(ringBuffer.headSequence(), 0, 1, (IFunction<Object, Boolean>) getClassInstance())
+                ringBuffer
+                        .readManyAsync(ringBuffer.headSequence(), 0, 1,
+                                (IFunction<Object, Boolean>) getClassInstance(getUserDefinedClassNames()[0]))
                         .toCompletableFuture().get().size());
     }
 
     @Override
-    protected String getUserDefinedClassName() {
-        return "usercodedeployment.AcceptAllIFunction";
+    protected String[] getUserDefinedClassNames() {
+        return new String[] {"usercodedeployment.AcceptAllIFunction"};
     }
 }

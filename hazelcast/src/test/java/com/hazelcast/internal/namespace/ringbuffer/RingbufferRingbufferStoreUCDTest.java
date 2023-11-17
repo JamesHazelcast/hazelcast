@@ -29,13 +29,13 @@ public class RingbufferRingbufferStoreUCDTest extends RingbufferUCDTest {
     }
 
     @Override
-    protected String getUserDefinedClassName() {
-        return "usercodedeployment.LargeSequenceRingBufferStore";
+    protected String[] getUserDefinedClassNames() {
+        return new String[] {"usercodedeployment.LargeSequenceRingBufferStore"};
     }
 
     @Override
     protected void mutateConfig(Config config) {
-        ringBufferConfig.setRingbufferStoreConfig(new RingbufferStoreConfig().setClassName(getUserDefinedClassName()));
+        ringBufferConfig.setRingbufferStoreConfig(new RingbufferStoreConfig().setClassName(getUserDefinedClassNames()[0]));
 
         super.mutateConfig(config);
     }
