@@ -21,7 +21,6 @@ import com.hazelcast.jet.impl.deployment.MapResourceClassLoader;
 import com.hazelcast.logging.ILogger;
 import com.hazelcast.logging.Logger;
 
-import java.io.IOException;
 import java.lang.reflect.Method;
 import java.sql.Driver;
 import java.sql.DriverManager;
