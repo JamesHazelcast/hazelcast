@@ -17,29 +17,53 @@
 package com.hazelcast.internal.namespace.ringbuffer;
 
 import com.hazelcast.config.RingbufferConfig;
+import com.hazelcast.config.RingbufferStoreConfig;
 import com.hazelcast.core.IFunction;
 import com.hazelcast.internal.namespace.UCDTest;
 import com.hazelcast.ringbuffer.Ringbuffer;
+import org.junit.Before;
 import org.junit.Test;
+
+import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;
 
-public class RingBufferUCDTest extends UCDTest {
-    @Test
-    public void testIFunction() throws Exception {
-        RingbufferConfig ringBufferConfig = instance.getConfig().getRingbufferConfig(randomName());
+public class RingbufferUCDTest extends UCDTest {
+    private RingbufferConfig ringBufferConfig;
+    private Ringbuffer<Object> ringBuffer;
+
+    @Override
+    @Before
+    public void setUp() throws IOException {
+        super.setUp();
+
+        ringBufferConfig = instance.getConfig().getRingbufferConfig(randomName());
         ringBufferConfig.setNamespace(namespaceConfig.getName());
 
+        ringBuffer = instance.getRingbuffer(ringBufferConfig.getName());
+    }
+
+    @Test
+    public void testIFunction() throws Exception {
         String clazz = "usercodedeployment.AcceptAllIFunction";
 
         registerClass(clazz);
 
-        Ringbuffer<Byte> ringBuffer = instance.getRingbuffer(ringBufferConfig.getName());
-
         ringBuffer.add(Byte.MIN_VALUE);
 
         assertEquals(1,
-                ringBuffer.readManyAsync(ringBuffer.headSequence(), 0, 1, (IFunction<Byte, Boolean>) getClassInstance(clazz))
+                ringBuffer.readManyAsync(ringBuffer.headSequence(), 0, 1, (IFunction<Object, Boolean>) getClassInstance(clazz))
                         .toCompletableFuture().get().size());
+    }
+
+    @Test
+    public void testRingBufferStore() throws Exception {
+        String clazz = "usercodedeployment.LargeSequenceRingBufferStore";
+
+        ringBufferConfig.setRingbufferStoreConfig(new RingbufferStoreConfig().setClassName(clazz));
+
+        registerClass(clazz);
+
+        assertEquals(Long.MAX_VALUE, ringBuffer.tailSequence());
     }
 }
