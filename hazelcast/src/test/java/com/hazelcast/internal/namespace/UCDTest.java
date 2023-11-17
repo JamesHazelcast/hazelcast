@@ -143,17 +143,16 @@ public abstract class UCDTest extends HazelcastTestSupport {
     protected abstract void mutateConfig(Config config);
 
     private void registerClass(Config config) throws ClassNotFoundException {
-        for(String clazz : getUserDefinedClassNames()) {
+        for (String clazz : getUserDefinedClassNames()) {
             namespaceConfig.addClass(mapResourceClassLoader.loadClass(clazz));
         }
-        
-        config.getNamespacesConfig()
-                .addNamespaceConfig(namespaceConfig);
+
+        config.getNamespacesConfig().addNamespaceConfig(namespaceConfig);
     }
 
     protected Object getClassInstance() throws ReflectiveOperationException {
-        return NamespaceAwareClassLoaderIntegrationTest.tryLoadClass(member, getNamespaceName(), getUserDefinedClassNames()[0]).getDeclaredConstructor()
-                .newInstance();
+        return NamespaceAwareClassLoaderIntegrationTest.tryLoadClass(member, getNamespaceName(), getUserDefinedClassNames()[0])
+                .getDeclaredConstructor().newInstance();
     }
 
     protected String getNamespaceName() {

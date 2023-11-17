@@ -33,7 +33,7 @@ public abstract class ListUCDTest extends UCDTest {
     public void setUp() throws IOException, ClassNotFoundException {
         listConfig = new ListConfig(objectName);
         listConfig.setNamespace(getNamespaceName());
-        
+
         super.setUp();
 
         list = instance.getList(objectName);

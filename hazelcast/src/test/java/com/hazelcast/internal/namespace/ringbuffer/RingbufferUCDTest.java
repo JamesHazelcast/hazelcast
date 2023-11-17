@@ -33,7 +33,7 @@ public abstract class RingbufferUCDTest extends UCDTest {
     public void setUp() throws IOException, ClassNotFoundException {
         ringBufferConfig = new RingbufferConfig(objectName);
         ringBufferConfig.setNamespace(getNamespaceName());
-        
+
         super.setUp();
 
         ringBuffer = instance.getRingbuffer(objectName);
