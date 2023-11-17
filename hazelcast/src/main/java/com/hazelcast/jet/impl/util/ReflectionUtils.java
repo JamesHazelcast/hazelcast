@@ -314,8 +314,8 @@ public final class ReflectionUtils {
 
     /**
      * Reads only the necessary amount of bytes for the provided {@link Class} to find and return
-     * the internal binary name for this class, as determined by the first {@code CONSTANT_Class}
-     * tag encountered while reading the constants pool.
+     * the internal binary name for this class, as determined by the {@code CONSTANT_Class} found
+     * in the constants pool at the index determined by the {@code this_class} field.
      *
      * @see <a href="https://docs.oracle.com/javase/specs/jvms/se21/html/jvms-4.html">Java Class file format</a>
      *
@@ -332,8 +332,7 @@ public final class ReflectionUtils {
             buffer.position(8);
 
             int constantPoolCount = buffer.getShort() & 0xFFFF;
-            String[] constantPool = new String[constantPoolCount];
-            int classNameIndex = -1;
+            Object[] constantPool = new Object[constantPoolCount];
 
             // Iterate constant pool, collecting UTF8 strings (could be our class name) and looking for CONSTANT_Class tags
             //   to identify our desired UTF8 string representing the class name. Skips appropriate bytes for all other tags.
@@ -347,22 +346,9 @@ public final class ReflectionUtils {
                         byte[] bytes = new byte[length];
                         buffer.get(bytes);
                         constantPool[i] = new String(bytes, StandardCharsets.UTF_8);
-                        if (classNameIndex >= 0 && i >= classNameIndex) {
-                            // Our class name string is now available to return
-                            return constantPool[classNameIndex];
-                        }
                         break;
                     case 7: // CONSTANT_Class
-                        if (classNameIndex < 0) {
-                            // The first CONSTANT_Class encountered is for the FQ class name
-                            classNameIndex = buffer.getShort() & 0xFFFF;
-                            if (classNameIndex <= i) {
-                                // The index referenced has already been populated in the constant pool
-                                return constantPool[classNameIndex];
-                            }
-                        } else {
-                            skipBytes(buffer, 2);
-                        }
+                        constantPool[i] = buffer.getShort() & 0xFFFF; // Store index
                         break;
                     case 8: // CONSTANT_String
                     case 16: // CONSTANT_MethodType
@@ -389,9 +375,15 @@ public final class ReflectionUtils {
                 }
             }
 
-            throw new IllegalArgumentException("Unable to local package/class names from class bytes");
+            // Skip access flag
+            skipBytes(buffer, 2);
+
+            // Read this_class index which points to the constantPool index which holds the value of
+            //     the index to find the current classes' internal binary name
+            int thisClassIndex = buffer.getShort() & 0xFFFF;
+            return (String) constantPool[(int) constantPool[thisClassIndex]];
         } catch (Exception e) {
-            throw sneakyThrow(e);
+            throw new IllegalArgumentException("Unable to local package/class names from class bytes!", e);
         }
     }
 

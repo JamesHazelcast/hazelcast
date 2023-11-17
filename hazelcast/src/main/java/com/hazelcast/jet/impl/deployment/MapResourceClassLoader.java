@@ -97,8 +97,8 @@ public class MapResourceClassLoader extends JetDelegatingClassLoader {
 
     // Jet only constructor
     MapResourceClassLoader(ClassLoader parent,
-                                     @Nonnull Supplier<? extends Map<String, byte[]>> resourcesSupplier,
-                                     boolean childFirst) {
+                           @Nonnull Supplier<? extends Map<String, byte[]>> resourcesSupplier,
+                           boolean childFirst) {
         super(parent);
         this.namespace = null;
         this.resourcesSupplier = Util.memoizeConcurrent(resourcesSupplier);
@@ -107,8 +107,8 @@ public class MapResourceClassLoader extends JetDelegatingClassLoader {
 
     // UCD Namespaces oriented constructor
     public MapResourceClassLoader(@Nonnull String namespace, ClassLoader parent,
-                                     @Nonnull Supplier<? extends Map<String, byte[]>> resourcesSupplier,
-                                     boolean childFirst) {
+                                  @Nonnull Supplier<? extends Map<String, byte[]>> resourcesSupplier,
+                                  boolean childFirst) {
         super("ucd-namespace", parent);
         this.namespace = namespace;
         this.resourcesSupplier = Util.memoizeConcurrent(resourcesSupplier);
@@ -137,10 +137,11 @@ public class MapResourceClassLoader extends JetDelegatingClassLoader {
                 }
             }
             if (klass == null && getParent() != null) {
-                klass = getParent().loadClass(name);
-            }
-            if (klass == null) {
-                throw new ClassNotFoundException(name);
+                try {
+                    klass = getParent().loadClass(name);
+                } catch (ClassNotFoundException ex) {
+                    throw newClassNotFoundException(name);
+                }
             }
             if (resolve) {
                 resolveClass(klass);
@@ -151,10 +152,12 @@ public class MapResourceClassLoader extends JetDelegatingClassLoader {
 
     /** Allow direct addition of a class to ensure that this classloader can load it in addition */
     public void addExtraClass(Class<?> clazz) throws IOException {
-        extraResources.put(ReflectionUtils.toClassResourceId(clazz),
-                ReflectionUtils.getClassContent(clazz.getName(), clazz.getClassLoader()));
+        byte[] content = ReflectionUtils.getClassContent(clazz.getName(), clazz.getClassLoader());
+        if (content == null) {
+            throw new IllegalArgumentException("Unable to fetch resources for class: " + clazz);
+        }
+        extraResources.put(classKeyName(ReflectionUtils.toClassResourceId(clazz)), IOUtil.compress(content));
     }
-
     @Override
     protected Class<?> findClass(String name) throws ClassNotFoundException {
         if (isNullOrEmpty(name)) {
@@ -193,7 +196,8 @@ public class MapResourceClassLoader extends JetDelegatingClassLoader {
             return null;
         }
 
-        if (!getResourceMap().containsKey(classKeyName(name)) && !getResourceMap().containsKey(fileKeyName(name))) {
+        Map<String, byte[]> resourceMap = getResourceMap();
+        if (!resourceMap.containsKey(classKeyName(name)) && !resourceMap.containsKey(fileKeyName(name))) {
             return null;
         }
 
@@ -207,7 +211,7 @@ public class MapResourceClassLoader extends JetDelegatingClassLoader {
 
     private Map<String, byte[]> getResourceMap() {
         return Stream.of(resourcesSupplier.get(), extraResources).flatMap(m -> m.entrySet().stream())
-                .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+                     .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
     }
 
     @Override
@@ -254,9 +258,10 @@ public class MapResourceClassLoader extends JetDelegatingClassLoader {
 
     @Nullable
     private byte[] getBytes(String name) {
-        byte[] classData = getResourceMap().get(classKeyName(name));
+        Map<String, byte[]> resourceMap = getResourceMap();
+        byte[] classData = resourceMap.get(classKeyName(name));
         if (classData == null) {
-            classData = getResourceMap().get(fileKeyName(name));
+            classData = resourceMap.get(fileKeyName(name));
             if (classData == null) {
                 return null;
             }
