@@ -37,6 +37,7 @@ import java.nio.file.Paths;
  * @see <a href="https://hazelcast.atlassian.net/browse/HZ-3597">HZ-3597 - Add unit tests for all @NamespacesSupported UDF
  *      interfaces, across all supported data structures</a>
  */
+// TODO Is this a quick test?
 @RunWith(HazelcastParallelClassRunner.class)
 @Category({QuickTest.class, ParallelJVMTest.class})
 public abstract class UCDTest extends HazelcastTestSupport {
@@ -58,7 +59,7 @@ public abstract class UCDTest extends HazelcastTestSupport {
     }
 
     protected void registerClass(String clazz) throws ClassNotFoundException {
-        namespaceConfig.addClass(mapResourceClassLoader.loadClass(clazz));
+        instance.getConfig().getNamespacesConfig().addNamespaceConfig(namespaceConfig.addClass(mapResourceClassLoader.loadClass(clazz)));
     }
 
     protected Class<?> tryLoadClass(String clazz) throws ClassNotFoundException {
