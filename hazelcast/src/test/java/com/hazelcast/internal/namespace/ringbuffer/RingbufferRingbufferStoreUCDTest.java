@@ -17,30 +17,26 @@
 package com.hazelcast.internal.namespace.ringbuffer;
 
 import com.hazelcast.config.Config;
-import com.hazelcast.config.RingbufferConfig;
-import com.hazelcast.internal.namespace.UCDTest;
-import com.hazelcast.ringbuffer.Ringbuffer;
-import org.junit.Before;
+import com.hazelcast.config.RingbufferStoreConfig;
+import org.junit.Test;
 
-import java.io.IOException;
+import static org.junit.Assert.assertEquals;
 
-public abstract class RingbufferUCDTest extends UCDTest {
-    protected RingbufferConfig ringBufferConfig;
-    protected Ringbuffer<Object> ringBuffer;
+public class RingbufferRingbufferStoreUCDTest extends RingbufferUCDTest {
+    @Test
+    public void test() throws Exception {
+        assertEquals(Long.MAX_VALUE, ringBuffer.tailSequence());
+    }
 
     @Override
-    @Before
-    public void setUp() throws IOException, ClassNotFoundException {
-        ringBufferConfig = new RingbufferConfig(objectName);
-        ringBufferConfig.setNamespace(getNamespaceName());
-        
-        super.setUp();
-
-        ringBuffer = instance.getRingbuffer(objectName);
+    protected String getUserDefinedClassName() {
+        return "usercodedeployment.LargeSequenceRingBufferStore";
     }
 
     @Override
     protected void mutateConfig(Config config) {
-        config.addRingBufferConfig(ringBufferConfig);
+        ringBufferConfig.setRingbufferStoreConfig(new RingbufferStoreConfig().setClassName(getUserDefinedClassName()));
+
+        super.mutateConfig(config);
     }
 }

@@ -14,33 +14,28 @@
  * limitations under the License.
  */
 
-package com.hazelcast.internal.namespace.ringbuffer;
+package com.hazelcast.internal.namespace.imap;
 
 import com.hazelcast.config.Config;
-import com.hazelcast.config.RingbufferConfig;
-import com.hazelcast.internal.namespace.UCDTest;
-import com.hazelcast.ringbuffer.Ringbuffer;
-import org.junit.Before;
+import org.junit.Test;
 
-import java.io.IOException;
+import static org.junit.Assert.assertFalse;
 
-public abstract class RingbufferUCDTest extends UCDTest {
-    protected RingbufferConfig ringBufferConfig;
-    protected Ringbuffer<Object> ringBuffer;
+public class IMapMapLoaderUCDTest extends IMapUCDTest {
+    @Test
+    public void test() throws Exception {
+        assertFalse(map.isEmpty());
+    }
 
     @Override
-    @Before
-    public void setUp() throws IOException, ClassNotFoundException {
-        ringBufferConfig = new RingbufferConfig(objectName);
-        ringBufferConfig.setNamespace(getNamespaceName());
-        
-        super.setUp();
-
-        ringBuffer = instance.getRingbuffer(objectName);
+    protected String getUserDefinedClassName() {
+        return "usercodedeployment.KeyBecomesValueMapLoader";
     }
 
     @Override
     protected void mutateConfig(Config config) {
-        config.addRingBufferConfig(ringBufferConfig);
+        mapConfig.getMapStoreConfig().setEnabled(true).setClassName(getUserDefinedClassName());
+
+        super.mutateConfig(config);
     }
 }

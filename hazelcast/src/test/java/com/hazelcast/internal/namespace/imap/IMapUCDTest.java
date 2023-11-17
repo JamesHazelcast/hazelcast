@@ -14,33 +14,33 @@
  * limitations under the License.
  */
 
-package com.hazelcast.internal.namespace.ringbuffer;
+package com.hazelcast.internal.namespace.imap;
 
 import com.hazelcast.config.Config;
-import com.hazelcast.config.RingbufferConfig;
+import com.hazelcast.config.MapConfig;
 import com.hazelcast.internal.namespace.UCDTest;
-import com.hazelcast.ringbuffer.Ringbuffer;
+import com.hazelcast.map.IMap;
 import org.junit.Before;
 
 import java.io.IOException;
 
-public abstract class RingbufferUCDTest extends UCDTest {
-    protected RingbufferConfig ringBufferConfig;
-    protected Ringbuffer<Object> ringBuffer;
+public abstract class IMapUCDTest extends UCDTest {
+    protected MapConfig mapConfig;
+    protected IMap<Object, Object> map;
 
     @Override
     @Before
     public void setUp() throws IOException, ClassNotFoundException {
-        ringBufferConfig = new RingbufferConfig(objectName);
-        ringBufferConfig.setNamespace(getNamespaceName());
-        
+        mapConfig = new MapConfig(objectName);
+        mapConfig.setNamespace(getNamespaceName());
+
         super.setUp();
 
-        ringBuffer = instance.getRingbuffer(objectName);
+        map = instance.getMap(objectName);
     }
 
     @Override
     protected void mutateConfig(Config config) {
-        config.addRingBufferConfig(ringBufferConfig);
+        config.addMapConfig(mapConfig);
     }
 }
