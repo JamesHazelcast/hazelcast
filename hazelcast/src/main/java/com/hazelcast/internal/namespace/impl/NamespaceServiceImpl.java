@@ -16,7 +16,6 @@
 
 package com.hazelcast.internal.namespace.impl;
 
-import com.hazelcast.config.Config;
 import com.hazelcast.config.JavaSerializationFilterConfig;
 import com.hazelcast.config.NamespaceConfig;
 import com.hazelcast.internal.namespace.NamespaceService;
