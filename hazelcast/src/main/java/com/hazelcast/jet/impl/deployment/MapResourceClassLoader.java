@@ -77,9 +77,6 @@ public class MapResourceClassLoader extends JetDelegatingClassLoader {
     // TODO Shouldn't this be a logging param?
     private static final boolean DEBUG_OUTPUT = Boolean.getBoolean(DEBUG_OUTPUT_PROPERTY);
 
-    // TODO a more effecient way to do this
-    protected final Map<String, byte[]> extraResources = new HashMap<>();
-
     protected final Supplier<? extends Map<String, byte[]>> resourcesSupplier;
     /**
      * When {@code true}, if the requested class/resource is not found in this ClassLoader's resources, then parent
@@ -150,14 +147,28 @@ public class MapResourceClassLoader extends JetDelegatingClassLoader {
         }
     }
 
-    /** Allow direct addition of a class to ensure that this classloader can load it in addition */
-    public void addExtraClass(Class<?> clazz) throws IOException {
-        byte[] content = ReflectionUtils.getClassContent(clazz.getName(), clazz.getClassLoader());
-        if (content == null) {
-            throw new IllegalArgumentException("Unable to fetch resources for class: " + clazz);
+    /**
+     * Loads the passed {@link Class} freshly from this {@link ClassLoader}, meaning that the
+     * returned class will resolve {@link Class#getClassLoader()} to this instance.
+     *
+     * @param clazz The {@link Class} to load using this {@link ClassLoader} instance
+     * @return      A {@link Class} that has its {@link ClassLoader} as this instance
+     */
+    public Class<?> loadClassFromThisLoader(Class<?> clazz) {
+        try {
+            byte[] content = ReflectionUtils.getClassContent(clazz.getName(), clazz.getClassLoader());
+            if (content == null) {
+                throw new IllegalArgumentException("Unable to read bytes for extra resource class: " + clazz);
+            }
+            definePackage(clazz.getName());
+            Class<?> result = defineClass(clazz.getName(), content, 0, content.length);
+            resolveClass(result);
+            return result;
+        } catch (IOException ex) {
+            throw new IllegalArgumentException("Unable to create extra resource class: " + clazz);
         }
-        extraResources.put(classKeyName(ReflectionUtils.toClassResourceId(clazz)), IOUtil.compress(content));
     }
+
     @Override
     protected Class<?> findClass(String name) throws ClassNotFoundException {
         if (isNullOrEmpty(name)) {
@@ -210,8 +221,7 @@ public class MapResourceClassLoader extends JetDelegatingClassLoader {
     }
 
     private Map<String, byte[]> getResourceMap() {
-        return Stream.of(resourcesSupplier.get(), extraResources).flatMap(m -> m.entrySet().stream())
-                     .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+        return resourcesSupplier.get();
     }
 
     @Override

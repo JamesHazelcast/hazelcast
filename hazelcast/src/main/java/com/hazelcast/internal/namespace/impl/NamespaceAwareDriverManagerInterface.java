@@ -68,15 +68,11 @@ public class NamespaceAwareDriverManagerInterface {
      */
     public static void cleanupJdbcDrivers(String nsName, MapResourceClassLoader classLoader) {
         try {
-            classLoader.addExtraClass(NamespaceAwareDriverManagerInterface.class);
-
             // This is a "NamespaceAwareDriverManagerInterface", but from the other ClassLoader, so no casting
-            Class<?> clazz = classLoader.loadClass(NamespaceAwareDriverManagerInterface.class.getName());
-
+            Class<?> clazz = classLoader.loadClassFromThisLoader(NamespaceAwareDriverManagerInterface.class);
             Method cleanupJdbcDriversMethod = clazz.getDeclaredMethod("cleanupJdbcDrivers", String.class);
-
             cleanupJdbcDriversMethod.invoke(clazz.getDeclaredConstructor().newInstance(), nsName);
-        } catch (ReflectiveOperationException | IOException e) {
+        } catch (ReflectiveOperationException e) {
             throw ExceptionUtil.sneakyThrow(e);
         }
     }
