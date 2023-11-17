@@ -26,7 +26,6 @@ import com.hazelcast.internal.metrics.MetricDescriptor;
 import com.hazelcast.internal.metrics.MetricsCollectionContext;
 import com.hazelcast.internal.monitor.impl.LocalTopicStatsImpl;
 import com.hazelcast.internal.namespace.NamespaceUtil;
-import com.hazelcast.internal.namespace.impl.NodeEngineThreadLocalContext;
 import com.hazelcast.internal.serialization.Data;
 import com.hazelcast.internal.services.ManagedService;
 import com.hazelcast.internal.services.RemoteService;
@@ -232,7 +231,7 @@ public class TopicService implements ManagedService, RemoteService, EventPublish
     public void provideDynamicMetrics(MetricDescriptor descriptor, MetricsCollectionContext context) {
         provide(descriptor, context, TOPIC_PREFIX, getStats());
     }
-    
+
     // todo move this somewhere proper?
     public static String getNamespace(NodeEngine nodeEngine, String topicName) {
         // No regular containers available, fallback to config
