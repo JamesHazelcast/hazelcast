@@ -48,4 +48,10 @@ public abstract class AbstractMultiMapPartitionMessageTask<P> extends AbstractPa
         MultiMapService service = getService(MultiMapService.SERVICE_NAME);
         return service.getOrCreateCollectionContainer(getPartitionId(), getDistributedObjectName());
     }
+
+    @Override
+    protected String getNamespace() {
+        MultiMapService service = getService(MultiMapService.SERVICE_NAME);
+        return service.getNamespace(getDistributedObjectName());
+    }
 }

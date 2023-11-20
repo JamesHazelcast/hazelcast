@@ -45,31 +45,37 @@ public class MapRemoveAllMessageTask extends AbstractMapAllPartitionsMessageTask
 
     public MapRemoveAllMessageTask(ClientMessage clientMessage, Node node, Connection connection) {
         super(clientMessage, node, connection);
+        setNamespaceAware();
     }
 
     @Override
     protected void processMessage() {
+        predicate = NamespaceUtil.callWithNamespace(nodeEngine, MapServiceContext.lookupMapNamespace(nodeEngine, parameters.name),
+                () -> serializationService.toObject(parameters.predicate));
         if (!(predicate instanceof PartitionPredicate)) {
             super.processMessage();
             return;
         }
-        PartitionPredicate partitionPredicate = (PartitionPredicate) predicate;
-        OperationFactory operationFactory = createOperationFactory();
-        OperationServiceImpl operationService = nodeEngine.getOperationService();
 
-        CompletableFuture<Map<Integer, Object>> future = operationService
-            .invokeOnPartitionsAsync(
-                getServiceName(),
-                operationFactory,
-                nodeEngine.getPartitionService().getPartitionIdSet(partitionPredicate.getPartitionKeys())
-            );
-        future.whenCompleteAsync((response, throwable) -> {
-            if (throwable == null) {
-                sendResponse(reduce(response));
-            } else {
-                handleProcessingFailure(throwable);
-            }
-        }, CALLER_RUNS);
+        NamespaceUtil.runWithNamespace(nodeEngine, getNamespace(), () -> {
+            PartitionPredicate partitionPredicate = (PartitionPredicate) predicate;
+            OperationFactory operationFactory = createOperationFactory();
+            OperationServiceImpl operationService = nodeEngine.getOperationService();
+
+            CompletableFuture<Map<Integer, Object>> future = operationService
+                    .invokeOnPartitionsAsync(
+                            getServiceName(),
+                            operationFactory,
+                            nodeEngine.getPartitionService().getPartitionIdSet(partitionPredicate.getPartitionKeys())
+                    );
+            future.whenCompleteAsync((response, throwable) -> {
+                if (throwable == null) {
+                    sendResponse(reduce(response));
+                } else {
+                    handleProcessingFailure(throwable);
+                }
+            }, CALLER_RUNS);
+        });
     }
 
     @Override
@@ -88,10 +94,7 @@ public class MapRemoveAllMessageTask extends AbstractMapAllPartitionsMessageTask
 
     @Override
     protected MapRemoveAllCodec.RequestParameters decodeClientMessage(ClientMessage clientMessage) {
-        MapRemoveAllCodec.RequestParameters parameters = MapRemoveAllCodec.decodeRequest(clientMessage);
-        predicate = NamespaceUtil.callWithNamespace(nodeEngine, MapServiceContext.lookupMapNamespace(nodeEngine, parameters.name),
-                () -> serializationService.toObject(parameters.predicate));
-        return parameters;
+        return MapRemoveAllCodec.decodeRequest(clientMessage);
     }
 
     @Override

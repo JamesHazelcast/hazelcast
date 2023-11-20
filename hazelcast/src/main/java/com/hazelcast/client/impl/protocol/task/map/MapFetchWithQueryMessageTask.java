@@ -51,9 +51,10 @@ import static com.hazelcast.internal.iteration.IterationPointer.encodePointers;
  * @since 3.9
  */
 public class MapFetchWithQueryMessageTask
-        extends AbstractNsAwareMapPartitionMessageTask<MapFetchWithQueryCodec.RequestParameters> {
+        extends AbstractMapPartitionMessageTask<MapFetchWithQueryCodec.RequestParameters> {
     public MapFetchWithQueryMessageTask(ClientMessage clientMessage, Node node, Connection connection) {
         super(clientMessage, node, connection);
+        setNamespaceAware();
     }
 
     @Override

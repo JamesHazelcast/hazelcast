@@ -185,4 +185,10 @@ public abstract class AbstractReplicatedMapAddEntryListenerMessageTask<Parameter
     public void mapCleared(MapEvent event) {
         handleMapEvent(event);
     }
+
+    @Override
+    protected String getNamespace() {
+        ReplicatedMapService service = getService(ReplicatedMapService.SERVICE_NAME);
+        return service.getNamespace(getDistributedObjectName());
+    }
 }

@@ -33,10 +33,11 @@ import java.security.Permission;
 
 
 public class MapSubmitToKeyMessageTask
-        extends AbstractNsAwareMapPartitionMessageTask<MapSubmitToKeyCodec.RequestParameters> {
+        extends AbstractMapPartitionMessageTask<MapSubmitToKeyCodec.RequestParameters> {
 
     public MapSubmitToKeyMessageTask(ClientMessage clientMessage, Node node, Connection connection) {
         super(clientMessage, node, connection);
+        setNamespaceAware();
     }
 
     @Override

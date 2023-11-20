@@ -124,4 +124,10 @@ public class CacheAddPartitionLostListenerMessageTask
     public String getDistributedObjectName() {
         return parameters.name;
     }
+
+    @Override
+    protected String getNamespace() {
+        final CacheService service = getService(CacheService.SERVICE_NAME);
+        return service.getNamespace(parameters.name);
+    }
 }

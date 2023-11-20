@@ -140,4 +140,9 @@ public class TopicAddMessageListenerMessageTask
             sendClientMessage(partitionKey, eventMessage);
         }
     }
+
+    @Override
+    protected String getNamespace() {
+        return TopicService.getNamespace(nodeEngine, parameters.name);
+    }
 }

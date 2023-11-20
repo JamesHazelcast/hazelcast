@@ -47,4 +47,10 @@ public abstract class AbstractMultiMapAllPartitionsMessageTask<P> extends Abstra
         MultiMapService service = getService(MultiMapService.SERVICE_NAME);
         return service.getOrCreateCollectionContainer(0, getDistributedObjectName());
     }
+
+    @Override
+    protected String getNamespace() {
+        MultiMapService service = getService(MultiMapService.SERVICE_NAME);
+        return service.getNamespace(getDistributedObjectName());
+    }
 }

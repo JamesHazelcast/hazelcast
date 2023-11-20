@@ -37,4 +37,9 @@ abstract class AbstractMapAllPartitionsMessageTask<P> extends AbstractAllPartiti
         MapServiceContext mapServiceContext = mapService.getMapServiceContext();
         return mapServiceContext.getMapOperationProvider(mapName);
     }
+
+    @Override
+    protected String getNamespace() {
+        return MapServiceContext.lookupMapNamespace(nodeEngine, getDistributedObjectName());
+    }
 }

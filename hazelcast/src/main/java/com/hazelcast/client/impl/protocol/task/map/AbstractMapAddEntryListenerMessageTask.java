@@ -138,4 +138,9 @@ public abstract class AbstractMapAddEntryListenerMessageTask<Parameter>
     protected abstract ClientMessage encodeEvent(Data keyData, Data newValueData,
                                                  Data oldValueData, Data meringValueData,
                                                  int type, UUID uuid, int numberOfEntriesAffected);
+
+    @Override
+    protected String getNamespace() {
+        return MapServiceContext.lookupMapNamespace(nodeEngine, getDistributedObjectName());
+    }
 }

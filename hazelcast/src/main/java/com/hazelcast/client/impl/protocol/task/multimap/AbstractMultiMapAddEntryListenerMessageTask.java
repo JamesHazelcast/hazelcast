@@ -25,6 +25,7 @@ import com.hazelcast.instance.impl.Node;
 import com.hazelcast.internal.nio.Connection;
 import com.hazelcast.map.MapEvent;
 import com.hazelcast.map.impl.DataAwareEntryEvent;
+import com.hazelcast.map.impl.MapServiceContext;
 import com.hazelcast.multimap.impl.MultiMapService;
 import com.hazelcast.internal.serialization.Data;
 import com.hazelcast.security.SecurityInterceptorConstants;
@@ -136,4 +137,9 @@ public abstract class AbstractMultiMapAddEntryListenerMessageTask<P>
 
     protected abstract ClientMessage encodeEvent(Data key, Data value, Data oldValue,
                                                  int type, UUID uuid, int numberOfEntriesAffected);
+
+    @Override
+    protected String getNamespace() {
+        return MapServiceContext.lookupMapNamespace(nodeEngine, getDistributedObjectName());
+    }
 }

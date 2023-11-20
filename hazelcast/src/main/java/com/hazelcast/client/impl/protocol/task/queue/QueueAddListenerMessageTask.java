@@ -120,4 +120,10 @@ public class QueueAddListenerMessageTask
     public String getDistributedObjectName() {
         return parameters.name;
     }
+
+    @Override
+    protected String getNamespace() {
+        QueueService service = nodeEngine.getService(QueueService.SERVICE_NAME);
+        return service.getNamespace(getDistributedObjectName());
+    }
 }

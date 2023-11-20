@@ -26,6 +26,7 @@ import com.hazelcast.client.impl.protocol.task.AbstractCallableMessageTask;
 import com.hazelcast.cluster.Member;
 import com.hazelcast.core.HazelcastException;
 import com.hazelcast.instance.impl.Node;
+import com.hazelcast.internal.namespace.NamespaceUtil;
 import com.hazelcast.internal.nio.Connection;
 import com.hazelcast.internal.util.CollectionUtil;
 import com.hazelcast.internal.util.IterationType;
@@ -100,6 +101,7 @@ public abstract class AbstractMapQueryMessageTask<P, QueryResult extends Result,
     protected final Object call() throws Exception {
         Collection<AccumulatedResults> result = new LinkedList<AccumulatedResults>();
         try {
+            NamespaceUtil.setupNamespace(nodeEngine, getNamespace());
             Predicate predicate = getPredicate();
             if (predicate instanceof PartitionPredicate) {
                 QueryResult queryResult = invokeOnPartitions((PartitionPredicate) predicate);
@@ -112,6 +114,8 @@ public abstract class AbstractMapQueryMessageTask<P, QueryResult extends Result,
             invokeOnMissingPartitions(result, predicate, finishedPartitions);
         } catch (Throwable t) {
             throw rethrow(t);
+        } finally {
+            NamespaceUtil.cleanupNamespace(nodeEngine, getNamespace());
         }
         return reduce(result);
     }

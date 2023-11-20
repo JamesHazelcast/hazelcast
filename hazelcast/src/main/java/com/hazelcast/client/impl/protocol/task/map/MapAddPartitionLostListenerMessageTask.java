@@ -97,4 +97,9 @@ public class MapAddPartitionLostListenerMessageTask
     public String getDistributedObjectName() {
         return parameters.name;
     }
+
+    @Override
+    protected String getNamespace() {
+        return MapServiceContext.lookupMapNamespace(nodeEngine, getDistributedObjectName());
+    }
 }

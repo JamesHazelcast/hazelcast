@@ -20,7 +20,6 @@ import com.hazelcast.client.impl.protocol.ClientMessage;
 import com.hazelcast.client.impl.protocol.codec.MapExecuteWithPredicateCodec;
 import com.hazelcast.client.impl.protocol.task.AbstractMultiPartitionMessageTask;
 import com.hazelcast.instance.impl.Node;
-import com.hazelcast.internal.namespace.NamespaceUtil;
 import com.hazelcast.internal.partition.IPartition;
 import com.hazelcast.internal.util.collection.PartitionIdSet;
 import com.hazelcast.map.EntryProcessor;
@@ -55,8 +54,7 @@ public class MapExecuteWithPredicateMessageTask
 
     @Override
     protected void beforeProcess() {
-        predicate = NamespaceUtil.callWithNamespace(nodeEngine, MapServiceContext.lookupMapNamespace(nodeEngine, parameters.name),
-                () -> serializationService.toObject(parameters.predicate));
+        predicate = serializationService.toObject(parameters.predicate);
     }
 
     @Override
@@ -141,5 +139,10 @@ public class MapExecuteWithPredicateMessageTask
     @Override
     public Object[] getParameters() {
         return new Object[]{parameters.entryProcessor, parameters.predicate};
+    }
+
+    @Override
+    protected String getNamespace() {
+        return MapServiceContext.lookupMapNamespace(nodeEngine, getDistributedObjectName());
     }
 }

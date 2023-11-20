@@ -37,6 +37,7 @@ import com.hazelcast.internal.metrics.MetricDescriptor;
 import com.hazelcast.internal.metrics.MetricsCollectionContext;
 import com.hazelcast.internal.monitor.LocalCacheStats;
 import com.hazelcast.internal.monitor.impl.LocalCacheStatsImpl;
+import com.hazelcast.internal.namespace.NamespaceUtil;
 import com.hazelcast.internal.nio.IOUtil;
 import com.hazelcast.internal.partition.IPartitionLostEvent;
 import com.hazelcast.internal.partition.MigrationEndpoint;
@@ -524,6 +525,17 @@ public abstract class AbstractCacheService implements ICacheService,
         }
         if (data instanceof Data) {
             return nodeEngine.toObject(data);
+        } else {
+            return data;
+        }
+    }
+
+    public Object toObject(Object data, String namespace) {
+        if (data == null) {
+            return null;
+        }
+        if (data instanceof Data) {
+            return NamespaceUtil.callWithNamespace(nodeEngine, namespace, () -> nodeEngine.toObject(data));
         } else {
             return data;
         }

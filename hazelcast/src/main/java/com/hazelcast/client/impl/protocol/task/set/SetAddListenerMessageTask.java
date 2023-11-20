@@ -133,4 +133,9 @@ public class SetAddListenerMessageTask
         return parameters.name;
     }
 
+    @Override
+    protected String getNamespace() {
+        SetService service = getService(SetService.SERVICE_NAME);
+        return service.getNamespace(parameters.name);
+    }
 }
