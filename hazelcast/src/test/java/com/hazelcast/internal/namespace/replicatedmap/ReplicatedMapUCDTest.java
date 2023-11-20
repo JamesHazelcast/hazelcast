@@ -17,7 +17,7 @@
 package com.hazelcast.internal.namespace.replicatedmap;
 
 import com.hazelcast.config.Config;
-import com.hazelcast.config.MapConfig;
+import com.hazelcast.config.ReplicatedMapConfig;
 import com.hazelcast.internal.namespace.UCDTest;
 import com.hazelcast.replicatedmap.ReplicatedMap;
 import org.junit.Before;
@@ -25,14 +25,14 @@ import org.junit.Before;
 import java.io.IOException;
 
 public abstract class ReplicatedMapUCDTest extends UCDTest {
-    protected MapConfig mapConfig;
+    protected ReplicatedMapConfig replicatedMapConfig;
     protected ReplicatedMap<Object, Object> map;
 
     @Override
     @Before
     public void setUp() throws IOException, ClassNotFoundException {
-        mapConfig = new MapConfig(objectName);
-        mapConfig.setNamespace(getNamespaceName());
+        replicatedMapConfig = new ReplicatedMapConfig(objectName);
+        replicatedMapConfig.setNamespace(getNamespaceName());
 
         super.setUp();
 
@@ -41,6 +41,6 @@ public abstract class ReplicatedMapUCDTest extends UCDTest {
 
     @Override
     protected void mutateConfig(Config config) {
-        config.addMapConfig(mapConfig);
+        config.addReplicatedMapConfig(replicatedMapConfig);
     }
 }
