@@ -39,6 +39,10 @@ public abstract class ReplicatedMapUCDTest extends UCDTest {
         map = instance.getReplicatedMap(objectName);
     }
 
+    protected void populate() {
+        map.put(1, 1);
+    }
+
     @Override
     protected void mutateConfig(Config config) {
         config.addReplicatedMapConfig(replicatedMapConfig);

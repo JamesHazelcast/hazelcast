@@ -37,7 +37,7 @@ public class ReplicatedMapPredicateUCDTest extends ReplicatedMapUCDTest {
             }
         }, (Predicate<Object, Object>) getClassInstance());
 
-        map.put(Void.TYPE, Void.TYPE);
+        populate();
 
         // Block and wait for listener to fire
         assertNotNull(listenerEvent.get());

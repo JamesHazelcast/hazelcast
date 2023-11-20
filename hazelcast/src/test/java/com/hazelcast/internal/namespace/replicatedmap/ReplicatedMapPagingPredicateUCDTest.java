@@ -16,19 +16,9 @@
 
 package com.hazelcast.internal.namespace.replicatedmap;
 
-import com.hazelcast.map.PartitionPredicateTest;
-
-public class ReplicatedMapPartitionPredicateUCDTest extends ReplicatedMapPredicateUCDTest {
-    @Override
-    protected void populate() {
-        for (int partitionId = 0; partitionId < PartitionPredicateTest.PARTITIONS; partitionId++) {
-            map.put(generateKeyForPartition(instance, partitionId), Void.TYPE);
-        }
-    }
-
+public class ReplicatedMapPagingPredicateUCDTest extends ReplicatedMapPredicateUCDTest {
     @Override
     protected String[] getUserDefinedClassNames() {
-        // TODO
-        return new String[] {"usercodedeployment.TruePartition1PartitionPredicate"};
+        return new String[] {"usercodedeployment.TruePagingPredicate"};
     }
 }
