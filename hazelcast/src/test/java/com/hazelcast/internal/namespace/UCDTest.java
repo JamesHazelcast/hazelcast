@@ -16,6 +16,7 @@
 
 package com.hazelcast.internal.namespace;
 
+import com.google.common.collect.Lists;
 import com.hazelcast.client.test.TestHazelcastFactory;
 import com.hazelcast.config.Config;
 import com.hazelcast.config.NamespaceConfig;
@@ -37,9 +38,8 @@ import org.junit.runners.Parameterized.Parameters;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.stream.Collectors;
+import java.util.List;
 
 /**
  * @see <a href="https://hazelcast.atlassian.net/browse/HZ-3597">HZ-3597 - Add unit tests for all @NamespacesSupported UDF
@@ -89,11 +89,9 @@ public abstract class UCDTest extends HazelcastTestSupport {
     }
 
     @Parameters(name = "Connection Style: {0}, Config Style: {1}")
-    public static Collection<Object[]> parameters() {
-        // Cartesian join
-        return Arrays.stream(ConnectionStyle.values())
-                .flatMap(driver -> Arrays.stream(ConfigStyle.values()).map(configStyle -> new Object[] {driver, configStyle}))
-                .collect(Collectors.toList());
+    public static Iterable<Object[]> parameters() {
+        return Lists.cartesianProduct(List.of(ConnectionStyle.values()), List.of(ConfigStyle.values())).stream()
+                .map(Collection::toArray)::iterator;
     }
 
     @Before
