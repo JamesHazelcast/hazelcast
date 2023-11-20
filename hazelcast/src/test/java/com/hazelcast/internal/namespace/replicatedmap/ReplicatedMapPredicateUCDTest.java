@@ -19,14 +19,13 @@ package com.hazelcast.internal.namespace.replicatedmap;
 import com.hazelcast.core.EntryAdapter;
 import com.hazelcast.core.EntryEvent;
 import com.hazelcast.query.Predicate;
-import org.junit.Test;
 
 import java.util.concurrent.CompletableFuture;
 
 import static org.junit.Assert.assertNotNull;
 
 public class ReplicatedMapPredicateUCDTest extends ReplicatedMapUCDTest {
-    @Test
+    @Override
     public void test() throws Exception {
         final CompletableFuture<EntryEvent<Object, Object>> listenerEvent = new CompletableFuture<>();
 

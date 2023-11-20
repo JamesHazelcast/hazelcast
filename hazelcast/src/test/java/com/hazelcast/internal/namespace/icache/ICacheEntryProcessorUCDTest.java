@@ -16,14 +16,12 @@
 
 package com.hazelcast.internal.namespace.icache;
 
-import org.junit.Test;
-
 import javax.cache.processor.EntryProcessor;
 
 import static org.junit.Assert.assertEquals;
 
 public class ICacheEntryProcessorUCDTest extends ICacheUCDTest {
-    @Test
+    @Override
     public void test() throws Exception {
         Integer KEY = 1;
 

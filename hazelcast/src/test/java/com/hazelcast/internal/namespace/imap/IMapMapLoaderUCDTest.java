@@ -17,12 +17,11 @@
 package com.hazelcast.internal.namespace.imap;
 
 import com.hazelcast.config.Config;
-import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;
 
 public class IMapMapLoaderUCDTest extends IMapUCDTest {
-    @Test
+    @Override
     public void test() throws Exception {
         assertFalse(map.isEmpty());
     }

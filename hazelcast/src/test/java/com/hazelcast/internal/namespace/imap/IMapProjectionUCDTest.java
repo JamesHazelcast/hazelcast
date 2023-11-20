@@ -24,7 +24,7 @@ import java.util.Map.Entry;
 import static org.junit.Assert.assertNotNull;
 
 public class IMapProjectionUCDTest extends IMapUCDTest {
-    @Test
+    @Override
     public void test() throws Exception {
         populate();
 

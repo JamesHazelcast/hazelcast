@@ -17,12 +17,11 @@
 package com.hazelcast.internal.namespace.ringbuffer;
 
 import com.hazelcast.core.IFunction;
-import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
 public class RingbufferIFunctionUCDTest extends RingbufferUCDTest {
-    @Test
+    @Override
     public void test() throws Exception {
         ringBuffer.add(Byte.MIN_VALUE);
 

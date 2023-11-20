@@ -17,12 +17,11 @@
 package com.hazelcast.internal.namespace.imap;
 
 import com.hazelcast.map.EntryProcessor;
-import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
 public class IMapEntryProcessorUCDTest extends IMapUCDTest {
-    @Test
+    @Override
     public void test() throws Exception {
         populate();
 

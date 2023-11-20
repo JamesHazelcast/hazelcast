@@ -18,12 +18,11 @@ package com.hazelcast.internal.namespace.ringbuffer;
 
 import com.hazelcast.config.Config;
 import com.hazelcast.config.RingbufferStoreConfig;
-import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
 public class RingbufferRingbufferStoreFactoryUCDTest extends RingbufferUCDTest {
-    @Test
+    @Override
     public void test() throws Exception {
         assertEquals(Long.MAX_VALUE, ringBuffer.tailSequence());
     }

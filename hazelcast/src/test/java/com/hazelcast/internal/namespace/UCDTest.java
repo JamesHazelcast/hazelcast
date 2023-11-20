@@ -30,6 +30,7 @@ import com.hazelcast.test.annotation.QuickTest;
 import org.apache.commons.text.WordUtils;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameter;
@@ -40,6 +41,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
  * @see <a href="https://hazelcast.atlassian.net/browse/HZ-3597">HZ-3597 - Add unit tests for all @NamespacesSupported UDF
@@ -55,6 +59,8 @@ public abstract class UCDTest extends HazelcastTestSupport {
     public ConnectionStyle connectionStyle;
     @Parameter(1)
     public ConfigStyle configStyle;
+    @Parameter(2)
+    public AssertionStyle assertionStyle;
 
     private HazelcastInstance member;
     protected HazelcastInstance instance;
@@ -88,10 +94,25 @@ public abstract class UCDTest extends HazelcastTestSupport {
         }
     }
 
-    @Parameters(name = "Connection Style: {0}, Config Style: {1}")
+    private enum AssertionStyle {
+        /** Happy path - assert the functionality works when configured correctly */
+        POSITIVE,
+        /**
+         * Negative path - assert that the functionality doesn't work normally when namespace not configured to ensure scope of
+         * test is correct
+         */
+        NEGATIVE;
+
+        @Override
+        public String toString() {
+            return WordUtils.capitalizeFully(name());
+        }
+    }
+
+    @Parameters(name = "Connection Style: {0}, Config Style: {1}, Assertion Style: {2}")
     public static Iterable<Object[]> parameters() {
-        return Lists.cartesianProduct(List.of(ConnectionStyle.values()), List.of(ConfigStyle.values())).stream()
-                .map(Collection::toArray)::iterator;
+        return Lists.cartesianProduct(List.of(ConnectionStyle.values()), List.of(ConfigStyle.values()),
+                List.of(AssertionStyle.values())).stream().map(Collection::toArray)::iterator;
     }
 
     @Before
@@ -104,7 +125,7 @@ public abstract class UCDTest extends HazelcastTestSupport {
         mapResourceClassLoader = NamespaceAwareClassLoaderIntegrationTest.generateMapResourceClassLoaderForDirectory(classRoot);
         namespaceConfig = new NamespaceConfig(getNamespaceName());
 
-        config.getNamespacesConfig().setEnabled(true);
+        config.getNamespacesConfig().setEnabled(assertionStyle == AssertionStyle.POSITIVE);
 
         if (configStyle == ConfigStyle.STATIC) {
             mutateConfig(config);
@@ -134,6 +155,44 @@ public abstract class UCDTest extends HazelcastTestSupport {
     public void tearDown() {
         testHazelcastFactory.shutdownAll();
     }
+
+    /**
+     * Executes {@link #test()}, and checking it's result against the expected {@link #assertionStyle}
+     * <p>
+     * It's possible (and neater) to implement this as a pair of {@link Test}s and use
+     * {@code assumeTrue(assertionStyle=AssertionStyle.XYZ)} to switch between execution implementation at runtime, but then you
+     * have twice the {@link Before} overhead when half is never used.
+     */
+    @Test
+    public void executeTest() throws Exception {
+        try {
+            test();
+        } catch (Throwable t) {
+            switch (assertionStyle) {
+                case NEGATIVE:
+                    // Do nothing - this is ok
+                    return;
+                case POSITIVE:
+                    throw t;
+                default:
+                    throw new IllegalArgumentException(assertionStyle.toString());
+            }
+        }
+
+        assertEquals("Test passed even though namespace was not configured, suggests scope of test is incorrect",
+                AssertionStyle.POSITIVE, assertionStyle);
+    }
+
+    @Test
+    public void testChildMethodsNotTestable() throws ReflectiveOperationException {
+        Class<Test> unwantedAnnotation = Test.class;
+        assertNull(
+                String.format("%s framework handles test execution, don't annotate implementations' methods with %s",
+                        UCDTest.class.getSimpleName(), unwantedAnnotation.getSimpleName()),
+                getClass().getDeclaredMethod("test").getAnnotation(unwantedAnnotation));
+    }
+
+    public abstract void test() throws Exception;
 
     // TODO Should this be a Collection?
     protected abstract String[] getUserDefinedClassNames();
