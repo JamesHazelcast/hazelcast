@@ -16,23 +16,9 @@
 
 package com.hazelcast.internal.namespace.imap;
 
-import com.hazelcast.map.MapInterceptor;
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-
-public class IMapMapInterceptorUCDTest extends IMapUCDTest {
-    @Test
-    public void test() throws Exception {
-        map.addInterceptor((MapInterceptor) getClassInstance());
-
-        populate();
-
-        assertEquals(Integer.valueOf(2), map.get(map.keySet().iterator().next()));
-    }
-
+public class IMapPagingPredicateUCDTest extends IMapPredicateUCDTest {
     @Override
     protected String[] getUserDefinedClassNames() {
-        return new String[] {"usercodedeployment.IncrementingMapInterceptor"};
+        return new String[] {"usercodedeployment.TruePagingPredicate"};
     }
 }

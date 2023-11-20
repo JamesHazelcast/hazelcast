@@ -39,6 +39,10 @@ public abstract class IMapUCDTest extends UCDTest {
         map = instance.getMap(objectName);
     }
 
+    protected void populate() {
+        map.put(1, 1);
+    }
+
     @Override
     protected void mutateConfig(Config config) {
         config.addMapConfig(mapConfig);

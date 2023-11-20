@@ -24,11 +24,10 @@ import static org.junit.Assert.assertEquals;
 public class IMapEntryProcessorUCDTest extends IMapUCDTest {
     @Test
     public void test() throws Exception {
-        Object KEY = 1;
+        populate();
 
-        map.put(KEY, 1);
-
-        assertEquals(Integer.valueOf(2), map.executeOnKey(KEY, (EntryProcessor<Object, Object, Integer>) getClassInstance()));
+        assertEquals(Integer.valueOf(2),
+                map.executeOnKey(map.keySet().iterator().next(), (EntryProcessor<Object, Object, Integer>) getClassInstance()));
     }
 
     @Override

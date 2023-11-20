@@ -16,9 +16,18 @@
 
 package com.hazelcast.internal.namespace.imap;
 
+import com.hazelcast.map.PartitionPredicateTest;
+
 public class IMapPartitionPredicateUCDTest extends IMapPredicateUCDTest {
     @Override
+    protected void populate() {
+        for (int partitionId = 0; partitionId < PartitionPredicateTest.PARTITIONS; partitionId++) {
+            map.put(generateKeyForPartition(instance, partitionId), Void.TYPE);
+        }
+    }
+
+    @Override
     protected String[] getUserDefinedClassNames() {
-        return new String[] {"usercodedeployment.TruePagingPredicate"};
+        return new String[] {"usercodedeployment.TruePartition1PartitionPredicate"};
     }
 }

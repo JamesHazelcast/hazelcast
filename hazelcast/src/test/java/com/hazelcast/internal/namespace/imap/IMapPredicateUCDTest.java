@@ -24,7 +24,7 @@ import static org.junit.Assert.assertFalse;
 public class IMapPredicateUCDTest extends IMapUCDTest {
     @Test
     public void test() throws Exception {
-        map.put(Void.TYPE, Void.TYPE);
+        populate();
 
         assertFalse(map.values((Predicate<Object, Object>) getClassInstance()).isEmpty());
     }
