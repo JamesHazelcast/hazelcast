@@ -23,6 +23,7 @@ import com.hazelcast.config.NamespaceConfig;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.instance.impl.NamespaceAwareClassLoaderIntegrationTest;
 import com.hazelcast.jet.impl.deployment.MapResourceClassLoader;
+import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
 import com.hazelcast.test.HazelcastParametrizedRunner;
 import com.hazelcast.test.HazelcastTestSupport;
 import com.hazelcast.test.annotation.ParallelJVMTest;
@@ -43,6 +44,7 @@ import java.util.Collection;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 
 /**
@@ -200,8 +202,15 @@ public abstract class UCDTest extends HazelcastTestSupport {
     protected abstract void mutateConfig(Config config);
 
     private void registerClass(Config config) throws ClassNotFoundException {
-        for (String clazz : getUserDefinedClassNames()) {
-            namespaceConfig.addClass(mapResourceClassLoader.loadClass(clazz));
+        for (String className : getUserDefinedClassNames()) {
+            Class<?> clazz = mapResourceClassLoader.loadClass(className);
+
+            Class<?> unwanted = IdentifiedDataSerializable.class;
+            assertFalse(String.format(
+                    "%s should not implement %s, as unless done with care, when deserialized the parent might be deserialized instead",
+                    className, unwanted.getSimpleName()), unwanted.isAssignableFrom(clazz));
+
+            namespaceConfig.addClass(clazz);
         }
 
         config.getNamespacesConfig().addNamespaceConfig(namespaceConfig);
