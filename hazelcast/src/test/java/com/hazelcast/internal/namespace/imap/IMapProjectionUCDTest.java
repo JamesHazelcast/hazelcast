@@ -17,7 +17,6 @@
 package com.hazelcast.internal.namespace.imap;
 
 import com.hazelcast.projection.Projection;
-import org.junit.Test;
 
 import java.util.Map.Entry;
 
