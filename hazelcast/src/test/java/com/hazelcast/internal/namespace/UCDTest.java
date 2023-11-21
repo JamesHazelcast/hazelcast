@@ -17,6 +17,7 @@
 package com.hazelcast.internal.namespace;
 
 import com.google.common.collect.Lists;
+import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.client.test.TestHazelcastFactory;
 import com.hazelcast.config.Config;
 import com.hazelcast.config.NamespaceConfig;
@@ -28,6 +29,7 @@ import com.hazelcast.test.HazelcastParametrizedRunner;
 import com.hazelcast.test.HazelcastTestSupport;
 import com.hazelcast.test.annotation.ParallelJVMTest;
 import com.hazelcast.test.annotation.QuickTest;
+import io.netty.util.internal.StringUtil;
 import org.apache.commons.text.WordUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -73,13 +75,15 @@ public abstract class UCDTest extends HazelcastTestSupport {
 
     private enum ConnectionStyle {
         /** Work directly with the underlying {@link HazelcastInstance} */
-        MEMBER,
-        /** Work via a client proxy, gives additional testing scope */
-        CLIENT;
+        EMBEDDED,
+        /** Test communication between {@link HazelcastClient} & member */
+        CLIENT_TO_MEMBER,
+        /** Test communication between members - using a lite member as the entry point */
+        MEMBER_TO_MEMBER;
 
         @Override
         public String toString() {
-            return WordUtils.capitalizeFully(name());
+            return prettyPrintEnumName(name());
         }
     }
 
@@ -91,7 +95,7 @@ public abstract class UCDTest extends HazelcastTestSupport {
 
         @Override
         public String toString() {
-            return WordUtils.capitalizeFully(name());
+            return prettyPrintEnumName(name());
         }
     }
 
@@ -106,7 +110,7 @@ public abstract class UCDTest extends HazelcastTestSupport {
 
         @Override
         public String toString() {
-            return WordUtils.capitalizeFully(name());
+            return prettyPrintEnumName(name());
         }
     }
 
@@ -144,11 +148,14 @@ public abstract class UCDTest extends HazelcastTestSupport {
         member = testHazelcastFactory.newHazelcastInstance(config);
 
         switch (connectionStyle) {
-            case CLIENT:
+            case EMBEDDED:
+                instance = member;
+                break;
+            case CLIENT_TO_MEMBER:
                 instance = testHazelcastFactory.newHazelcastClient();
                 break;
-            case MEMBER:
-                instance = member;
+            case MEMBER_TO_MEMBER:
+                instance = testHazelcastFactory.newHazelcastInstance(config.setLiteMember(true));
                 break;
             default:
                 throw new IllegalArgumentException(connectionStyle.toString());
@@ -218,5 +225,9 @@ public abstract class UCDTest extends HazelcastTestSupport {
 
     protected String getNamespaceName() {
         return "ns1";
+    }
+
+    private static String prettyPrintEnumName(String name) {
+        return WordUtils.capitalizeFully(name.replace('_', StringUtil.SPACE));
     }
 }
