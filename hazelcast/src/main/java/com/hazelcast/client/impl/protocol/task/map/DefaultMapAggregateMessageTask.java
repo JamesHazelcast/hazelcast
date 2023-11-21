@@ -87,7 +87,7 @@ public abstract class DefaultMapAggregateMessageTask<P>
     }
 
     @Override
-    public Permission[] getRequiredPermissions() {
+    public Collection<Permission> getRequiredPermissions() {
         return extendPermissions(super.getRequiredPermissions(),
                 new MapPermission(getDistributedObjectName(), ActionConstants.ACTION_AGGREGATE));
     }

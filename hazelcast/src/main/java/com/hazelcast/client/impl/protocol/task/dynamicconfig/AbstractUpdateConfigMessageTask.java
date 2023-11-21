@@ -28,6 +28,7 @@ import com.hazelcast.security.permission.ConfigPermission;
 
 import java.security.Permission;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
@@ -54,12 +55,7 @@ public abstract class AbstractUpdateConfigMessageTask<P> extends AbstractMessage
 
     @Override
     public Permission getRequiredPermission() {
-        return null;
-    }
-
-    @Override
-    public Permission[] getRequiredPermissions() {
-        return new Permission[] {CONFIG_PERMISSION};
+        return CONFIG_PERMISSION;
     }
 
     @Override

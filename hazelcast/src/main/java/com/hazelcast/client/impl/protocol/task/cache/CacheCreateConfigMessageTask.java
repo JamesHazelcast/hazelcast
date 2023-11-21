@@ -36,8 +36,8 @@ import com.hazelcast.spi.impl.InternalCompletableFuture;
 import com.hazelcast.spi.merge.SplitBrainMergePolicyProvider;
 
 import java.security.Permission;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.function.BiConsumer;
 
 import static com.hazelcast.internal.config.ConfigValidator.checkCacheConfig;
@@ -92,8 +92,8 @@ public class CacheCreateConfigMessageTask
     }
 
     @Override
-    public Permission[] getRequiredPermissions() {
-        Collection<Permission> permissions = new ArrayList<>();
+    public Collection<Permission> getRequiredPermissions() {
+        Collection<Permission> permissions = new HashSet<>();
         permissions.add(new CachePermission(
                 CacheUtil.getDistributedObjectName(parameters.cacheConfig.asCacheConfig(serializationService).getName()),
                 ActionConstants.ACTION_CREATE));
@@ -104,7 +104,7 @@ public class CacheCreateConfigMessageTask
             permissions.add(new NamespacePermission(namespace, ActionConstants.ACTION_USE));
         }
 
-        return permissions.toArray(Permission[]::new);
+        return permissions;
     }
 
     @Override

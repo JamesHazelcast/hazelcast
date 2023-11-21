@@ -32,8 +32,8 @@ import com.hazelcast.topic.impl.DataAwareMessage;
 import com.hazelcast.topic.impl.TopicService;
 
 import java.security.Permission;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -84,8 +84,8 @@ public class TopicAddMessageListenerMessageTask
     }
 
     @Override
-    public Permission[] getRequiredPermissions() {
-        Collection<Permission> permissions = new ArrayList<>();
+    public Collection<Permission> getRequiredPermissions() {
+        Collection<Permission> permissions = new HashSet<>();
         permissions.add(new TopicPermission(getDistributedObjectName(), ActionConstants.ACTION_LISTEN));
 
         String namespace = TopicService.getNamespace(nodeEngine, getDistributedObjectName());
@@ -94,7 +94,7 @@ public class TopicAddMessageListenerMessageTask
             permissions.add(new NamespacePermission(namespace, ActionConstants.ACTION_USE));
         }
 
-        return permissions.toArray(Permission[]::new);
+        return permissions;
     }
 
     @Override

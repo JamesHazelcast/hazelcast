@@ -31,6 +31,7 @@ import com.hazelcast.security.permission.NamespacePermission;
 
 import java.security.Permission;
 import java.util.ArrayList;
+import java.util.Collection;
 
 public class AddReplicatedMapConfigMessageTask
         extends AbstractAddConfigMessageTask<DynamicConfigAddReplicatedMapConfigCodec.RequestParameters> {
@@ -76,7 +77,7 @@ public class AddReplicatedMapConfigMessageTask
     }
 
     @Override
-    public Permission[] getRequiredPermissions() {
+    public Collection<Permission> getRequiredPermissions() {
         if (parameters.namespace == null) {
             return super.getRequiredPermissions();
         } else {

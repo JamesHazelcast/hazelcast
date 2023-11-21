@@ -37,6 +37,7 @@ import com.hazelcast.security.permission.NamespacePermission;
 
 import java.security.Permission;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class AddMapConfigMessageTask
@@ -141,7 +142,7 @@ public class AddMapConfigMessageTask
     }
 
     @Override
-    public Permission[] getRequiredPermissions() {
+    public Collection<Permission> getRequiredPermissions() {
         if (parameters.namespace == null) {
             return super.getRequiredPermissions();
         } else {

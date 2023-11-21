@@ -30,6 +30,7 @@ import com.hazelcast.security.permission.ActionConstants;
 import com.hazelcast.security.permission.NamespacePermission;
 
 import java.security.Permission;
+import java.util.Collection;
 
 public class AddMultiMapConfigMessageTask extends
         AbstractAddConfigMessageTask<DynamicConfigAddMultiMapConfigCodec.RequestParameters> {
@@ -78,7 +79,7 @@ public class AddMultiMapConfigMessageTask extends
     }
 
     @Override
-    public Permission[] getRequiredPermissions() {
+    public Collection<Permission> getRequiredPermissions() {
         if (parameters.namespace == null) {
             return super.getRequiredPermissions();
         } else {

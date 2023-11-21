@@ -38,8 +38,8 @@ import com.hazelcast.security.permission.NamespacePermission;
 import com.hazelcast.security.permission.ReplicatedMapPermission;
 
 import java.security.Permission;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -84,8 +84,8 @@ public abstract class AbstractReplicatedMapAddEntryListenerMessageTask<Parameter
     }
 
     @Override
-    public Permission[] getRequiredPermissions() {
-        Collection<Permission> permissions = new ArrayList<>();
+    public Collection<Permission> getRequiredPermissions() {
+        Collection<Permission> permissions = new HashSet<>();
         permissions.add(new ReplicatedMapPermission(getDistributedObjectName(), ActionConstants.ACTION_LISTEN));
 
         ReplicatedMapService service = getService(getServiceName());
@@ -95,7 +95,7 @@ public abstract class AbstractReplicatedMapAddEntryListenerMessageTask<Parameter
             permissions.add(new NamespacePermission(namespace, ActionConstants.ACTION_USE));
         }
 
-        return permissions.toArray(Permission[]::new);
+        return permissions;
     }
 
     public abstract Predicate getPredicate();

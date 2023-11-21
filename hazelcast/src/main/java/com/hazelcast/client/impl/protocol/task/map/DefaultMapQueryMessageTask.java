@@ -52,7 +52,7 @@ public abstract class DefaultMapQueryMessageTask<P>
     }
 
     @Override
-    public Permission[] getRequiredPermissions() {
+    public Collection<Permission> getRequiredPermissions() {
         return extendPermissions(super.getRequiredPermissions(),
                 new MapPermission(getDistributedObjectName(), ActionConstants.ACTION_READ));
     }

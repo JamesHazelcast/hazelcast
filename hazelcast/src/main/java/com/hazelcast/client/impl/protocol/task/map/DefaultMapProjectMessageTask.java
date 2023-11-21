@@ -92,7 +92,7 @@ public abstract class DefaultMapProjectMessageTask<P>
     }
 
     @Override
-    public Permission[] getRequiredPermissions() {
+    public Collection<Permission> getRequiredPermissions() {
         return extendPermissions(super.getRequiredPermissions(),
                 new MapPermission(getDistributedObjectName(), ActionConstants.ACTION_PROJECTION));
     }

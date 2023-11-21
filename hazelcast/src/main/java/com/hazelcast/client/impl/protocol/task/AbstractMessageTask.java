@@ -35,7 +35,6 @@ import com.hazelcast.internal.nio.ConnectionType;
 import com.hazelcast.internal.serialization.InternalSerializationService;
 import com.hazelcast.internal.server.ServerConnection;
 import com.hazelcast.internal.tpcengine.net.AsyncSocket;
-import com.hazelcast.internal.util.collection.ArrayUtils;
 import com.hazelcast.internal.tpcengine.iobuffer.IOBuffer;
 import com.hazelcast.internal.tpcengine.iobuffer.IOBufferAllocator;
 import com.hazelcast.logging.ILogger;
@@ -243,9 +242,9 @@ public abstract class AbstractMessageTask<P> implements MessageTask, SecureReque
     private void checkPermissions(ClientEndpoint endpoint) {
         SecurityContext securityContext = clientEngine.getSecurityContext();
         if (securityContext != null) {
-            Permission[] permissions = getRequiredPermissions();
+            Collection<Permission> permissions = getRequiredPermissions();
             if (permissions != null) {
-                Arrays.stream(permissions).filter(Objects::nonNull)
+                permissions.stream().filter(Objects::nonNull)
                         .forEach(permission -> securityContext.checkPermission(endpoint.getSubject(), permission));
             }
         }
@@ -339,15 +338,17 @@ public abstract class AbstractMessageTask<P> implements MessageTask, SecureReque
         return getServiceName();
     }
 
-    protected static Permission[] extendPermissions(@Nullable Permission[] parentPermissions, Permission... permissions) {
-        if (parentPermissions == null) {
-            return permissions;
-        } else {
-            // TODO if https://github.com/hazelcast/hazelcast/pull/25953 is merged, "cumulativePermissions" can be deleted
-            Permission[] cumulativePermissions = new Permission[permissions.length + parentPermissions.length];
-            ArrayUtils.concat(permissions, parentPermissions, cumulativePermissions);
-            return cumulativePermissions;
+    protected static Collection<Permission> extendPermissions(@Nullable Collection<Permission> parentPermissions,
+            Permission permission) {
+        Collection<Permission> permissions = new HashSet<>();
+
+        if (parentPermissions != null) {
+            permissions.addAll(parentPermissions);
         }
+
+        permissions.add(permission);
+
+        return permissions;
     }
 
     protected final BuildInfo getMemberBuildInfo() {

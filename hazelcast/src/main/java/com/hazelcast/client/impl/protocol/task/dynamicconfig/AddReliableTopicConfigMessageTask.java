@@ -30,6 +30,7 @@ import com.hazelcast.security.permission.NamespacePermission;
 import com.hazelcast.topic.TopicOverloadPolicy;
 
 import java.security.Permission;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Executor;
 
@@ -74,7 +75,7 @@ public class AddReliableTopicConfigMessageTask
     }
 
     @Override
-    public Permission[] getRequiredPermissions() {
+    public Collection<Permission> getRequiredPermissions() {
         if (parameters.namespace == null) {
             return super.getRequiredPermissions();
         } else {

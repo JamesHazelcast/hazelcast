@@ -29,8 +29,8 @@ import com.hazelcast.security.permission.MapPermission;
 import com.hazelcast.security.permission.NamespacePermission;
 
 import java.security.Permission;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.UUID;
 import java.util.concurrent.Future;
 
@@ -78,8 +78,8 @@ public class MapRemoveEntryListenerMessageTask
     }
 
     @Override
-    public Permission[] getRequiredPermissions() {
-        Collection<Permission> permissions = new ArrayList<>();
+    public Collection<Permission> getRequiredPermissions() {
+        Collection<Permission> permissions = new HashSet<>();
         permissions.add(new MapPermission(getDistributedObjectName(), ActionConstants.ACTION_LISTEN));
 
         String namespace = MapServiceContext.lookupMapNamespace(nodeEngine, getDistributedObjectName());
@@ -88,7 +88,7 @@ public class MapRemoveEntryListenerMessageTask
             permissions.add(new NamespacePermission(namespace, ActionConstants.ACTION_USE));
         }
 
-        return permissions.toArray(Permission[]::new);
+        return permissions;
     }
 
     @Override

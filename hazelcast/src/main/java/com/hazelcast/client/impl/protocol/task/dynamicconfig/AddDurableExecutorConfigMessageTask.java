@@ -28,6 +28,7 @@ import com.hazelcast.security.permission.ActionConstants;
 import com.hazelcast.security.permission.NamespacePermission;
 
 import java.security.Permission;
+import java.util.Collection;
 
 public class AddDurableExecutorConfigMessageTask
         extends AbstractAddConfigMessageTask<DynamicConfigAddDurableExecutorConfigCodec.RequestParameters> {
@@ -65,7 +66,7 @@ public class AddDurableExecutorConfigMessageTask
     }
 
     @Override
-    public Permission[] getRequiredPermissions() {
+    public Collection<Permission> getRequiredPermissions() {
         if (parameters.namespace == null) {
             return super.getRequiredPermissions();
         } else {

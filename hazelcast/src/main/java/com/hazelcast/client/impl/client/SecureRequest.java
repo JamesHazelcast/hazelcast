@@ -19,6 +19,8 @@ package com.hazelcast.client.impl.client;
 import javax.annotation.Nullable;
 
 import java.security.Permission;
+import java.util.Collection;
+import java.util.Set;
 
 public interface SecureRequest {
     /**
@@ -34,10 +36,11 @@ public interface SecureRequest {
     @Nullable
     Permission getRequiredPermission();
 
-    // TODO Should this return a Collection instead?
     @Nullable
-    default Permission[] getRequiredPermissions() {
-        return new Permission[] {getRequiredPermission()};
+    default Collection<Permission> getRequiredPermissions() {
+        Permission permission = getRequiredPermission();
+
+        return permission == null ? null : Set.of(permission);
     }
 
     /**

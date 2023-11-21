@@ -71,14 +71,9 @@ public abstract class AbstractMapQueryMessageTask<P, QueryResult extends Result,
 
     @Override
     public Permission getRequiredPermission() {
-        return null;
-    }
-
-    @Override
-    public Permission[] getRequiredPermissions() {
         String namespace = getNamespace();
 
-        return namespace == null ? null : new Permission[] {new NamespacePermission(getNamespace(), ActionConstants.ACTION_USE)};
+        return namespace == null ? null : new NamespacePermission(getNamespace(), ActionConstants.ACTION_USE);
     }
 
     protected String getNamespace() {
