@@ -35,8 +35,6 @@ import com.hazelcast.spi.impl.eventservice.EventRegistration;
 import com.hazelcast.spi.impl.eventservice.EventService;
 
 import java.security.Permission;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -102,22 +100,13 @@ public class CacheAddPartitionLostListenerMessageTask
 
     @Override
     public Permission getRequiredPermission() {
-        return null;
+        return new CachePermission(getDistributedObjectName(), ActionConstants.ACTION_LISTEN);
     }
 
     @Override
-    public Collection<Permission> getRequiredPermissions() {
-        Collection<Permission> permissions = new HashSet<>();
-        permissions.add(new CachePermission(getDistributedObjectName(), ActionConstants.ACTION_LISTEN));
-
-        CacheService service = getService(getServiceName());
-        String namespace = service.getNamespace(getDistributedObjectName());
-
-        if (namespace != null) {
-            permissions.add(new NamespacePermission(namespace, ActionConstants.ACTION_USE));
-        }
-
-        return permissions;
+    public Permission getNamespacePermission() {
+        String namespace = getNamespace();
+        return namespace != null ? new NamespacePermission(namespace, ActionConstants.ACTION_USE) : null;
     }
 
     @Override

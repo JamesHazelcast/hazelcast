@@ -29,7 +29,6 @@ import com.hazelcast.security.permission.ActionConstants;
 import com.hazelcast.security.permission.NamespacePermission;
 
 import java.security.Permission;
-import java.util.Collection;
 import java.util.List;
 
 public class AddTopicConfigMessageTask
@@ -71,14 +70,8 @@ public class AddTopicConfigMessageTask
     }
 
     @Override
-    public Collection<Permission> getRequiredPermissions() {
-        if (parameters.namespace == null) {
-            return super.getRequiredPermissions();
-        } else {
-            // Require NamespacePermissions as the config is namespace aware - e.g. if inflating a MapStore, could be required
-            return extendPermissions(super.getRequiredPermissions(),
-                    new NamespacePermission(parameters.namespace, ActionConstants.ACTION_USE));
-        }
+    public Permission getNamespacePermission() {
+        return parameters.namespace != null ? new NamespacePermission(parameters.namespace, ActionConstants.ACTION_USE) : null;
     }
 
     @Override

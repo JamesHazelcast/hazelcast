@@ -150,15 +150,11 @@ public class MessageTaskSecurityTest {
         }
         ClassPool cp = ClassPool.getDefault();
         ClassFile cf = cp.get(clsname).getClassFile();
-        // Check both getRequiredPermission() and newly added getRequiredPermissions()
-        MethodInfo minfo1 = cf.getMethod("getRequiredPermission");
-        MethodInfo minfo2 = cf.getMethod("getRequiredPermissions");
-        if (minfo1 == null && minfo2 == null) {
+        MethodInfo minfo = cf.getMethod("getRequiredPermission");
+        if (minfo == null) {
             return doesGetRequiredPermissionSimpleReturnNull(cf.getSuperclass());
         }
-        // Prefer #getRequiredPermissions() if it exists as this supersedes #getRequiredPermission()
-        MethodInfo selected = minfo2 != null ? minfo2 : minfo1;
-        CodeAttribute ca = selected.getCodeAttribute();
+        CodeAttribute ca = minfo.getCodeAttribute();
         CodeIterator ci = ca.iterator();
         String[] ops = new String[RETURN_NULL_OPS.length];
         int i = 0;

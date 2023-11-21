@@ -26,6 +26,7 @@ import com.hazelcast.query.Predicates;
 import com.hazelcast.security.permission.ActionConstants;
 import com.hazelcast.security.permission.MapPermission;
 import com.hazelcast.internal.util.IterationType;
+import com.hazelcast.security.permission.NamespacePermission;
 
 import java.security.Permission;
 import java.util.Collection;
@@ -87,8 +88,13 @@ public abstract class DefaultMapAggregateMessageTask<P>
     }
 
     @Override
-    public Collection<Permission> getRequiredPermissions() {
-        return extendPermissions(super.getRequiredPermissions(),
-                new MapPermission(getDistributedObjectName(), ActionConstants.ACTION_AGGREGATE));
+    public Permission getNamespacePermission() {
+        String namespace = getNamespace();
+        return namespace != null ? new NamespacePermission(namespace, ActionConstants.ACTION_USE) : null;
+    }
+
+    @Override
+    public Permission getRequiredPermission() {
+        return new MapPermission(getDistributedObjectName(), ActionConstants.ACTION_AGGREGATE);
     }
 }

@@ -24,7 +24,7 @@ import com.hazelcast.map.impl.query.QueryResultRow;
 import com.hazelcast.internal.nio.Connection;
 import com.hazelcast.projection.Projection;
 import com.hazelcast.security.permission.ActionConstants;
-import com.hazelcast.security.permission.MapPermission;
+import com.hazelcast.security.permission.NamespacePermission;
 
 import java.security.Permission;
 import java.util.Collection;
@@ -52,8 +52,8 @@ public abstract class DefaultMapQueryMessageTask<P>
     }
 
     @Override
-    public Collection<Permission> getRequiredPermissions() {
-        return extendPermissions(super.getRequiredPermissions(),
-                new MapPermission(getDistributedObjectName(), ActionConstants.ACTION_READ));
+    public Permission getNamespacePermission() {
+        String namespace = getNamespace();
+        return namespace != null ? new NamespacePermission(getNamespace(), ActionConstants.ACTION_USE) : null;
     }
 }

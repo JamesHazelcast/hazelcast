@@ -28,6 +28,7 @@ import com.hazelcast.query.Predicates;
 import com.hazelcast.security.permission.ActionConstants;
 import com.hazelcast.security.permission.MapPermission;
 import com.hazelcast.internal.util.IterationType;
+import com.hazelcast.security.permission.NamespacePermission;
 
 import java.security.Permission;
 import java.util.ArrayList;
@@ -92,8 +93,13 @@ public abstract class DefaultMapProjectMessageTask<P>
     }
 
     @Override
-    public Collection<Permission> getRequiredPermissions() {
-        return extendPermissions(super.getRequiredPermissions(),
-                new MapPermission(getDistributedObjectName(), ActionConstants.ACTION_PROJECTION));
+    public Permission getRequiredPermission() {
+        return new MapPermission(getDistributedObjectName(), ActionConstants.ACTION_PROJECTION);
+    }
+
+    @Override
+    public Permission getNamespacePermission() {
+        String namespace = getNamespace();
+        return namespace != null ? new NamespacePermission(getNamespace(), ActionConstants.ACTION_USE) : null;
     }
 }

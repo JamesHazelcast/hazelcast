@@ -30,14 +30,11 @@ import com.hazelcast.internal.nio.Connection;
 import com.hazelcast.security.SecurityInterceptorConstants;
 import com.hazelcast.security.permission.ActionConstants;
 import com.hazelcast.security.permission.CachePermission;
-import com.hazelcast.security.permission.ConfigPermission;
 import com.hazelcast.security.permission.NamespacePermission;
 import com.hazelcast.spi.impl.InternalCompletableFuture;
 import com.hazelcast.spi.merge.SplitBrainMergePolicyProvider;
 
 import java.security.Permission;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.function.BiConsumer;
 
 import static com.hazelcast.internal.config.ConfigValidator.checkCacheConfig;
@@ -88,23 +85,14 @@ public class CacheCreateConfigMessageTask
 
     @Override
     public Permission getRequiredPermission() {
-        return new ConfigPermission();
+        CacheConfig cacheConfig = parameters.cacheConfig.asCacheConfig(serializationService);
+        return new CachePermission(CacheUtil.getDistributedObjectName(cacheConfig.getName()), ActionConstants.ACTION_CREATE);
     }
 
     @Override
-    public Collection<Permission> getRequiredPermissions() {
-        Collection<Permission> permissions = new HashSet<>();
-        permissions.add(new CachePermission(
-                CacheUtil.getDistributedObjectName(parameters.cacheConfig.asCacheConfig(serializationService).getName()),
-                ActionConstants.ACTION_CREATE));
-
+    public Permission getNamespacePermission() {
         String namespace = parameters.cacheConfig.getNamespace();
-
-        if (namespace != null) {
-            permissions.add(new NamespacePermission(namespace, ActionConstants.ACTION_USE));
-        }
-
-        return permissions;
+        return namespace != null ? new NamespacePermission(namespace, ActionConstants.ACTION_USE) : null;
     }
 
     @Override

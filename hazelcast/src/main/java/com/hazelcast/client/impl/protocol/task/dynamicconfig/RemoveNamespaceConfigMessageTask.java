@@ -28,7 +28,6 @@ import com.hazelcast.security.permission.ActionConstants;
 import com.hazelcast.security.permission.NamespacePermission;
 
 import java.security.Permission;
-import java.util.Collection;
 
 public class RemoveNamespaceConfigMessageTask
         extends AbstractRemoveConfigMessageTask<DynamicConfigRemoveNamespaceConfigCodec.RequestParameters> {
@@ -60,8 +59,7 @@ public class RemoveNamespaceConfigMessageTask
     }
 
     @Override
-    public Collection<Permission> getRequiredPermissions() {
-        return extendPermissions(super.getRequiredPermissions(),
-                new NamespacePermission(parameters.name, ActionConstants.ACTION_DESTROY));
+    public Permission getNamespacePermission() {
+        return parameters.name != null ? new NamespacePermission(parameters.name, ActionConstants.ACTION_DESTROY) : null;
     }
 }
