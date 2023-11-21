@@ -14,20 +14,21 @@
  * limitations under the License.
  */
 
-package com.hazelcast.internal.namespace.list;
+package com.hazelcast.internal.namespace.set;
 
 import com.hazelcast.map.IMap;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class ListItemListenerUCDTest extends ListUCDTest {
+public class SetItemListenerUCDTest extends SetUCDTest {
 
     @Override
     public void test() throws Exception {
-        IMap<String, Boolean> map = instance.getMap("ListItemListenerUCDTest");
-        list.add("item");
-        list.remove("item");
+
+        set.add("item");
+        set.remove("item");
+        IMap<String, Boolean> map = instance.getMap("SetItemListenerUCDTest");
         assertNotNull(map);
 
         assertTrueEventually("The 'added' key should be set to true eventually", () -> {
@@ -45,6 +46,6 @@ public class ListItemListenerUCDTest extends ListUCDTest {
 
     @Override
     protected String[] getUserDefinedClassNames() {
-        return new String[]{"usercodedeployment.ListItemListener"};
+        return new String[]{"usercodedeployment.SetItemListener"};
     }
 }
