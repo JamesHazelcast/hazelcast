@@ -131,7 +131,7 @@ public abstract class UCDTest extends HazelcastTestSupport {
     }
 
     /** Don't annotate children with {@code @Before}, framework controls test execution */
-    public void setUpInstance() throws IOException, ClassNotFoundException {
+    public void setUpInstance() throws IOException, ReflectiveOperationException {
         Config config = smallInstanceConfig();
 
         Path classRoot = Paths.get("src/test/class");

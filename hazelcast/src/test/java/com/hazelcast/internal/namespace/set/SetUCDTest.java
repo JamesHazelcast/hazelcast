@@ -30,7 +30,7 @@ public abstract class SetUCDTest extends UCDTest {
     protected ISet<Object> set;
 
     @Override
-    public void setUpInstance() throws IOException, ClassNotFoundException {
+    public void setUpInstance() throws IOException, ReflectiveOperationException {
         setConfig = new SetConfig(objectName);
         setConfig.setNamespace(getNamespaceName());
         super.setUpInstance();

@@ -30,7 +30,7 @@ public abstract class ListUCDTest extends UCDTest {
     protected IList<Object> list;
 
     @Override
-    public void setUpInstance() throws IOException, ClassNotFoundException {
+    public void setUpInstance() throws IOException, ReflectiveOperationException {
         listConfig = new ListConfig(objectName);
         listConfig.setNamespace(getNamespaceName());
 

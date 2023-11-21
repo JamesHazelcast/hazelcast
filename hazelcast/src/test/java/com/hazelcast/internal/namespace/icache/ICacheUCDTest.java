@@ -30,7 +30,7 @@ public abstract class ICacheUCDTest extends UCDTest {
 
     @Override
     @Before
-    public void setUpInstance() throws IOException, ClassNotFoundException {
+    public void setUpInstance() throws IOException, ReflectiveOperationException {
         cacheConfig = new CacheSimpleConfig(objectName);
         cacheConfig.setNamespace(getNamespaceName());
 

@@ -14,35 +14,35 @@
  * limitations under the License.
  */
 
-package com.hazelcast.internal.namespace.imap;
+package com.hazelcast.internal.namespace.querycache;
 
 import com.hazelcast.config.Config;
-import com.hazelcast.config.MapConfig;
-import com.hazelcast.internal.namespace.UCDTest;
-import com.hazelcast.map.IMap;
+import com.hazelcast.config.QueryCacheConfig;
+import com.hazelcast.internal.namespace.imap.IMapUCDTest;
+import com.hazelcast.map.QueryCache;
 
 import java.io.IOException;
 
-public abstract class IMapUCDTest extends UCDTest {
-    protected MapConfig mapConfig;
-    protected IMap<Object, Object> map;
+public abstract class QueryCacheUCDTest extends IMapUCDTest {
+    protected QueryCacheConfig queryCacheConfig;
+    protected QueryCache<Object, Object> cache;
 
     @Override
     public void setUpInstance() throws IOException, ReflectiveOperationException {
-        mapConfig = new MapConfig(objectName);
-        mapConfig.setNamespace(getNamespaceName());
+        String cacheName = randomName();
+
+        queryCacheConfig = new QueryCacheConfig(cacheName);
+        queryCacheConfig.setNamespace(getNamespaceName());
 
         super.setUpInstance();
 
-        map = instance.getMap(objectName);
-    }
-
-    protected void populate() {
-        map.put(1, 1);
+        cache = map.getQueryCache(cacheName);
     }
 
     @Override
     protected void mutateConfig(Config config) {
-        config.addMapConfig(mapConfig);
+        mapConfig.addQueryCacheConfig(queryCacheConfig);
+
+        super.mutateConfig(config);
     }
 }

@@ -28,7 +28,7 @@ public abstract class IQueueUCDTest extends UCDTest {
     protected IQueue<Object> queue;
 
     @Override
-    public void setUpInstance() throws IOException, ClassNotFoundException {
+    public void setUpInstance() throws IOException, ReflectiveOperationException {
         queueConfig = new QueueConfig(objectName);
         queueConfig.setNamespace(getNamespaceName());
 

@@ -30,7 +30,7 @@ public abstract class TopicUCDTest extends UCDTest {
     protected ITopic<Object> topic;
 
     @Override
-    public void setUpInstance() throws IOException, ClassNotFoundException {
+    public void setUpInstance() throws IOException, ReflectiveOperationException {
         reliableTopicConfig = new ReliableTopicConfig(objectName);
         reliableTopicConfig.setNamespace(getNamespaceName());
         super.setUpInstance();

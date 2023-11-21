@@ -28,7 +28,7 @@ public abstract class ReplicatedMapUCDTest extends UCDTest {
     protected ReplicatedMap<Object, Object> map;
 
     @Override
-    public void setUpInstance() throws IOException, ClassNotFoundException {
+    public void setUpInstance() throws IOException, ReflectiveOperationException {
         replicatedMapConfig = new ReplicatedMapConfig(objectName);
         replicatedMapConfig.setNamespace(getNamespaceName());
 
