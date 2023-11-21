@@ -368,6 +368,7 @@ public final class ReflectionUtils {
                     case 5: // CONSTANT_Long
                     case 6: // CONSTANT_Double
                         skipBytes(buffer, 8);
+                        i++;
                         break;
                     case 15: // CONSTANT_MethodHandle
                     case 17: // CONSTANT_Dynamic
