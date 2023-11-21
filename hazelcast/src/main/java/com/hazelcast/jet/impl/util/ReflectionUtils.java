@@ -338,17 +338,9 @@ public final class ReflectionUtils {
             //   to identify our desired UTF8 string representing the class name. Skips appropriate bytes for all other tags.
             // While it is generally convention for the index referenced by a CONSTANT_Class value to already be populated in
             //   the constant pool (forward references), it is not forbidden by JVM Spec to use backward references.
+            // We need to skip the payload of all irrelevant tags, by the amount defined in the JVM spec (see javadoc)
             for (int i = 1; i < constantPoolCount; i++) {
                 int tag = buffer.get() & 0xFF;
-
-                // Bytes to Skip calculated from the table in the constant pool table
-                // https://docs.oracle.com/javase/specs/jvms/se21/html/jvms-4.html#jvms-4.4
-                // Subtracting the tag bytes (typically 1) from the rest, e.g.:
-                // u1 tag
-                // u2 index
-                // u4 something_else
-                // Is a size of 6
-
                 switch (tag) {
                     case 1: // CONSTANT_Utf8
                         int length = buffer.getShort() & 0xFFFF;
