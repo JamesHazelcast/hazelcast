@@ -100,6 +100,6 @@ public abstract class DefaultMapProjectMessageTask<P>
     @Override
     public Permission getNamespacePermission() {
         String namespace = getNamespace();
-        return namespace != null ? new NamespacePermission(getNamespace(), ActionConstants.ACTION_USE) : null;
+        return namespace != null ? new NamespacePermission(namespace, ActionConstants.ACTION_USE) : null;
     }
 }

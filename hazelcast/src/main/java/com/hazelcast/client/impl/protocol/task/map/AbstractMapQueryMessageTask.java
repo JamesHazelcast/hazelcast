@@ -45,6 +45,7 @@ import com.hazelcast.query.Predicate;
 import com.hazelcast.query.QueryException;
 import com.hazelcast.security.permission.ActionConstants;
 import com.hazelcast.security.permission.MapPermission;
+import com.hazelcast.security.permission.NamespacePermission;
 import com.hazelcast.spi.impl.operationservice.Operation;
 import com.hazelcast.spi.impl.operationservice.impl.OperationServiceImpl;
 import java.security.Permission;
@@ -89,6 +90,12 @@ public abstract class AbstractMapQueryMessageTask<P, QueryResult extends Result,
     protected abstract ReducedResult reduce(Collection<AccumulatedResults> results);
 
     protected abstract IterationType getIterationType();
+
+    @Override
+    public Permission getNamespacePermission() {
+        String namespace = getNamespace();
+        return namespace != null ? new NamespacePermission(namespace, ActionConstants.ACTION_USE) : null;
+    }
 
     @Override
     protected final Object call() throws Exception {

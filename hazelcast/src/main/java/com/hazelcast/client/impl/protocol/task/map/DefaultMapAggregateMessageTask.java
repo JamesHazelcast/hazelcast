@@ -88,12 +88,6 @@ public abstract class DefaultMapAggregateMessageTask<P>
     }
 
     @Override
-    public Permission getNamespacePermission() {
-        String namespace = getNamespace();
-        return namespace != null ? new NamespacePermission(namespace, ActionConstants.ACTION_USE) : null;
-    }
-
-    @Override
     public Permission getRequiredPermission() {
         return new MapPermission(getDistributedObjectName(), ActionConstants.ACTION_AGGREGATE);
     }
