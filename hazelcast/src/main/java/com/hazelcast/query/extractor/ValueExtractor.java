@@ -119,6 +119,6 @@ public interface ValueExtractor<T, A> {
      * @param collector collector of the extracted value(s)
      * @see ValueCollector
      */
-    void extract(T target, A argument, ValueCollector collector);
+    void extract(T target, A argument, ValueCollector<Object> collector);
 
 }
