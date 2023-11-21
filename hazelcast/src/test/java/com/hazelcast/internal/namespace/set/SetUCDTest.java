@@ -14,37 +14,36 @@
  * limitations under the License.
  */
 
-package com.hazelcast.internal.namespace.list;
+package com.hazelcast.internal.namespace.set;
 
-import com.hazelcast.collection.IList;
+import com.hazelcast.collection.ISet;
 import com.hazelcast.config.Config;
 import com.hazelcast.config.ItemListenerConfig;
-import com.hazelcast.config.ListConfig;
+import com.hazelcast.config.SetConfig;
 import com.hazelcast.internal.namespace.UCDTest;
 
 import java.io.IOException;
-import java.util.List;
 
-public abstract class ListUCDTest extends UCDTest {
-    protected ListConfig listConfig;
-    protected IList<Object> list;
+public abstract class SetUCDTest extends UCDTest {
+
+    protected SetConfig setConfig;
+    protected ISet<Object> set;
 
     @Override
     public void setUpInstance() throws IOException, ClassNotFoundException {
-        listConfig = new ListConfig(objectName);
-        listConfig.setNamespace(getNamespaceName());
-
+        setConfig = new SetConfig(objectName);
+        setConfig.setNamespace(getNamespaceName());
         super.setUpInstance();
 
-        list = instance.getList(objectName);
+        set = instance.getSet(objectName);
     }
 
     @Override
     protected void mutateConfig(Config config) {
-        ItemListenerConfig itemListenerConfig = new ItemListenerConfig();
-        itemListenerConfig.setClassName(getUserDefinedClassNames()[0]);
+        ItemListenerConfig listenerConfig = new ItemListenerConfig();
+        listenerConfig.setClassName(getUserDefinedClassNames()[0]);
 
-        listConfig.setItemListenerConfigs(List.of(itemListenerConfig));
-        config.addListConfig(listConfig);
+        setConfig.addItemListenerConfig(listenerConfig);
+        config.addSetConfig(setConfig);
     }
 }

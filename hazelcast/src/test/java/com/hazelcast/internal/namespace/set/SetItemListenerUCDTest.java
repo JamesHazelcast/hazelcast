@@ -14,31 +14,38 @@
  * limitations under the License.
  */
 
-package com.hazelcast.internal.namespace.topic;
+package com.hazelcast.internal.namespace.set;
 
 import com.hazelcast.map.IMap;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class TopicMessageListenerUCDTest extends TopicUCDTest {
+public class SetItemListenerUCDTest extends SetUCDTest {
 
     @Override
     public void test() throws Exception {
-        objectName = "TopicMessageListenerUCDTest";
-        topic.publish(Byte.MIN_VALUE);
-        IMap<String, Boolean> map = instance.getMap("TopicMessageListenerUCDTest");
+
+        set.add("item");
+        set.remove("item");
+        IMap<String, Boolean> map = instance.getMap("SetItemListenerUCDTest");
         assertNotNull(map);
 
-        assertTrueEventually("The 'processed' key should be set to true eventually", () -> {
-            Boolean processed = map.get("processed");
-            assertNotNull(processed);
-            assertTrue(map.get("processed"));
+        assertTrueEventually("The 'added' key should be set to true eventually", () -> {
+            Boolean added = map.get("added");
+            assertNotNull(added);
+            assertTrue(added);
+        });
+
+        assertTrueEventually("The 'removed' key should be set to true eventually", () -> {
+            Boolean removed = map.get("removed");
+            assertNotNull(removed);
+            assertTrue(removed);
         });
     }
 
     @Override
     protected String[] getUserDefinedClassNames() {
-        return new String[]{"usercodedeployment.TopicMessageListener"};
+        return new String[]{"usercodedeployment.SetItemListener"};
     }
 }
