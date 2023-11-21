@@ -47,6 +47,7 @@ import com.hazelcast.spi.impl.NodeEngine;
 import com.hazelcast.spi.impl.eventservice.EventFilter;
 import com.hazelcast.spi.properties.HazelcastProperty;
 
+import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -288,7 +289,7 @@ public interface MapServiceContext extends MapServiceContextInterceptorSupport,
      * @return the Namespace ID if found, or {@code null} otherwise.
      */
     // todo move this somewhere proper?
-    static String getNamespace(String mapName) {
+    static String getNamespace(@Nonnull String mapName) {
         // TODO: We lookup NodeEngine again later in the NS-awareness stack; can we optimize?
         NodeEngine engine = NodeEngineThreadLocalContext.getNamespaceThreadLocalContext();
         // We're skipping enablement checks here as they're handled at NS-awareness start logic
@@ -305,7 +306,7 @@ public interface MapServiceContext extends MapServiceContextInterceptorSupport,
      * @param mapName The name of the {@link com.hazelcast.map.IMap} to lookup for
      * @return the Namespace ID if found, or {@code null} otherwise.
      */
-    static String lookupMapNamespace(NodeEngine engine, String mapName) {
+    static String lookupMapNamespace(@Nonnull NodeEngine engine, @Nonnull String mapName) {
         MapService mapService = engine.getService(MapService.SERVICE_NAME);
         MapContainer container = mapService.getMapServiceContext().getExistingMapContainer(mapName);
         if (container != null) {
