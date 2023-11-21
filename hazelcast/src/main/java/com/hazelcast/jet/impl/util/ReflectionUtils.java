@@ -340,6 +340,15 @@ public final class ReflectionUtils {
             //   the constant pool (forward references), it is not forbidden by JVM Spec to use backward references.
             for (int i = 1; i < constantPoolCount; i++) {
                 int tag = buffer.get() & 0xFF;
+
+                // Bytes to Skip calculated from the table in the constant pool table
+                // https://docs.oracle.com/javase/specs/jvms/se21/html/jvms-4.html#jvms-4.4
+                // Subtracting the tag bytes (typically 1) from the rest, e.g.:
+                // u1 tag
+                // u2 index
+                // u4 something_else
+                // Is a size of 6
+
                 switch (tag) {
                     case 1: // CONSTANT_Utf8
                         int length = buffer.getShort() & 0xFFFF;
@@ -356,6 +365,9 @@ public final class ReflectionUtils {
                     case 20: // CONSTANT_Package
                         skipBytes(buffer, 2);
                         break;
+                    case 15: // CONSTANT_MethodHandle
+                        skipBytes(buffer, 3);
+                        break;
                     case 3: // CONSTANT_Integer
                     case 4: // CONSTANT_Float
                     case 9: // CONSTANT_Fieldref
@@ -363,6 +375,7 @@ public final class ReflectionUtils {
                     case 11: // CONSTANT_InterfaceMethodref
                     case 12: // CONSTANT_NameAndType
                     case 18: // CONSTANT_InvokeDynamic
+                    case 17: // CONSTANT_Dynamic
                         skipBytes(buffer, 4);
                         break;
                     case 5: // CONSTANT_Long
@@ -370,8 +383,6 @@ public final class ReflectionUtils {
                         skipBytes(buffer, 8);
                         i++;
                         break;
-                    case 15: // CONSTANT_MethodHandle
-                    case 17: // CONSTANT_Dynamic
                     default:
                         throw new IllegalArgumentException("Invalid constant pool tag: " + tag);
                 }
