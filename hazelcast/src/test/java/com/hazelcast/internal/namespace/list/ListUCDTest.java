@@ -18,10 +18,12 @@ package com.hazelcast.internal.namespace.list;
 
 import com.hazelcast.collection.IList;
 import com.hazelcast.config.Config;
+import com.hazelcast.config.ItemListenerConfig;
 import com.hazelcast.config.ListConfig;
 import com.hazelcast.internal.namespace.UCDTest;
 
 import java.io.IOException;
+import java.util.List;
 
 public abstract class ListUCDTest extends UCDTest {
     protected ListConfig listConfig;
@@ -39,6 +41,10 @@ public abstract class ListUCDTest extends UCDTest {
 
     @Override
     protected void mutateConfig(Config config) {
+        ItemListenerConfig itemListenerConfig = new ItemListenerConfig();
+        itemListenerConfig.setClassName(getUserDefinedClassNames()[0]);
+
+        listConfig.setItemListenerConfigs(List.of(itemListenerConfig));
         config.addListConfig(listConfig);
     }
 }
