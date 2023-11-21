@@ -28,7 +28,6 @@ import com.hazelcast.security.permission.ActionConstants;
 import com.hazelcast.security.permission.NamespacePermission;
 
 import java.security.Permission;
-import java.util.Collection;
 
 public class AddNamespaceConfigMessageTask
         extends AbstractAddConfigMessageTask<DynamicConfigAddNamespaceConfigCodec.RequestParameters> {
@@ -60,9 +59,8 @@ public class AddNamespaceConfigMessageTask
     }
 
     @Override
-    public Collection<Permission> getRequiredPermissions() {
-        return extendPermissions(super.getRequiredPermissions(),
-                new NamespacePermission(parameters.name, ActionConstants.ACTION_CREATE));
+    public Permission getNamespacePermission() {
+        return parameters.name != null ? new NamespacePermission(parameters.name, ActionConstants.ACTION_CREATE) : null;
     }
 
     @Override

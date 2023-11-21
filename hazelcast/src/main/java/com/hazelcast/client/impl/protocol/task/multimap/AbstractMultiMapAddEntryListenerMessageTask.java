@@ -34,8 +34,6 @@ import com.hazelcast.security.permission.MultiMapPermission;
 import com.hazelcast.security.permission.NamespacePermission;
 
 import java.security.Permission;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -74,24 +72,15 @@ public abstract class AbstractMultiMapAddEntryListenerMessageTask<P>
 
     @Override
     public Permission getRequiredPermission() {
-        return null;
+        return new MultiMapPermission(getDistributedObjectName(), ActionConstants.ACTION_LISTEN);
     }
 
     @Override
-    public Collection<Permission> getRequiredPermissions() {
-        Collection<Permission> permissions = new HashSet<>();
-        permissions.add(new MultiMapPermission(getDistributedObjectName(), ActionConstants.ACTION_LISTEN));
-
+    public Permission getNamespacePermission() {
         MultiMapService service = getService(getServiceName());
         String namespace = service.getNamespace(getDistributedObjectName());
-
-        if (namespace != null) {
-            permissions.add(new NamespacePermission(namespace, ActionConstants.ACTION_USE));
-        }
-
-        return permissions;
+        return namespace != null ? new NamespacePermission(namespace, ActionConstants.ACTION_USE) : null;
     }
-
 
     @Override
     public String getMethodName() {

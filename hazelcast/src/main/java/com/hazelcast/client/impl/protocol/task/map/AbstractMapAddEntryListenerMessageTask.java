@@ -34,8 +34,6 @@ import com.hazelcast.security.permission.NamespacePermission;
 import com.hazelcast.spi.impl.eventservice.EventFilter;
 
 import java.security.Permission;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -83,21 +81,13 @@ public abstract class AbstractMapAddEntryListenerMessageTask<Parameter>
 
     @Override
     public Permission getRequiredPermission() {
-        return null;
+        return new MapPermission(getDistributedObjectName(), ActionConstants.ACTION_LISTEN);
     }
 
     @Override
-    public Collection<Permission> getRequiredPermissions() {
-        Collection<Permission> permissions = new HashSet<>();
-        permissions.add(new MapPermission(getDistributedObjectName(), ActionConstants.ACTION_LISTEN));
-
-        String namespace = MapServiceContext.lookupMapNamespace(nodeEngine, getDistributedObjectName());
-
-        if (namespace != null) {
-            permissions.add(new NamespacePermission(namespace, ActionConstants.ACTION_USE));
-        }
-
-        return permissions;
+    public Permission getNamespacePermission() {
+        String namespace = getNamespace();
+        return namespace != null ? new NamespacePermission(namespace, ActionConstants.ACTION_USE) : null;
     }
 
     private class ClientMapListener extends MapListenerAdapter<Object, Object> {

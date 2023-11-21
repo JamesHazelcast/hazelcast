@@ -34,7 +34,6 @@ import com.hazelcast.spi.impl.operationservice.Operation;
 
 import java.security.Permission;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -89,21 +88,13 @@ public class MapAddInterceptorMessageTask
 
     @Override
     public Permission getRequiredPermission() {
-        return null;
+        return new MapPermission(getDistributedObjectName(), ActionConstants.ACTION_INTERCEPT);
     }
 
     @Override
-    public Collection<Permission> getRequiredPermissions() {
-        Collection<Permission> permissions = new HashSet<>();
-        permissions.add(new MapPermission(getDistributedObjectName(), ActionConstants.ACTION_INTERCEPT));
-
+    public Permission getNamespacePermission() {
         String namespace = MapServiceContext.lookupMapNamespace(nodeEngine, getDistributedObjectName());
-
-        if (namespace != null) {
-            permissions.add(new NamespacePermission(namespace, ActionConstants.ACTION_USE));
-        }
-
-        return permissions;
+        return namespace != null ? new NamespacePermission(namespace, ActionConstants.ACTION_USE) : null;
     }
 
     @Override

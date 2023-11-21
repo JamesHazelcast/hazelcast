@@ -17,30 +17,26 @@
 package com.hazelcast.client.impl.client;
 
 import javax.annotation.Nullable;
-
 import java.security.Permission;
-import java.util.Collection;
-import java.util.Set;
 
 public interface SecureRequest {
-    /**
-     * Although this method is {@link Deprecated}, to avoid changing <em>every</em> implementation of {@link SecureRequest}, an
-     * implementation is still required. This to enforce that at least one permission accessor is implemented.
-     * <p>
-     * Once {@link getRequiredPermission()} is ready for removal, the {@code default} implementation of
-     * {@link getRequiredPermissions()} can also be removed.
-     *
-     * @deprecated use {@link #getDistributedObjectType()} instead
-     */
-    @Deprecated(since = "5.4")
-    @Nullable
+
     Permission getRequiredPermission();
 
+    /**
+     * Defines the {@link com.hazelcast.security.permission.NamespacePermission} associated
+     * with this request, if applicable. Since the majority of requests are not associated
+     * with a Namespace, this method returns {@code null} by default to reduce bloat.
+     * <p>
+     * Requests that are associated with a {@code Namespace} should implement this method
+     * and return the appropriate {@link com.hazelcast.security.permission.NamespacePermission}
+     *
+     * @return The {@link com.hazelcast.security.permission.NamespacePermission} required for
+     *         this task, or {@code null} if there is no Namespace associated with it.
+     */
     @Nullable
-    default Collection<Permission> getRequiredPermissions() {
-        Permission permission = getRequiredPermission();
-
-        return permission == null ? null : Set.of(permission);
+    default Permission getNamespacePermission() {
+        return null;
     }
 
     /**
