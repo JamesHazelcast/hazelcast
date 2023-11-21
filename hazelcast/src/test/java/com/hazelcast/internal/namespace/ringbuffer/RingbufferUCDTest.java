@@ -20,7 +20,6 @@ import com.hazelcast.config.Config;
 import com.hazelcast.config.RingbufferConfig;
 import com.hazelcast.internal.namespace.UCDTest;
 import com.hazelcast.ringbuffer.Ringbuffer;
-import org.junit.Before;
 
 import java.io.IOException;
 
@@ -29,12 +28,11 @@ public abstract class RingbufferUCDTest extends UCDTest {
     protected Ringbuffer<Object> ringBuffer;
 
     @Override
-    @Before
-    public void setUp() throws IOException, ClassNotFoundException {
+    public void setUpInstance() throws IOException, ClassNotFoundException {
         ringBufferConfig = new RingbufferConfig(objectName);
         ringBufferConfig.setNamespace(getNamespaceName());
 
-        super.setUp();
+        super.setUpInstance();
 
         ringBuffer = instance.getRingbuffer(objectName);
     }

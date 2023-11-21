@@ -20,7 +20,6 @@ import com.hazelcast.config.Config;
 import com.hazelcast.config.MapConfig;
 import com.hazelcast.internal.namespace.UCDTest;
 import com.hazelcast.map.IMap;
-import org.junit.Before;
 
 import java.io.IOException;
 
@@ -29,12 +28,11 @@ public abstract class IMapUCDTest extends UCDTest {
     protected IMap<Object, Object> map;
 
     @Override
-    @Before
-    public void setUp() throws IOException, ClassNotFoundException {
+    public void setUpInstance() throws IOException, ClassNotFoundException {
         mapConfig = new MapConfig(objectName);
         mapConfig.setNamespace(getNamespaceName());
 
-        super.setUp();
+        super.setUpInstance();
 
         map = instance.getMap(objectName);
     }

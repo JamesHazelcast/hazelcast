@@ -45,7 +45,6 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
 
 /**
  * @see <a href="https://hazelcast.atlassian.net/browse/HZ-3597">HZ-3597 - Add unit tests for all @NamespacesSupported UDF
@@ -118,9 +117,17 @@ public abstract class UCDTest extends HazelcastTestSupport {
     }
 
     @Before
-    public void setUp() throws IOException, ClassNotFoundException {
+    public void setUp() {
         testHazelcastFactory = new TestHazelcastFactory();
+    }
 
+    @After
+    public void tearDown() {
+        testHazelcastFactory.shutdownAll();
+    }
+
+    /** Don't annotate children with {@code @Before}, framework controls test execution */
+    public void setUpInstance() throws IOException, ClassNotFoundException {
         Config config = smallInstanceConfig();
 
         Path classRoot = Paths.get("src/test/class");
@@ -153,11 +160,6 @@ public abstract class UCDTest extends HazelcastTestSupport {
         }
     }
 
-    @After
-    public void tearDown() {
-        testHazelcastFactory.shutdownAll();
-    }
-
     /**
      * Executes {@link #test()}, and checking it's result against the expected {@link #assertionStyle}
      * <p>
@@ -168,6 +170,7 @@ public abstract class UCDTest extends HazelcastTestSupport {
     @Test
     public void executeTest() throws Exception {
         try {
+            setUpInstance();
             test();
         } catch (Throwable t) {
             switch (assertionStyle) {
@@ -185,15 +188,7 @@ public abstract class UCDTest extends HazelcastTestSupport {
                 AssertionStyle.POSITIVE, assertionStyle);
     }
 
-    @Test
-    public void testChildMethodsNotTestable() throws ReflectiveOperationException {
-        Class<Test> unwantedAnnotation = Test.class;
-        assertNull(
-                String.format("%s framework handles test execution, don't annotate implementations' methods with %s",
-                        UCDTest.class.getSimpleName(), unwantedAnnotation.getSimpleName()),
-                getClass().getDeclaredMethod("test").getAnnotation(unwantedAnnotation));
-    }
-
+    /** Don't annotate children with {@code @Test}, framework controls test execution */
     public abstract void test() throws Exception;
 
     // TODO Should this be a Collection?

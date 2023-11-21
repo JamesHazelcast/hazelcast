@@ -20,7 +20,6 @@ import com.hazelcast.config.Config;
 import com.hazelcast.config.ReplicatedMapConfig;
 import com.hazelcast.internal.namespace.UCDTest;
 import com.hazelcast.replicatedmap.ReplicatedMap;
-import org.junit.Before;
 
 import java.io.IOException;
 
@@ -29,12 +28,11 @@ public abstract class ReplicatedMapUCDTest extends UCDTest {
     protected ReplicatedMap<Object, Object> map;
 
     @Override
-    @Before
-    public void setUp() throws IOException, ClassNotFoundException {
+    public void setUpInstance() throws IOException, ClassNotFoundException {
         replicatedMapConfig = new ReplicatedMapConfig(objectName);
         replicatedMapConfig.setNamespace(getNamespaceName());
 
-        super.setUp();
+        super.setUpInstance();
 
         map = instance.getReplicatedMap(objectName);
     }

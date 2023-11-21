@@ -20,7 +20,6 @@ import com.hazelcast.collection.IList;
 import com.hazelcast.config.Config;
 import com.hazelcast.config.ListConfig;
 import com.hazelcast.internal.namespace.UCDTest;
-import org.junit.Before;
 
 import java.io.IOException;
 
@@ -29,12 +28,11 @@ public abstract class ListUCDTest extends UCDTest {
     protected IList<Object> list;
 
     @Override
-    @Before
-    public void setUp() throws IOException, ClassNotFoundException {
+    public void setUpInstance() throws IOException, ClassNotFoundException {
         listConfig = new ListConfig(objectName);
         listConfig.setNamespace(getNamespaceName());
 
-        super.setUp();
+        super.setUpInstance();
 
         list = instance.getList(objectName);
     }
