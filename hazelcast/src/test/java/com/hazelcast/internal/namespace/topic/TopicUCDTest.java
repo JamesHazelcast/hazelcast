@@ -5,7 +5,6 @@ import com.hazelcast.config.ListenerConfig;
 import com.hazelcast.config.ReliableTopicConfig;
 import com.hazelcast.internal.namespace.UCDTest;
 import com.hazelcast.topic.ITopic;
-import org.junit.Before;
 
 import java.io.IOException;
 
@@ -15,11 +14,10 @@ public abstract class TopicUCDTest extends UCDTest {
     protected ITopic<Object> topic;
 
     @Override
-    @Before
-    public void setUp() throws IOException, ClassNotFoundException {
+    public void setUpInstance() throws IOException, ClassNotFoundException {
         reliableTopicConfig = new ReliableTopicConfig(objectName);
         reliableTopicConfig.setNamespace(getNamespaceName());
-        super.setUp();
+        super.setUpInstance();
 
         topic = instance.getReliableTopic(objectName);
     }
