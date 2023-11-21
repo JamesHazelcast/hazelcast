@@ -104,7 +104,7 @@ public class QueryCacheEventPublisher {
             Accumulator accumulator = accumulatorRegistry.getOrCreate(partitionId);
 
             QueryCacheEventData singleEventData = newQueryCacheEventDataBuilder(false).withPartitionId(partitionId)
-                    .withEventType(eventType.getType()).build();
+                    .withEventType(eventType.getType()).withMapName(mapName).build();
 
             accumulator.accumulate(singleEventData);
         }

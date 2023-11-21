@@ -69,7 +69,7 @@ public class MapPublisherCreateWithValueMessageTask
         ClusterService clusterService = clientEngine.getClusterService();
         Collection<MemberImpl> members = clusterService.getMemberImpls();
         List<Future> snapshotFutures = NamespaceUtil.callWithNamespace(nodeEngine,
-                MapServiceContext.lookupMapNamespace(nodeEngine, getDistributedObjectName()),
+                MapServiceContext.lookupMapNamespace(nodeEngine, parameters.mapName),
                 () -> createPublishersAndGetSnapshotOf(members));
         return fetchMapSnapshotFrom(snapshotFutures);
     }
