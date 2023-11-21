@@ -4,11 +4,18 @@ Contents:
 
 - `ChildClass.class`, `ParentClass.class`: hierarchy of classes where `ChildClass extends ParentClass`.
 - `IncrementingEntryProcessor.class`: an `EntryProcessor` for `<Integer, Integer>` entries that increments value by 1.
+- `IncrementingJavaxEntryProcessor.class`: a `javax.cache.processor.EntryProcessor<K, V, T>` for `<Integer, Integer>` entries that increments value by 1.
+- `IncrementingValueExtractor`: a `ValueExtractor` that increments value by 1.
+- `IncrementingMapInterceptor.class`: an `MapInterceptor` that increments value by 1.
 - `ShadedClasses.jar`: contains a class `com.hazelcast.core.HazelcastInstance` that defines a `main` method.
 - `IncrementingEntryProcessor.jar`: contains `IncrementingEntryProcessor` class.
 - `ChildParent.jar`: contains `ChildClass` and `ParentClass` as described above.
 - `EntryProcessorWithAnonymousAndInner.jar`: contains class `EntryProcessorWithAnonymousAndInner`, to exercise loading classes with anonymous and named inner classes.
 - `LowerCaseValueEntryProcessor`, `UpperCaseValueEntryProcessor`: `EntryProcessor` who adjust the case of the value, with deliberately overlapping class names.
+- `AcceptAllIFunction`: a simple `IFunction` that always returns `true`.
+- `DerbyUpperCaseStringMapLoader`: connects to an embedded Derby database instance and returns the result of an upper-casing SQL query.
+- `H2WitHDataSourceBuilderVerionMapLoader`, `H2WithDriverManagerBuildVersionMapLoader`: connects to an embedded H2 database and returns the results of an SQL query for the databases' version.
+- `IdentityProjection`: a `Projection` that returns the input.
 
 Note: unless package is explicitly specified, all classes described above reside in package `usercodedeployment`.
 
