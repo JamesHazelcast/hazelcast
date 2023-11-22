@@ -18,10 +18,8 @@ package com.hazelcast.internal.namespace.replicatedmap;
 
 import com.hazelcast.config.Config;
 import com.hazelcast.config.EntryListenerConfig;
-import com.hazelcast.config.ListenerConfig;
 import com.hazelcast.map.IMap;
 
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
