@@ -25,11 +25,9 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.instance.impl.NamespaceAwareClassLoaderIntegrationTest;
 import com.hazelcast.jet.impl.deployment.MapResourceClassLoader;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
-import com.hazelcast.test.HazelcastParallelParametersRunnerFactory;
 import com.hazelcast.test.HazelcastParametrizedRunner;
 import com.hazelcast.test.HazelcastTestSupport;
-import com.hazelcast.test.annotation.ParallelJVMTest;
-import com.hazelcast.test.annotation.QuickTest;
+import com.hazelcast.test.annotation.SlowTest;
 import io.netty.util.internal.StringUtil;
 import org.apache.commons.text.WordUtils;
 import org.junit.After;
@@ -40,7 +38,6 @@ import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
-import org.junit.runners.Parameterized.UseParametersRunnerFactory;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -55,11 +52,8 @@ import static org.junit.Assert.assertFalse;
  * @see <a href="https://hazelcast.atlassian.net/browse/HZ-3597">HZ-3597 - Add unit tests for all @NamespacesSupported UDF
  *      interfaces, across all supported data structures</a>
  */
-// TODO NS Is this a quick test?
 @RunWith(HazelcastParametrizedRunner.class)
-// TODO NS should this test be parallelised?
-@UseParametersRunnerFactory(HazelcastParallelParametersRunnerFactory.class)
-@Category({QuickTest.class, ParallelJVMTest.class})
+@Category(SlowTest.class)
 public abstract class UCDTest extends HazelcastTestSupport {
     private static MapResourceClassLoader mapResourceClassLoader;
 
