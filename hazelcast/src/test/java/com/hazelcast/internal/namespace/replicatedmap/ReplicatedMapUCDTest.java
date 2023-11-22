@@ -34,7 +34,7 @@ public abstract class ReplicatedMapUCDTest extends UCDTest {
 
         super.setUpInstance();
 
-        map = instance.getReplicatedMap(objectName);
+        map = member.getReplicatedMap(objectName);
     }
 
     protected void populate() {

@@ -65,7 +65,7 @@ public abstract class UCDTest extends HazelcastTestSupport {
     @Parameter(2)
     public AssertionStyle assertionStyle;
 
-    private HazelcastInstance member;
+    protected HazelcastInstance member;
     protected HazelcastInstance instance;
 
     private NamespaceConfig namespaceConfig;
