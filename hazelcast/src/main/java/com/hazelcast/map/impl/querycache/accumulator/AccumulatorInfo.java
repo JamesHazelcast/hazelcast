@@ -17,7 +17,9 @@
 package com.hazelcast.map.impl.querycache.accumulator;
 
 import com.hazelcast.config.QueryCacheConfig;
+import com.hazelcast.internal.namespace.NamespaceUtil;
 import com.hazelcast.map.impl.MapDataSerializerHook;
+import com.hazelcast.map.impl.MapServiceContext;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
@@ -190,7 +192,7 @@ public class AccumulatorInfo implements IdentifiedDataSerializable {
         publishable = in.readBoolean();
         coalesce = in.readBoolean();
         populate = in.readBoolean();
-        predicate = in.readObject();
+        predicate = NamespaceUtil.callWithNamespace(MapServiceContext.getNamespace(mapName), in::readObject);
     }
 
     @Override
