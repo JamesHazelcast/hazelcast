@@ -25,6 +25,7 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.instance.impl.NamespaceAwareClassLoaderIntegrationTest;
 import com.hazelcast.jet.impl.deployment.MapResourceClassLoader;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
+import com.hazelcast.test.HazelcastParallelParametersRunnerFactory;
 import com.hazelcast.test.HazelcastParametrizedRunner;
 import com.hazelcast.test.HazelcastTestSupport;
 import com.hazelcast.test.annotation.ParallelJVMTest;
@@ -39,6 +40,7 @@ import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
+import org.junit.runners.Parameterized.UseParametersRunnerFactory;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -55,6 +57,8 @@ import static org.junit.Assert.assertFalse;
  */
 // TODO Is this a quick test?
 @RunWith(HazelcastParametrizedRunner.class)
+// TODO should this test be parallised?
+@UseParametersRunnerFactory(HazelcastParallelParametersRunnerFactory.class)
 @Category({QuickTest.class, ParallelJVMTest.class})
 public abstract class UCDTest extends HazelcastTestSupport {
     private static MapResourceClassLoader mapResourceClassLoader;
