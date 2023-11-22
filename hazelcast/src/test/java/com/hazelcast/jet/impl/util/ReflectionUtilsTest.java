@@ -232,9 +232,8 @@ public class ReflectionUtilsTest {
             // Special handling for CONSTANT_Class to point at our Utf8 index (1)
             if (tagId == 7) {
                 buffer.putShort((short) 1);
-            }
-            // Special handling for CONSTANT_Utf8 to write our fake class name
-            else if (tagId == 1) {
+            } else if (tagId == 1) {
+                // Special handling for CONSTANT_Utf8 to write our fake class name
                 byte[] bytes = "com.hazelcast.test.FakeClass".getBytes(StandardCharsets.UTF_8);
                 buffer.putShort((short) bytes.length);
                 buffer.put(bytes);
