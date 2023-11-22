@@ -51,6 +51,9 @@ public class AddExecutorConfigMessageTask
         ExecutorConfig config = new ExecutorConfig(parameters.name, parameters.poolSize);
         config.setQueueCapacity(parameters.queueCapacity);
         config.setStatisticsEnabled(parameters.statisticsEnabled);
+        if (parameters.isNamespaceExists) {
+            config.setNamespace(parameters.namespace);
+        }
         return config;
     }
 

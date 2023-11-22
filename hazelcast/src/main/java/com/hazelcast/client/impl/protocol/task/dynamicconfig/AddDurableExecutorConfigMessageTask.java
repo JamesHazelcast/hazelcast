@@ -54,9 +54,8 @@ public class AddDurableExecutorConfigMessageTask
         boolean statsEnabled = !parameters.isStatisticsEnabledExists
                 || parameters.statisticsEnabled;
 
-        DurableExecutorConfig config = new DurableExecutorConfig(parameters.name, parameters.poolSize,
-                parameters.durability, parameters.capacity, statsEnabled, parameters.namespace);
-        return config;
+        return new DurableExecutorConfig(parameters.name, parameters.poolSize, parameters.durability, parameters.capacity,
+                statsEnabled, parameters.isNamespaceExists ? parameters.namespace : null);
     }
 
     @Override

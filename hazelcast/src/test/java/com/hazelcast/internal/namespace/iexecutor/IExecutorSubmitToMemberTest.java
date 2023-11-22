@@ -25,7 +25,7 @@ public class IExecutorSubmitToMemberTest extends IExecutorUCDTest {
     @Override
     public void test() throws InterruptedException, ExecutionException, ReflectiveOperationException {
         assertNotNull(
-                executor.submitToMember((Callable<Object>) getClassInstance(), member.getCluster().getLocalMember()).get());
+                executor.submitToMember((Callable<?>) getClassInstance(), member.getCluster().getLocalMember()).get());
     }
 
     @Override

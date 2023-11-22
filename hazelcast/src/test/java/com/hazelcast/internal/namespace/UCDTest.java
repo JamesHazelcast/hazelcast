@@ -57,7 +57,7 @@ import static org.junit.Assert.assertFalse;
  */
 // TODO NS Is this a quick test?
 @RunWith(HazelcastParametrizedRunner.class)
-// TODO NS should this test be parallised?
+// TODO NS should this test be parallelised?
 @UseParametersRunnerFactory(HazelcastParallelParametersRunnerFactory.class)
 @Category({QuickTest.class, ParallelJVMTest.class})
 public abstract class UCDTest extends HazelcastTestSupport {

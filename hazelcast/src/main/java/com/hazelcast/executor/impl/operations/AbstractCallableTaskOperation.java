@@ -104,11 +104,11 @@ abstract class AbstractCallableTaskOperation extends Operation implements NamedO
             service.execute(name, uuid, loadTask(), AbstractCallableTaskOperation.this);
         }
 
-        private <T> T loadTask() {
+        private Object loadTask() {
             return NamespaceUtil.callWithNamespace(DistributedExecutorService.getNamespace(name), () -> {
                 ManagedContext managedContext = serializationService.getManagedContext();
                 Object object = serializationService.toObject(callableData);
-                return (T) managedContext.initialize(object);
+                return managedContext.initialize(object);
             });
         }
     }

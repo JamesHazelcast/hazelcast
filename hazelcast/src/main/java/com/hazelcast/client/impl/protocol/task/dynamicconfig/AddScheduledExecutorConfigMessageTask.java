@@ -66,6 +66,9 @@ public class AddScheduledExecutorConfigMessageTask
         if (parameters.isCapacityPolicyExists) {
             config.setCapacityPolicy(ScheduledExecutorConfig.CapacityPolicy.getById(parameters.capacityPolicy));
         }
+        if (parameters.isNamespaceExists) {
+            config.setNamespace(parameters.namespace);
+        }
         return config;
     }
 

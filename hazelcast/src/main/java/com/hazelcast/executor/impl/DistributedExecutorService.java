@@ -125,9 +125,12 @@ public class DistributedExecutorService implements ManagedService, RemoteService
         Processor processor;
         if (task instanceof Runnable) {
             processor = new Processor(name, uuid, (Runnable) task, op, cfg.isStatisticsEnabled(), cfg.getNamespace());
+        } else if (task instanceof Callable) {
+            processor = new Processor(name, uuid, (Callable<?>) task, op, cfg.isStatisticsEnabled(), cfg.getNamespace());
         } else {
-            processor = new Processor(name, uuid, (Callable) task, op, cfg.isStatisticsEnabled(), cfg.getNamespace());
+            throw new IllegalArgumentException(task.getClass().getName());
         }
+
         if (uuid != null) {
             submittedTasks.put(uuid, processor);
         }
