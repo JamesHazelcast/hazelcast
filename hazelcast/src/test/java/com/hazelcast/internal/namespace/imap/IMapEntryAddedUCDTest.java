@@ -23,7 +23,7 @@ import com.hazelcast.map.IMap;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class IMapEntryAddedUCDTest extends IMapUCDTest{
+public class IMapEntryAddedUCDTest extends IMapUCDTest {
     @Override
     public void test() throws Exception {
         map.put(1, 1);
