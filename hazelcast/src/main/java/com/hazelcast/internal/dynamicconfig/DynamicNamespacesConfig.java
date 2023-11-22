@@ -42,9 +42,9 @@ public class DynamicNamespacesConfig extends NamespacesConfig {
     }
 
     @Override
-    public NamespacesConfig removeNamespaceConfig(NamespaceConfig namespaceConfig) {
-        super.removeNamespaceConfig(namespaceConfig);
-        configurationServiceAccessor.get().unbroadcastConfig(namespaceConfig);
+    public NamespacesConfig removeNamespaceConfig(String namespace) {
+        super.removeNamespaceConfig(namespace);
+        configurationServiceAccessor.get().unbroadcastConfig(new NamespaceConfig(namespace));
         return this;
     }
 

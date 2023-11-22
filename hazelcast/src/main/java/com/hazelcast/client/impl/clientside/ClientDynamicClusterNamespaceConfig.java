@@ -50,9 +50,8 @@ public class ClientDynamicClusterNamespaceConfig extends NamespacesConfig {
     }
 
     @Override
-    public NamespacesConfig removeNamespaceConfig(NamespaceConfig namespaceConfig) {
-        parent.invoke(DynamicConfigRemoveNamespaceConfigCodec.encodeRequest(namespaceConfig.getName(),
-                toResourceDefinitionHolders(namespaceConfig)));
+    public NamespacesConfig removeNamespaceConfig(String namespace) {
+        parent.invoke(DynamicConfigRemoveNamespaceConfigCodec.encodeRequest(namespace));
         return this;
     }
 

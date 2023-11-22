@@ -39,7 +39,7 @@ public class NamespacesConfigReadOnly extends NamespacesConfig {
     }
 
     @Override
-    public NamespacesConfig removeNamespaceConfig(NamespaceConfig namespaceConfig) {
+    public NamespacesConfig removeNamespaceConfig(String namespace) {
         throw new UnsupportedOperationException("This config is read-only name-spaces");
     }
 

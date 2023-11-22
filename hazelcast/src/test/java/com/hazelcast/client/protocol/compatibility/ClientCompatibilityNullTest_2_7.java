@@ -6051,7 +6051,7 @@ public class ClientCompatibilityNullTest_2_7 {
     @Test
     public void test_DynamicConfigRemoveNamespaceConfigCodec_encodeRequest() {
         int fileClientMessageIndex = 767;
-        ClientMessage encoded = DynamicConfigRemoveNamespaceConfigCodec.encodeRequest(aString, aListOfResourceDefinitionHolders);
+        ClientMessage encoded = DynamicConfigRemoveNamespaceConfigCodec.encodeRequest(aString);
         ClientMessage fromFile = clientMessages.get(fileClientMessageIndex);
         compareClientMessages(fromFile, encoded);
     }

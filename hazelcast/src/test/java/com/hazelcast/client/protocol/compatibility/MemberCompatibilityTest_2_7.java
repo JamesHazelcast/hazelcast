@@ -6934,9 +6934,7 @@ public class MemberCompatibilityTest_2_7 {
     public void test_DynamicConfigRemoveNamespaceConfigCodec_decodeRequest() {
         int fileClientMessageIndex = 767;
         ClientMessage fromFile = clientMessages.get(fileClientMessageIndex);
-        DynamicConfigRemoveNamespaceConfigCodec.RequestParameters parameters = DynamicConfigRemoveNamespaceConfigCodec.decodeRequest(fromFile);
-        assertTrue(isEqual(aString, parameters.name));
-        assertTrue(isEqual(aListOfResourceDefinitionHolders, parameters.resources));
+        assertTrue(isEqual(aString, DynamicConfigRemoveNamespaceConfigCodec.decodeRequest(fromFile)));
     }
 
     @Test

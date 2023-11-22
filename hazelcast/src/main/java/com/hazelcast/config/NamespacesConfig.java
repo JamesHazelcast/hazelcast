@@ -60,8 +60,8 @@ public class NamespacesConfig {
         return this;
     }
 
-    public NamespacesConfig removeNamespaceConfig(NamespaceConfig namespaceConfig) {
-        namespaceConfigs.remove(namespaceConfig.getName(), namespaceConfig);
+    public NamespacesConfig removeNamespaceConfig(String namespace) {
+        namespaceConfigs.remove(namespace);
         return this;
     }
 

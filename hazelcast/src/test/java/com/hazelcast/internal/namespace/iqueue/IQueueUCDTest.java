@@ -21,8 +21,6 @@ import com.hazelcast.config.Config;
 import com.hazelcast.config.QueueConfig;
 import com.hazelcast.internal.namespace.UCDTest;
 
-import java.io.IOException;
-
 public abstract class IQueueUCDTest extends UCDTest {
     protected QueueConfig queueConfig;
     protected IQueue<Object> queue;

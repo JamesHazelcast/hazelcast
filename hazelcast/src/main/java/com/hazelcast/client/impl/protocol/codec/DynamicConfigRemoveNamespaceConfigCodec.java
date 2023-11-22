@@ -37,7 +37,7 @@ import static com.hazelcast.client.impl.protocol.codec.builtin.FixedSizeTypesCod
  * Removes a namespace configuration.
  */
 @SuppressWarnings("unused")
-@Generated("3cf48052a4117ccb2eb69f7aa9c99ae0")
+@Generated("6dc7de0fe61d7ece37f768d2a5c0fcc4")
 public final class DynamicConfigRemoveNamespaceConfigCodec {
     //hex: 0x1B1400
     public static final int REQUEST_MESSAGE_TYPE = 1774592;
@@ -49,21 +49,7 @@ public final class DynamicConfigRemoveNamespaceConfigCodec {
     private DynamicConfigRemoveNamespaceConfigCodec() {
     }
 
-    @edu.umd.cs.findbugs.annotations.SuppressFBWarnings({"URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD"})
-    public static class RequestParameters {
-
-        /**
-         * Namespace configuration name.
-         */
-        public java.lang.String name;
-
-        /**
-         * List of resource definitions.
-         */
-        public java.util.List<com.hazelcast.client.impl.protocol.task.dynamicconfig.ResourceDefinitionHolder> resources;
-    }
-
-    public static ClientMessage encodeRequest(java.lang.String name, java.util.List<com.hazelcast.client.impl.protocol.task.dynamicconfig.ResourceDefinitionHolder> resources) {
+    public static ClientMessage encodeRequest(java.lang.String name) {
         ClientMessage clientMessage = ClientMessage.createForEncode();
         clientMessage.setRetryable(false);
         clientMessage.setOperationName("DynamicConfig.RemoveNamespaceConfig");
@@ -72,18 +58,17 @@ public final class DynamicConfigRemoveNamespaceConfigCodec {
         encodeInt(initialFrame.content, PARTITION_ID_FIELD_OFFSET, -1);
         clientMessage.add(initialFrame);
         StringCodec.encode(clientMessage, name);
-        ListMultiFrameCodec.encode(clientMessage, resources, ResourceDefinitionCodec::encode);
         return clientMessage;
     }
 
-    public static DynamicConfigRemoveNamespaceConfigCodec.RequestParameters decodeRequest(ClientMessage clientMessage) {
+    /**
+     * Namespace configuration name.
+     */
+    public static java.lang.String decodeRequest(ClientMessage clientMessage) {
         ClientMessage.ForwardFrameIterator iterator = clientMessage.frameIterator();
-        RequestParameters request = new RequestParameters();
         //empty initial frame
         iterator.next();
-        request.name = StringCodec.decode(iterator);
-        request.resources = ListMultiFrameCodec.decode(iterator, ResourceDefinitionCodec::decode);
-        return request;
+        return StringCodec.decode(iterator);
     }
 
     public static ClientMessage encodeResponse() {

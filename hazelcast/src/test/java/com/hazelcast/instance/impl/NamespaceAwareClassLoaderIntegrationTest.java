@@ -254,7 +254,7 @@ public class NamespaceAwareClassLoaderIntegrationTest extends HazelcastTestSuppo
         processor.createExecuteAssertOnMap(hazelcastInstance);
 
         // And able to roll back by removing it again
-        hazelcastInstance.getConfig().getNamespacesConfig().removeNamespaceConfig(processor.namespace);
+        hazelcastInstance.getConfig().getNamespacesConfig().removeNamespaceConfig(processor.namespace.getName());
         assertThrows(Exception.class, () -> processor.createExecuteAssertOnMap(hazelcastInstance));
     }
 
@@ -357,7 +357,7 @@ public class NamespaceAwareClassLoaderIntegrationTest extends HazelcastTestSuppo
                     Accessors.getNode(member).getNamespaceService().hasNamespace(processor.namespace.getName()));
 
             // Remove
-            client.getConfig().getNamespacesConfig().removeNamespaceConfig(processor.namespace);
+            client.getConfig().getNamespacesConfig().removeNamespaceConfig(processor.namespace.getName());
             assertFalse("Namespace configuration removal has not propagated from client to member",
                     Accessors.getNode(member).getNamespaceService().hasNamespace(processor.namespace.getName()));
         } finally {

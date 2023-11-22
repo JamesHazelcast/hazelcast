@@ -18,7 +18,6 @@ package com.hazelcast.client.impl.protocol.task.dynamicconfig;
 
 import com.hazelcast.client.impl.protocol.ClientMessage;
 import com.hazelcast.client.impl.protocol.codec.DynamicConfigRemoveNamespaceConfigCodec;
-import com.hazelcast.config.ConfigAccessor;
 import com.hazelcast.config.NamespaceConfig;
 import com.hazelcast.instance.impl.Node;
 import com.hazelcast.internal.nio.Connection;
@@ -30,14 +29,14 @@ import com.hazelcast.security.permission.NamespacePermission;
 import java.security.Permission;
 
 public class RemoveNamespaceConfigMessageTask
-        extends AbstractRemoveConfigMessageTask<DynamicConfigRemoveNamespaceConfigCodec.RequestParameters> {
+        extends AbstractRemoveConfigMessageTask<String> {
 
     public RemoveNamespaceConfigMessageTask(ClientMessage clientMessage, Node node, Connection connection) {
         super(clientMessage, node, connection);
     }
 
     @Override
-    protected DynamicConfigRemoveNamespaceConfigCodec.RequestParameters decodeClientMessage(ClientMessage clientMessage) {
+    protected String decodeClientMessage(ClientMessage clientMessage) {
         return DynamicConfigRemoveNamespaceConfigCodec.decodeRequest(clientMessage);
     }
 
@@ -48,8 +47,7 @@ public class RemoveNamespaceConfigMessageTask
 
     @Override
     protected IdentifiedDataSerializable getConfig() {
-        NamespaceConfig config = new NamespaceConfig(parameters.name);
-        parameters.resources.forEach(holder -> ConfigAccessor.add(config, holder));
+        NamespaceConfig config = new NamespaceConfig(parameters);
         return config;
     }
 
@@ -60,6 +58,6 @@ public class RemoveNamespaceConfigMessageTask
 
     @Override
     public Permission getNamespacePermission() {
-        return parameters.name != null ? new NamespacePermission(parameters.name, ActionConstants.ACTION_DESTROY) : null;
+        return parameters != null ? new NamespacePermission(parameters, ActionConstants.ACTION_DESTROY) : null;
     }
 }
