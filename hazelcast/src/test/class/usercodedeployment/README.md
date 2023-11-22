@@ -3,7 +3,7 @@ This directory contains resources for testing user code deployment use cases.
 Contents:
 
 - `ChildClass.class`, `ParentClass.class`: hierarchy of classes where `ChildClass extends ParentClass`.
-- `IncrementingEntryProcessor.class`: an `EntryProcessor` for `<Integer, Integer>` entries that increments value by 1.
+- `IncrementingExternalEntryProcessor.class`: an `EntryProcessor` for `<Integer, Integer>` entries that increments value by 1 - renamed to avoid `IncrementingEntryProcessor` already on the classpath.
 - `IncrementingJavaxEntryProcessor.class`: a `javax.cache.processor.EntryProcessor<K, V, T>` for `<Integer, Integer>` entries that increments value by 1.
 - `IncrementingValueExtractor`: a `ValueExtractor` that increments value by 1.
 - `IncrementingMapInterceptor.class`: an `MapInterceptor` that increments value by 1.
