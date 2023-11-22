@@ -125,7 +125,7 @@ public abstract class UCDTest extends HazelcastTestSupport {
         return Lists.cartesianProduct(List.of(ConnectionStyle.values()), List.of(ConfigStyle.values()),
                 List.of(AssertionStyle.values())).stream().map(Collection::toArray)::iterator;
     }
-    
+
     @BeforeClass
     public static void setUpClass() throws IOException {
         Path classRoot = Paths.get("src/test/class");
