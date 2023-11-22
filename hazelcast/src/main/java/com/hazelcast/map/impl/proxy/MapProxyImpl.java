@@ -22,6 +22,7 @@ import com.hazelcast.core.EntryView;
 import com.hazelcast.core.ManagedContext;
 import com.hazelcast.internal.journal.EventJournalInitialSubscriberState;
 import com.hazelcast.internal.journal.EventJournalReader;
+import com.hazelcast.internal.namespace.NamespaceUtil;
 import com.hazelcast.internal.serialization.Data;
 import com.hazelcast.internal.serialization.impl.SerializationUtil;
 import com.hazelcast.internal.util.CollectionUtil;
@@ -38,6 +39,7 @@ import com.hazelcast.map.impl.ComputeIfPresentEntryProcessor;
 import com.hazelcast.map.impl.KeyValueConsumingEntryProcessor;
 import com.hazelcast.map.impl.MapEntryReplacingEntryProcessor;
 import com.hazelcast.map.impl.MapService;
+import com.hazelcast.map.impl.MapServiceContext;
 import com.hazelcast.map.impl.MergeEntryProcessor;
 import com.hazelcast.map.impl.SimpleEntryView;
 import com.hazelcast.map.impl.iterator.MapIterable;
@@ -963,9 +965,11 @@ public class MapProxyImpl<K, V> extends MapProxySupport<K, V> implements EventJo
         checkDoesNotContainPagingPredicate(predicate, "project");
 
         // HazelcastInstanceAware handled by cloning
-        projection = serializationService.toObject(serializationService.toData(projection));
+        Projection<? super Map.Entry<K, V>, R> clonedProjection =
+                NamespaceUtil.callWithNamespace(getNodeEngine(), MapServiceContext.lookupMapNamespace(getNodeEngine(), name),
+                        () -> serializationService.toObject(serializationService.toData(projection)));
 
-        QueryResult result = executeQueryInternal(predicate, null, projection, IterationType.VALUE, target);
+        QueryResult result = executeQueryInternal(predicate, null, clonedProjection, IterationType.VALUE, target);
         return transformToSet(serializationService, result, predicate, IterationType.VALUE, false, false);
     }
 
