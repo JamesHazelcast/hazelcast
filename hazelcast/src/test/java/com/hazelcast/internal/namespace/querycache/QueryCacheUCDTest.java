@@ -21,14 +21,12 @@ import com.hazelcast.config.QueryCacheConfig;
 import com.hazelcast.internal.namespace.imap.IMapUCDTest;
 import com.hazelcast.map.QueryCache;
 
-import java.io.IOException;
-
 public abstract class QueryCacheUCDTest extends IMapUCDTest {
     protected QueryCacheConfig queryCacheConfig;
     protected QueryCache<Object, Object> cache;
 
     @Override
-    public void setUpInstance() throws IOException, ReflectiveOperationException {
+    public void setUpInstance() throws ReflectiveOperationException {
         String cacheName = randomName();
 
         queryCacheConfig = new QueryCacheConfig(cacheName);

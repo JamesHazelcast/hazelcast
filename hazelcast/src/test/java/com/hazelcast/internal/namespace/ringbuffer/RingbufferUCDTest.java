@@ -21,14 +21,12 @@ import com.hazelcast.config.RingbufferConfig;
 import com.hazelcast.internal.namespace.UCDTest;
 import com.hazelcast.ringbuffer.Ringbuffer;
 
-import java.io.IOException;
-
 public abstract class RingbufferUCDTest extends UCDTest {
     protected RingbufferConfig ringBufferConfig;
     protected Ringbuffer<Object> ringBuffer;
 
     @Override
-    public void setUpInstance() throws IOException, ReflectiveOperationException {
+    public void setUpInstance() throws ReflectiveOperationException {
         ringBufferConfig = new RingbufferConfig(objectName);
         ringBufferConfig.setNamespace(getNamespaceName());
 

@@ -33,6 +33,7 @@ import io.netty.util.internal.StringUtil;
 import org.apache.commons.text.WordUtils;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
@@ -56,7 +57,7 @@ import static org.junit.Assert.assertFalse;
 @RunWith(HazelcastParametrizedRunner.class)
 @Category({QuickTest.class, ParallelJVMTest.class})
 public abstract class UCDTest extends HazelcastTestSupport {
-    private TestHazelcastFactory testHazelcastFactory;
+    private static MapResourceClassLoader mapResourceClassLoader;
 
     @Parameter(0)
     public ConnectionStyle connectionStyle;
@@ -65,11 +66,12 @@ public abstract class UCDTest extends HazelcastTestSupport {
     @Parameter(2)
     public AssertionStyle assertionStyle;
 
+    private TestHazelcastFactory testHazelcastFactory;
+
     protected HazelcastInstance member;
     protected HazelcastInstance instance;
 
     private NamespaceConfig namespaceConfig;
-    private MapResourceClassLoader mapResourceClassLoader;
 
     protected String objectName = randomName();
 
@@ -119,6 +121,12 @@ public abstract class UCDTest extends HazelcastTestSupport {
         return Lists.cartesianProduct(List.of(ConnectionStyle.values()), List.of(ConfigStyle.values()),
                 List.of(AssertionStyle.values())).stream().map(Collection::toArray)::iterator;
     }
+    
+    @BeforeClass
+    public static void setUpClass() throws IOException {
+        Path classRoot = Paths.get("src/test/class");
+        mapResourceClassLoader = NamespaceAwareClassLoaderIntegrationTest.generateMapResourceClassLoaderForDirectory(classRoot);
+    }
 
     @Before
     public void setUp() {
@@ -131,11 +139,9 @@ public abstract class UCDTest extends HazelcastTestSupport {
     }
 
     /** Don't annotate children with {@code @Before}, framework controls test execution */
-    public void setUpInstance() throws IOException, ReflectiveOperationException {
+    public void setUpInstance() throws ReflectiveOperationException {
         Config config = smallInstanceConfig();
 
-        Path classRoot = Paths.get("src/test/class");
-        mapResourceClassLoader = NamespaceAwareClassLoaderIntegrationTest.generateMapResourceClassLoaderForDirectory(classRoot);
         namespaceConfig = new NamespaceConfig(getNamespaceName());
 
         config.getNamespacesConfig().setEnabled(assertionStyle == AssertionStyle.POSITIVE);

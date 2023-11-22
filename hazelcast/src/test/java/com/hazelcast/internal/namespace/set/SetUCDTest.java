@@ -22,15 +22,13 @@ import com.hazelcast.config.ItemListenerConfig;
 import com.hazelcast.config.SetConfig;
 import com.hazelcast.internal.namespace.UCDTest;
 
-import java.io.IOException;
-
 public abstract class SetUCDTest extends UCDTest {
 
     protected SetConfig setConfig;
     protected ISet<Object> set;
 
     @Override
-    public void setUpInstance() throws IOException, ReflectiveOperationException {
+    public void setUpInstance() throws ReflectiveOperationException {
         setConfig = new SetConfig(objectName);
         setConfig.setNamespace(getNamespaceName());
         super.setUpInstance();

@@ -22,15 +22,13 @@ import com.hazelcast.config.Config;
 import com.hazelcast.internal.namespace.UCDTest;
 import org.junit.Before;
 
-import java.io.IOException;
-
 public abstract class ICacheUCDTest extends UCDTest {
     protected CacheSimpleConfig cacheConfig;
     protected ICache<Integer, Integer> cache;
 
     @Override
     @Before
-    public void setUpInstance() throws IOException, ReflectiveOperationException {
+    public void setUpInstance() throws ReflectiveOperationException {
         cacheConfig = new CacheSimpleConfig(objectName);
         cacheConfig.setNamespace(getNamespaceName());
 

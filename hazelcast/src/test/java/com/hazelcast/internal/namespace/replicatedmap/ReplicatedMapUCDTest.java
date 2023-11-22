@@ -21,14 +21,12 @@ import com.hazelcast.config.ReplicatedMapConfig;
 import com.hazelcast.internal.namespace.UCDTest;
 import com.hazelcast.replicatedmap.ReplicatedMap;
 
-import java.io.IOException;
-
 public abstract class ReplicatedMapUCDTest extends UCDTest {
     protected ReplicatedMapConfig replicatedMapConfig;
     protected ReplicatedMap<Object, Object> map;
 
     @Override
-    public void setUpInstance() throws IOException, ReflectiveOperationException {
+    public void setUpInstance() throws ReflectiveOperationException {
         replicatedMapConfig = new ReplicatedMapConfig(objectName);
         replicatedMapConfig.setNamespace(getNamespaceName());
 

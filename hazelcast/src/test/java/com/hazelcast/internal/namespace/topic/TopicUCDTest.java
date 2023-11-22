@@ -22,15 +22,13 @@ import com.hazelcast.config.ReliableTopicConfig;
 import com.hazelcast.internal.namespace.UCDTest;
 import com.hazelcast.topic.ITopic;
 
-import java.io.IOException;
-
 public abstract class TopicUCDTest extends UCDTest {
 
     protected ReliableTopicConfig reliableTopicConfig;
     protected ITopic<Object> topic;
 
     @Override
-    public void setUpInstance() throws IOException, ReflectiveOperationException {
+    public void setUpInstance() throws ReflectiveOperationException {
         reliableTopicConfig = new ReliableTopicConfig(objectName);
         reliableTopicConfig.setNamespace(getNamespaceName());
         super.setUpInstance();

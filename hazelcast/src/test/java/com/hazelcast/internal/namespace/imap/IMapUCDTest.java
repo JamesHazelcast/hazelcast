@@ -21,14 +21,12 @@ import com.hazelcast.config.MapConfig;
 import com.hazelcast.internal.namespace.UCDTest;
 import com.hazelcast.map.IMap;
 
-import java.io.IOException;
-
 public abstract class IMapUCDTest extends UCDTest {
     protected MapConfig mapConfig;
     protected IMap<Object, Object> map;
 
     @Override
-    public void setUpInstance() throws IOException, ReflectiveOperationException {
+    public void setUpInstance() throws ReflectiveOperationException {
         mapConfig = new MapConfig(objectName);
         mapConfig.setNamespace(getNamespaceName());
 

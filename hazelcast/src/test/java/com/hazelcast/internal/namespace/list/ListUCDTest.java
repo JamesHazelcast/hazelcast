@@ -22,7 +22,6 @@ import com.hazelcast.config.ItemListenerConfig;
 import com.hazelcast.config.ListConfig;
 import com.hazelcast.internal.namespace.UCDTest;
 
-import java.io.IOException;
 import java.util.List;
 
 public abstract class ListUCDTest extends UCDTest {
@@ -30,7 +29,7 @@ public abstract class ListUCDTest extends UCDTest {
     protected IList<Object> list;
 
     @Override
-    public void setUpInstance() throws IOException, ReflectiveOperationException {
+    public void setUpInstance() throws ReflectiveOperationException {
         listConfig = new ListConfig(objectName);
         listConfig.setNamespace(getNamespaceName());
 
