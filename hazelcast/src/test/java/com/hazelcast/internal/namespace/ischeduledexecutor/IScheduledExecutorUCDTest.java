@@ -16,21 +16,27 @@
 
 package com.hazelcast.internal.namespace.ischeduledexecutor;
 
-import com.hazelcast.config.ExecutorConfig;
-import com.hazelcast.internal.namespace.iexecutor.IExecutorUCDTest;
+import com.hazelcast.config.Config;
+import com.hazelcast.config.ScheduledExecutorConfig;
+import com.hazelcast.internal.namespace.UCDTest;
 import com.hazelcast.scheduledexecutor.IScheduledExecutorService;
 
-public abstract class IScheduledExecutorUCDTest extends IExecutorUCDTest {
-    protected ExecutorConfig executorConfig;
+public abstract class IScheduledExecutorUCDTest extends UCDTest {
+    protected ScheduledExecutorConfig scheduledExecutorConfig;
     protected IScheduledExecutorService executor;
 
     @Override
     public void setUpInstance() throws ReflectiveOperationException {
-        executorConfig = new ExecutorConfig(objectName);
-        executorConfig.setNamespace(getNamespaceName());
+        scheduledExecutorConfig = new ScheduledExecutorConfig(objectName);
+        scheduledExecutorConfig.setNamespace(getNamespaceName());
 
         super.setUpInstance();
 
         executor = instance.getScheduledExecutorService(objectName);
+    }
+
+    @Override
+    protected void mutateConfig(Config config) {
+        config.addScheduledExecutorConfig(scheduledExecutorConfig);
     }
 }
