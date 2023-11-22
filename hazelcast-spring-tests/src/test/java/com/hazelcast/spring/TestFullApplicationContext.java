@@ -35,6 +35,7 @@ import com.hazelcast.config.ClassFilter;
 import com.hazelcast.config.CompactSerializationConfig;
 import com.hazelcast.config.CompactSerializationConfigAccessor;
 import com.hazelcast.config.Config;
+import com.hazelcast.config.ConfigAccessor;
 import com.hazelcast.config.ConsistencyCheckStrategy;
 import com.hazelcast.config.DiscoveryConfig;
 import com.hazelcast.config.DiscoveryStrategyConfig;
@@ -1706,9 +1707,9 @@ public class TestFullApplicationContext extends HazelcastTestSupport {
 
         final NamespacesConfig namespacesConfig = config.getNamespacesConfig();
         assertTrue(namespacesConfig.isEnabled());
-        assertEquals(2, namespacesConfig.getNamespaceConfigs().size());
+        assertEquals(2, ConfigAccessor.getNamespaceConfigs(config).size());
 
-        final NamespaceConfig namespaceConfig = namespacesConfig.getNamespaceConfigs().get("ns1");
+        final NamespaceConfig namespaceConfig = ConfigAccessor.getNamespaceConfigs(config).get("ns1");
 
         assertNotNull(namespaceConfig);
         assertEquals("ns1", namespaceConfig.getName());
@@ -1733,7 +1734,7 @@ public class TestFullApplicationContext extends HazelcastTestSupport {
         assertArrayEquals(getTestFileBytes(zipPath.toFile()), zipId.get().payload());
         //validate NS2 ResourceDefinition contents.
 
-        final NamespaceConfig namespaceConfig2 = namespacesConfig.getNamespaceConfigs().get("ns2");
+        final NamespaceConfig namespaceConfig2 = ConfigAccessor.getNamespaceConfigs(config).get("ns2");
         assertNotNull(namespaceConfig2);
         assertEquals("ns2", namespaceConfig2.getName());
 

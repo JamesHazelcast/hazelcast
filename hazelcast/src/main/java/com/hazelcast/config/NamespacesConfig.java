@@ -65,7 +65,7 @@ public class NamespacesConfig {
         return this;
     }
 
-    public Map<String, NamespaceConfig> getNamespaceConfigs() {
+    Map<String, NamespaceConfig> getNamespaceConfigs() {
         return Collections.unmodifiableMap(namespaceConfigs);
     }
 
