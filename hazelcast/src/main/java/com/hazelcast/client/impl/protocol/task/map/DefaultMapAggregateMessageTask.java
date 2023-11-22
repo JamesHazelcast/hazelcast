@@ -26,7 +26,6 @@ import com.hazelcast.query.Predicates;
 import com.hazelcast.security.permission.ActionConstants;
 import com.hazelcast.security.permission.MapPermission;
 import com.hazelcast.internal.util.IterationType;
-import com.hazelcast.security.permission.NamespacePermission;
 
 import java.security.Permission;
 import java.util.Collection;
