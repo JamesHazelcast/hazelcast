@@ -49,7 +49,8 @@ public final class NodeEngineThreadLocalContext {
     public static NodeEngine getNamespaceThreadLocalContext() {
         NodeEngineThreadLocalContext tlContext = NE_THREAD_LOCAL.get();
         if (tlContext == null) {
-            throw new IllegalStateException("NodeEngine context is not available for Namespaces!");
+            throw new IllegalStateException("NodeEngine context is not available for Namespaces! Current thread: "
+                    + Thread.currentThread().getName() + " (" + Thread.currentThread().getId() + ")");
         } else {
             return tlContext.nodeEngine;
         }

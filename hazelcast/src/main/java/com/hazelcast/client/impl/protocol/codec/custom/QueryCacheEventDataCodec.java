@@ -62,10 +62,15 @@ public final class QueryCacheEventDataCodec {
 
         com.hazelcast.internal.serialization.Data dataKey = CodecUtil.decodeNullable(iterator, DataCodec::decode);
         com.hazelcast.internal.serialization.Data dataNewValue = CodecUtil.decodeNullable(iterator, DataCodec::decode);
-        java.lang.String mapName = StringCodec.decode(iterator);
+        boolean isMapNameExists = false;
+        java.lang.String mapName = null;
+        if (!iterator.peekNext().isEndFrame()) {
+            mapName = StringCodec.decode(iterator);
+            isMapNameExists = true;
+        }
 
         fastForwardToEndFrame(iterator);
 
-        return CustomTypeFactory.createQueryCacheEventData(dataKey, dataNewValue, sequence, eventType, partitionId, mapName);
+        return CustomTypeFactory.createQueryCacheEventData(dataKey, dataNewValue, sequence, eventType, partitionId, isMapNameExists, mapName);
     }
 }
