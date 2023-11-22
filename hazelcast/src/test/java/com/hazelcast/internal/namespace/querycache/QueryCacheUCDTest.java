@@ -34,7 +34,7 @@ public abstract class QueryCacheUCDTest extends IMapUCDTest {
 
         super.setUpInstance();
 
-        cache = map.getQueryCache(cacheName);
+        cache = member.getMap(objectName).getQueryCache(cacheName);
     }
 
     @Override
