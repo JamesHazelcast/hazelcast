@@ -375,7 +375,7 @@ public class QueueConfig implements IdentifiedDataSerializable, NamedConfig, Ver
     }
 
     /**
-     * TODO: Documentation
+     * TODO NS: Documentation
      * @since 5.4
      */
     public String getNamespace() {
@@ -383,7 +383,7 @@ public class QueueConfig implements IdentifiedDataSerializable, NamedConfig, Ver
     }
 
     /**
-     * TODO: Documentation
+     * TODO NS: Documentation
      * @since 5.4
      */
     public void setNamespace(@Nullable String namespace) {

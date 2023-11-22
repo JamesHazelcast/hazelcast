@@ -41,7 +41,7 @@ public abstract class AbstractMapOperationFactory implements OperationFactory {
     }
 
     /**
-     * TODO: sensible approach for operation factories?
+     * TODO NS: sensible approach for operation factories?
      * Utility method for obtaining the Namespace associated with the underlying IMap
      * used in this factory's operations - primarily for Namespace aware deserialization
      */

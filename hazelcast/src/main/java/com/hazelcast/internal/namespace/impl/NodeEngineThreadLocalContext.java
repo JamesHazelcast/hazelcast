@@ -18,8 +18,8 @@ package com.hazelcast.internal.namespace.impl;
 
 import com.hazelcast.spi.impl.NodeEngine;
 
-// todo should this be part of NamespaceThreadLocalContext if we keep it?
-// todo docs
+// TODO NS should this be part of NamespaceThreadLocalContext if we keep it?
+//  Documentation
 public final class NodeEngineThreadLocalContext {
 
     private static final ThreadLocal<NodeEngineThreadLocalContext> NE_THREAD_LOCAL = new ThreadLocal<>();

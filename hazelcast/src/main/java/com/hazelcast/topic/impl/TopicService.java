@@ -232,7 +232,7 @@ public class TopicService implements ManagedService, RemoteService, EventPublish
         provide(descriptor, context, TOPIC_PREFIX, getStats());
     }
 
-    // todo move this somewhere proper?
+    // TODO NS move this somewhere proper?
     public static String getNamespace(NodeEngine nodeEngine, String topicName) {
         // No regular containers available, fallback to config
         TopicConfig topicConfig = nodeEngine.getConfig().findTopicConfig(topicName);

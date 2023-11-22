@@ -288,9 +288,9 @@ public interface MapServiceContext extends MapServiceContextInterceptorSupport,
      * @param mapName The name of the {@link com.hazelcast.map.IMap} to lookup for
      * @return the Namespace ID if found, or {@code null} otherwise.
      */
-    // todo move this somewhere proper?
+    // TODO NS move this somewhere proper?
     static String getNamespace(@Nonnull String mapName) {
-        // TODO: We lookup NodeEngine again later in the NS-awareness stack; can we optimize?
+        // TODO NS: We lookup NodeEngine again later in the NS-awareness stack; can we optimize?
         NodeEngine engine = NodeEngineThreadLocalContext.getNamespaceThreadLocalContext();
         // We're skipping enablement checks here as they're handled at NS-awareness start logic
         return lookupMapNamespace(engine, mapName);

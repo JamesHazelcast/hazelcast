@@ -33,7 +33,7 @@ public abstract class ConfigClassLoaderTest extends HazelcastTestSupport {
         config.setClassLoader(HazelcastInstance.class.getClassLoader());
     }
 
-    // TODO Better way of doing this? We need to create an instance (or mock lots of pieces that account for NS)
+    // TODO NS: Better way of doing this? We need to create an instance (or mock lots of pieces that account for NS)
     //  and we need to reference that instance for NodeEngine context in tests
     protected void populateConfigClassLoader() {
         if (lastInstance != null) {

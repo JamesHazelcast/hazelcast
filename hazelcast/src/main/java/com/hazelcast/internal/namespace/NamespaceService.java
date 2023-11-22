@@ -25,9 +25,8 @@ import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.concurrent.Callable;
 
-// TODO proper documentation
+// TODO NS proper documentation
 public interface NamespaceService {
-    // TODO no idea for the format
     String SERVICE_NAME = "hz:impl:namespaceService";
     String DEFAULT_NAMESPACE_ID = "default";
 

@@ -77,7 +77,7 @@ public class NamespaceAwareClassLoaderTest extends ConfigClassLoaderTest {
         config.getNamespacesConfig().setEnabled(true);
     }
 
-    // TODO: This only validates cleanup from the test environment; would be good to
+    // TODO NS: This only validates cleanup from the test environment; would be good to
     //  validate for all threads somehow?
     @After
     public void validateNamespaceCleanup() {

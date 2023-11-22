@@ -55,9 +55,9 @@ import static org.junit.Assert.assertFalse;
  * @see <a href="https://hazelcast.atlassian.net/browse/HZ-3597">HZ-3597 - Add unit tests for all @NamespacesSupported UDF
  *      interfaces, across all supported data structures</a>
  */
-// TODO Is this a quick test?
+// TODO NS Is this a quick test?
 @RunWith(HazelcastParametrizedRunner.class)
-// TODO should this test be parallised?
+// TODO NS should this test be parallised?
 @UseParametersRunnerFactory(HazelcastParallelParametersRunnerFactory.class)
 @Category({QuickTest.class, ParallelJVMTest.class})
 public abstract class UCDTest extends HazelcastTestSupport {
@@ -208,7 +208,7 @@ public abstract class UCDTest extends HazelcastTestSupport {
     /** Don't annotate children with {@code @Test}, framework controls test execution */
     public abstract void test() throws Exception;
 
-    // TODO Should this be a Collection?
+    // TODO NS Should this be a Collection?
     protected abstract String[] getUserDefinedClassNames();
 
     protected abstract void mutateConfig(Config config);

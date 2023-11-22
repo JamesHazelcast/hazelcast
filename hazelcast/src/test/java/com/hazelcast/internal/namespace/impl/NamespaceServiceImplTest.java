@@ -118,7 +118,7 @@ public class NamespaceServiceImplTest {
         }
     }
 
-    // TODO This test is hacky and probably does not belong here - we should refactor/move it eventually
+    // TODO NS This test is hacky and probably does not belong here - we should refactor/move it eventually
     @Test
     void testXmlConfigLoadingForNamespacesWithIMap() {
         String stringPath =
@@ -157,7 +157,7 @@ public class NamespaceServiceImplTest {
         }
     }
 
-    // TODO These tests are hacky and probably does not belong here (should be programmatic even, since we have
+    // TODO NS These tests are hacky and probably does not belong here (should be programmatic even, since we have
     //      coverage in XMLConfigBuilderTest & YamlConfigBuilderTest?) We should refactor/move it eventually
     @Test
     void testXmlConfigDefinedFiltering_ClassBlacklist() {
@@ -260,7 +260,7 @@ public class NamespaceServiceImplTest {
     }
 
     // "No-op" implementation test
-    // TODO Should this be in a separate test class? It would only be the 1 test...
+    // TODO NS Should this be in a separate test class? It would only be the 1 test...
     @Test
     void testNoOpImplementation() {
         // Do not enable Namespaces in any form, results in No-Op implementation being used

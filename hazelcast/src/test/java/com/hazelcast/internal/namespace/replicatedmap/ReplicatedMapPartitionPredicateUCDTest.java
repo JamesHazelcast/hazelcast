@@ -28,7 +28,7 @@ public class ReplicatedMapPartitionPredicateUCDTest extends ReplicatedMapPredica
 
     @Override
     protected String[] getUserDefinedClassNames() {
-        // TODO
+        // TODO NS
         return new String[] {"usercodedeployment.TruePartition1PartitionPredicate"};
     }
 }

@@ -4040,7 +4040,7 @@
     ===== HAZELCAST USER CODE DEPLOYMENT V2 (NAMESPACES) CONFIGURATION =====
 
     Hazelcast UCD Namespaces are the next generation of User Code Deployment.
-    TODO: Expand documentation
+    TODO NS: Expand documentation
     -->
     <namespaces enabled="false">
         <java-serialization-filter defaults-disabled="true">

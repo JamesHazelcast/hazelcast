@@ -35,7 +35,7 @@ public class NamespaceUtil {
     private NamespaceUtil() {
     }
 
-    // TODO Docs for all methods
+    // TODO NS Docs for all methods
     public static void setupNamespace(@Nullable String namespace) {
         NodeEngine engine = NodeEngineThreadLocalContext.getNamespaceThreadLocalContext();
         setupNamespace(engine, namespace);

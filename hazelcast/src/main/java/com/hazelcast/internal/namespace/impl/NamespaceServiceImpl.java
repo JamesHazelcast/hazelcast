@@ -126,7 +126,7 @@ public final class NamespaceServiceImpl implements NamespaceService {
 
         ClassLoader loader = getClassLoaderForExactNamespace(namespace);
         if (loader == null) {
-            // TODO: Do we want to be this aggressive about floating Namespaces? We can only reach here if a
+            // TODO NS: Do we want to be this aggressive about floating Namespaces? We can only reach here if a
             //  Namespace was defined for a Distributed Object, but not within Namespaces config; feels correct
             throw new IllegalArgumentException("There is no environment defined for provided namespace: " + namespace);
         }

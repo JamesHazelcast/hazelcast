@@ -86,7 +86,7 @@ public class NamespaceAwareClassLoaderIntegrationTest extends HazelcastTestSuppo
 
     @BeforeClass
     public static void setUpClass() throws IOException {
-        // TODO Remove?
+        // TODO NS Remove?
         System.setProperty(MapResourceClassLoader.DEBUG_OUTPUT_PROPERTY, "true");
         classRoot = Paths.get("src/test/class");
         mapResourceClassLoader = generateMapResourceClassLoaderForDirectory(classRoot);
@@ -96,7 +96,7 @@ public class NamespaceAwareClassLoaderIntegrationTest extends HazelcastTestSuppo
 
     @AfterClass
     public static void cleanUpClass() {
-        // TODO Remove?
+        // TODO NS Remove?
         System.clearProperty(MapResourceClassLoader.DEBUG_OUTPUT_PROPERTY);
     }
 
@@ -106,7 +106,7 @@ public class NamespaceAwareClassLoaderIntegrationTest extends HazelcastTestSuppo
         config.getNamespacesConfig().setEnabled(true);
     }
 
-    // TODO: This only validates cleanup from the test environment; would be good to
+    // TODO NS: This only validates cleanup from the test environment; would be good to
     //  validate for all threads somehow?
     @After
     public void validateNamespaceCleanup() {
@@ -231,7 +231,7 @@ public class NamespaceAwareClassLoaderIntegrationTest extends HazelcastTestSuppo
                 namespaceH2Version);
     }
 
-    // TODO I think all the "milestone" tests should be in their own class(es) that extend this one
+    // TODO NS I think all the "milestone" tests should be in their own class(es) that extend this one
     /**
      * "As a Java developer, I can dynamically configure namespaces and their resources. A new data structure config I add at
      * runtime, can reference a namespace I dynamically added and resources will be looked up in the configured namespace."
@@ -337,7 +337,7 @@ public class NamespaceAwareClassLoaderIntegrationTest extends HazelcastTestSuppo
     }
 
     /**
-     * TODO Should this be somewhere else?
+     * TODO NS Should this be somewhere else?
      *
      * @see <a href="https://hazelcast.atlassian.net/browse/HZ-3450">HZ-3450 - Implement message tasks for adding & removing
      *      namespaces</a>
@@ -395,7 +395,7 @@ public class NamespaceAwareClassLoaderIntegrationTest extends HazelcastTestSuppo
                 "usercodedeployment.ComplexProcessor");
     }
 
-    // TODO use test parameters for nodeCount
+    // TODO NS use test parameters for nodeCount
     private void testMemberToMemberDeserialization(int nodeCount, String entryProcessClassName,
                                                                String... resourceClassNames) throws ReflectiveOperationException {
         assertGreaterOrEquals("nodeCount", nodeCount, 2);
@@ -516,7 +516,7 @@ public class NamespaceAwareClassLoaderIntegrationTest extends HazelcastTestSuppo
         }
     }
 
-    // TODO Put somewhere more sensible
+    // TODO NS Put somewhere more sensible
     /** Find & load all {@code .class} files in the scope of this test */
     public static MapResourceClassLoader generateMapResourceClassLoaderForDirectory(Path root) throws IOException {
         try (Stream<Path> stream = Files.walk(root.resolve("usercodedeployment"))) {
@@ -540,7 +540,7 @@ public class NamespaceAwareClassLoaderIntegrationTest extends HazelcastTestSuppo
         return OsHelper.ensureUnixSeparators(classKeyName);
     }
 
-    // TODO Put somewhere more sensible
+    // TODO NS Put somewhere more sensible
     public static Class<?> tryLoadClass(HazelcastInstance instance, String namespace, String className) throws ClassNotFoundException  {
         if (namespace != null) {
             NamespaceUtil.setupNamespace(getNodeEngineImpl(instance), namespace);
