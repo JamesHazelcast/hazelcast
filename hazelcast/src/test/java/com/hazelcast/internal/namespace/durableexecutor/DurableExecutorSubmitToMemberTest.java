@@ -14,21 +14,17 @@
  * limitations under the License.
  */
 
-package com.hazelcast.internal.namespace.ischeduledexecutor;
+package com.hazelcast.internal.namespace.durableexecutor;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertNotNull;
 
-//TODO NS this fails because com.hazelcast.internal.util.executor.PoolExecutorThreadFactory.nodeEngine is null
-public class IScheduledExecutorScheduleOnMemberTest extends IScheduledExecutorUCDTest {
+public class DurableExecutorSubmitToMemberTest extends DurableExecutorUCDTest {
     @Override
     public void test() throws InterruptedException, ExecutionException, ReflectiveOperationException {
-        assertNotNull(executor
-                .scheduleOnMember((Callable<?>) getClassInstance(), member.getCluster().getLocalMember(), 0, TimeUnit.SECONDS)
-                .get());
+        assertNotNull(executor.submitToKeyOwner((Callable<?>) getClassInstance(), generateKeyOwnedBy(member, true)).get());
     }
 
     @Override
