@@ -22,12 +22,11 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertNotNull;
 
-//TODO NS this fails because com.hazelcast.internal.util.executor.PoolExecutorThreadFactory.nodeEngine is null
 public class IScheduledExecutorScheduleOnMemberTest extends IScheduledExecutorUCDTest {
     @Override
     public void test() throws InterruptedException, ExecutionException, ReflectiveOperationException {
         assertNotNull(executor
-                .scheduleOnMember((Callable<?>) getClassInstance(), member.getCluster().getLocalMember(), 0, TimeUnit.SECONDS)
+                .scheduleOnMember((Callable<?>) getClassInstance(), getTargetLocalMember(), 0, TimeUnit.SECONDS)
                 .get());
     }
 

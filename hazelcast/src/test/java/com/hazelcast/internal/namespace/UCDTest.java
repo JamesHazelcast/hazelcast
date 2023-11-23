@@ -73,7 +73,7 @@ public abstract class UCDTest extends HazelcastTestSupport {
 
     protected String objectName = randomName();
 
-    private enum ConnectionStyle {
+    protected enum ConnectionStyle {
         /** Work directly with the underlying {@link HazelcastInstance} */
         EMBEDDED,
         /** Test communication between {@link HazelcastClient} & member */
@@ -87,7 +87,7 @@ public abstract class UCDTest extends HazelcastTestSupport {
         }
     }
 
-    private enum ConfigStyle {
+    protected enum ConfigStyle {
         /** All configuration is done <strong>before</strong> the instance is started */
         STATIC,
         /** Where possible, configuration is changed <strong>after</strong> the instance has started */
@@ -99,7 +99,7 @@ public abstract class UCDTest extends HazelcastTestSupport {
         }
     }
 
-    private enum AssertionStyle {
+    protected enum AssertionStyle {
         /** Happy path - assert the functionality works when configured correctly */
         POSITIVE,
         /**

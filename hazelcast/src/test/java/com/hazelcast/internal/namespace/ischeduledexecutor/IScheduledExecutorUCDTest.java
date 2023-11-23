@@ -16,6 +16,7 @@
 
 package com.hazelcast.internal.namespace.ischeduledexecutor;
 
+import com.hazelcast.cluster.Member;
 import com.hazelcast.config.Config;
 import com.hazelcast.config.ScheduledExecutorConfig;
 import com.hazelcast.internal.namespace.UCDTest;
@@ -38,5 +39,14 @@ public abstract class IScheduledExecutorUCDTest extends UCDTest {
     @Override
     protected void mutateConfig(Config config) {
         config.addScheduledExecutorConfig(scheduledExecutorConfig);
+    }
+
+    protected Member getTargetLocalMember() {
+        // We need a `Member` to execute on, which should be from our `instance` driver,
+        //  but when that instance is a Client, we need to use a target member
+        if (connectionStyle == ConnectionStyle.CLIENT_TO_MEMBER) {
+            return member.getCluster().getLocalMember();
+        }
+        return instance.getCluster().getLocalMember();
     }
 }
