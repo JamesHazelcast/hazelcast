@@ -19,15 +19,13 @@ package com.hazelcast.internal.namespace.list;
 import com.hazelcast.config.Config;
 import com.hazelcast.config.ItemListenerConfig;
 
-import java.util.List;
-
 public abstract class ListListenerUCDTest extends ListUCDTest {
     @Override
     protected void mutateConfig(Config config) {
         ItemListenerConfig itemListenerConfig = new ItemListenerConfig();
         itemListenerConfig.setClassName(getUserDefinedClassNames()[0]);
 
-        listConfig.setItemListenerConfigs(List.of(itemListenerConfig));
+        listConfig.addItemListenerConfig(itemListenerConfig);
         config.addListConfig(listConfig);
     }
 
