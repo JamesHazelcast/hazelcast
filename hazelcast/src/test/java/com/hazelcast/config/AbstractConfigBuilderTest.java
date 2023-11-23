@@ -122,7 +122,10 @@ public abstract class AbstractConfigBuilderTest extends HazelcastTestSupport {
     public abstract void readSetConfig();
 
     @Test
-    public abstract void readReliableTopic();
+    public abstract void readReliableTopicConfig();
+
+    @Test
+    public abstract void readTopicConfig();
 
     @Test
     public abstract void readRingbuffer();

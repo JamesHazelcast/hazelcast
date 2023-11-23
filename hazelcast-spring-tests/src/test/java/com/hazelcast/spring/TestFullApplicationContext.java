@@ -354,6 +354,8 @@ public class TestFullApplicationContext extends HazelcastTestSupport {
         assertTrue(cacheConfig.isDisablePerEntryInvalidationEvents());
         assertTrue(cacheConfig.getDataPersistenceConfig().isEnabled());
         assertTrue(cacheConfig.getDataPersistenceConfig().isFsync());
+        assertEquals("ns1", cacheConfig.getNamespace());
+
         EventJournalConfig journalConfig = cacheConfig.getEventJournalConfig();
         assertTrue(journalConfig.isEnabled());
         assertEquals(123, journalConfig.getCapacity());
@@ -395,6 +397,7 @@ public class TestFullApplicationContext extends HazelcastTestSupport {
         assertEquals(321, journalConfig.getTimeToLiveSeconds());
         assertEquals(MetadataPolicy.OFF, testMapConfig.getMetadataPolicy());
         assertTrue(testMapConfig.isReadBackupData());
+        assertEquals("ns1", testMapConfig.getNamespace());
         assertEquals(3, testMapConfig.getIndexConfigs().size());
         for (IndexConfig index : testMapConfig.getIndexConfigs()) {
             if ("name".equals(index.getAttributes().get(0))) {
@@ -569,6 +572,7 @@ public class TestFullApplicationContext extends HazelcastTestSupport {
         assertEquals(1000, testQConfig.getMaxSize());
         assertEquals(1, testQConfig.getItemListenerConfigs().size());
         assertTrue(testQConfig.isStatisticsEnabled());
+        assertEquals("ns1", testQConfig.getNamespace());
         ItemListenerConfig listenerConfig = testQConfig.getItemListenerConfigs().get(0);
         assertEquals("com.hazelcast.spring.DummyItemListener", listenerConfig.getClassName());
         assertTrue(listenerConfig.isIncludeValue());
@@ -621,6 +625,7 @@ public class TestFullApplicationContext extends HazelcastTestSupport {
         assertEquals(1, testRingbuffer.getBackupCount());
         assertEquals(1, testRingbuffer.getAsyncBackupCount());
         assertEquals(20, testRingbuffer.getTimeToLiveSeconds());
+        assertEquals("ns1", testRingbuffer.getNamespace());
         RingbufferStoreConfig store1 = testRingbuffer.getRingbufferStoreConfig();
         assertNotNull(store1);
         assertEquals(DummyRingbufferStore.class.getName(), store1.getClassName());
@@ -723,6 +728,7 @@ public class TestFullApplicationContext extends HazelcastTestSupport {
         assertEquals("com.hazelcast.spring.DummyMessageListener", listenerConfig.getClassName());
         assertEquals(10, testReliableTopic.getReadBatchSize());
         assertEquals(TopicOverloadPolicy.BLOCK, testReliableTopic.getTopicOverloadPolicy());
+        assertEquals("ns1", testReliableTopic.getNamespace());
     }
 
     @Test
@@ -732,6 +738,7 @@ public class TestFullApplicationContext extends HazelcastTestSupport {
         assertEquals(2, testMultiMapConfig.getEntryListenerConfigs().size());
         assertFalse(testMultiMapConfig.isBinary());
         assertFalse(testMultiMapConfig.isStatisticsEnabled());
+        assertEquals("ns1", testMultiMapConfig.getNamespace());
         for (EntryListenerConfig listener : testMultiMapConfig.getEntryListenerConfigs()) {
             if (listener.getClassName() != null) {
                 assertNull(listener.getImplementation());
@@ -758,6 +765,7 @@ public class TestFullApplicationContext extends HazelcastTestSupport {
         assertEquals(1, testListConfig.getBackupCount());
         assertEquals(1, testListConfig.getAsyncBackupCount());
         assertFalse(testListConfig.isStatisticsEnabled());
+        assertEquals("ns1", testListConfig.getNamespace());
 
         MergePolicyConfig mergePolicyConfig = testListConfig.getMergePolicyConfig();
         assertEquals("DiscardMergePolicy", mergePolicyConfig.getPolicy());
@@ -773,6 +781,7 @@ public class TestFullApplicationContext extends HazelcastTestSupport {
         assertEquals(0, testSetConfig.getBackupCount());
         assertEquals(0, testSetConfig.getAsyncBackupCount());
         assertFalse(testSetConfig.isStatisticsEnabled());
+        assertEquals("ns1", testSetConfig.getNamespace());
 
         MergePolicyConfig mergePolicyConfig = testSetConfig.getMergePolicyConfig();
         assertEquals("DiscardMergePolicy", mergePolicyConfig.getPolicy());
@@ -787,6 +796,7 @@ public class TestFullApplicationContext extends HazelcastTestSupport {
         assertEquals(1, testTopicConfig.getMessageListenerConfigs().size());
         assertTrue(testTopicConfig.isGlobalOrderingEnabled());
         assertFalse(testTopicConfig.isStatisticsEnabled());
+        assertEquals("ns1", testTopicConfig.getNamespace());
         ListenerConfig listenerConfig = testTopicConfig.getMessageListenerConfigs().get(0);
         assertEquals("com.hazelcast.spring.DummyMessageListener", listenerConfig.getClassName());
     }
@@ -804,6 +814,7 @@ public class TestFullApplicationContext extends HazelcastTestSupport {
         assertEquals(2, testExecConfig.getPoolSize());
         assertEquals(100, testExecConfig.getQueueCapacity());
         assertTrue(testExecConfig.isStatisticsEnabled());
+        assertEquals("ns1", testExecConfig.getNamespace());
         ExecutorConfig testExec2Config = config.getExecutorConfig("testExec2");
         assertNotNull(testExec2Config);
         assertEquals("testExec2", testExec2Config.getName());
@@ -821,6 +832,7 @@ public class TestFullApplicationContext extends HazelcastTestSupport {
         assertEquals(5, testExecConfig.getDurability());
         assertEquals(200, testExecConfig.getCapacity());
         assertFalse(testExecConfig.isStatisticsEnabled());
+        assertEquals("ns1", testExecConfig.getNamespace());
     }
 
     @Test
@@ -837,6 +849,7 @@ public class TestFullApplicationContext extends HazelcastTestSupport {
         assertEquals("PassThroughMergePolicy", mergePolicyConfig.getPolicy());
         assertEquals(101, mergePolicyConfig.getBatchSize());
         assertFalse(testExecConfig.isStatisticsEnabled());
+        assertEquals("ns1", testExecConfig.getNamespace());
     }
 
     @Test
@@ -1280,6 +1293,7 @@ public class TestFullApplicationContext extends HazelcastTestSupport {
         assertFalse(replicatedMapConfig.isAsyncFillup());
         assertFalse(replicatedMapConfig.isStatisticsEnabled());
         assertEquals("my-split-brain-protection", replicatedMapConfig.getSplitBrainProtectionName());
+        assertEquals("ns1", replicatedMapConfig.getNamespace());
 
         MergePolicyConfig mergePolicyConfig = replicatedMapConfig.getMergePolicyConfig();
         assertNotNull(mergePolicyConfig);

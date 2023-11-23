@@ -51,6 +51,7 @@
                                             </xs:documentation>
                                         </xs:annotation>
                                     </xs:element>
+                                    <xs:element name="namespace" type="xs:string" minOccurs="0"/>
                                 </xs:sequence>
                                 <xs:attribute name="name" use="required" type="xs:string"/>
                                 <xs:attribute name="pool-size" type="xs:string">
@@ -89,6 +90,7 @@
                                             </xs:documentation>
                                         </xs:annotation>
                                     </xs:element>
+                                    <xs:element name="namespace" type="xs:string" minOccurs="0"/>
                                 </xs:sequence>
                                 <xs:attribute name="name" use="required" type="xs:string"/>
                                 <xs:attribute name="pool-size" type="xs:string">
@@ -135,6 +137,7 @@
                                         </xs:annotation>
                                     </xs:element>
                                     <xs:element name="merge-policy" type="merge-policy" minOccurs="0"/>
+                                    <xs:element name="namespace" type="xs:string" minOccurs="0"/>
                                 </xs:all>
                                 <xs:attribute name="name" use="required" type="xs:string"/>
                                 <xs:attribute name="pool-size" type="xs:string" default="16">
@@ -265,6 +268,7 @@
                                         </xs:annotation>
                                     </xs:element>
                                     <xs:element name="merge-policy" type="merge-policy" minOccurs="0"/>
+                                    <xs:element name="namespace" type="xs:string" minOccurs="0"/>
                                 </xs:sequence>
                                 <xs:attribute name="name" use="required" type="xs:string"/>
                                 <xs:attribute name="priority-comparator-class-name" type="xs:string">
@@ -355,6 +359,7 @@
                                         </xs:annotation>
                                     </xs:element>
                                     <xs:element name="merge-policy" type="merge-policy" minOccurs="0"/>
+                                    <xs:element name="namespace" type="xs:string" minOccurs="0"/>
                                 </xs:sequence>
                                 <xs:attribute name="name" use="required" type="xs:string"/>
                                 <xs:attribute name="capacity" type="parameterized-unsigned-int">
@@ -434,6 +439,7 @@
                                             </xs:sequence>
                                         </xs:complexType>
                                     </xs:element>
+                                    <xs:element name="namespace" type="xs:string" minOccurs="0"/>
                                 </xs:sequence>
                                 <xs:attribute name="name" use="required" type="xs:string"/>
                                 <xs:attribute name="statistics-enabled" type="parameterized-boolean" default="true">
@@ -693,6 +699,7 @@
                                             </xs:sequence>
                                         </xs:complexType>
                                     </xs:element>
+                                    <xs:element name="namespace" type="xs:string" minOccurs="0"/>
                                 </xs:sequence>
                                 <xs:attribute name="name" use="required" type="xs:string"/>
                                 <xs:attribute name="in-memory-format" type="xs:string" default="BINARY">
@@ -910,6 +917,7 @@
                                     <xs:element name="data-persistence" type="data-persistence" minOccurs="0"/>
                                     <xs:element name="event-journal" type="event-journal" minOccurs="0"/>
                                     <xs:element name="merge-policy" type="merge-policy" minOccurs="0"/>
+                                    <xs:element name="namespace" type="xs:string" minOccurs="0"/>
                                 </xs:sequence>
                                 <xs:attribute name="name" type="xs:string" use="required">
                                     <xs:annotation>
@@ -1059,6 +1067,7 @@
                                         </xs:annotation>
                                     </xs:element>
                                     <xs:element name="merge-policy" type="merge-policy" minOccurs="0"/>
+                                    <xs:element name="namespace" type="xs:string" minOccurs="0"/>
                                 </xs:sequence>
                                 <xs:attribute name="name" type="xs:string" default="default"/>
                                 <xs:attribute name="backup-count" type="parameterized-backup-count">
@@ -1132,6 +1141,7 @@
                                         </xs:annotation>
                                     </xs:element>
                                     <xs:element name="merge-policy" type="merge-policy" minOccurs="0"/>
+                                    <xs:element name="namespace" type="xs:string" minOccurs="0"/>
                                 </xs:sequence>
                                 <xs:attribute name="name" use="required" type="xs:string"/>
                                 <xs:attribute name="max-size" type="xs:string">
@@ -1190,6 +1200,7 @@
                                         </xs:annotation>
                                     </xs:element>
                                     <xs:element name="merge-policy" type="merge-policy" minOccurs="0"/>
+                                    <xs:element name="namespace" type="xs:string" minOccurs="0"/>
                                 </xs:sequence>
                                 <xs:attribute name="name" use="required" type="xs:string"/>
                                 <xs:attribute name="max-size" type="xs:string">
@@ -1265,6 +1276,7 @@
                                             </xs:documentation>
                                         </xs:annotation>
                                     </xs:element>
+                                    <xs:element name="namespace" type="xs:string" minOccurs="0"/>
                                 </xs:sequence>
                                 <xs:attribute name="name" type="xs:string" default="default"/>
                             </xs:complexType>
@@ -1303,6 +1315,7 @@
                                         </xs:annotation>
                                     </xs:element>
                                     <xs:element name="merge-policy" type="merge-policy" minOccurs="0"/>
+                                    <xs:element name="namespace" type="xs:string" minOccurs="0"/>
                                 </xs:sequence>
                                 <xs:attribute name="name" type="xs:string" default="default"/>
                                 <xs:attribute name="in-memory-format" type="in-memory-format" default="OBJECT"/>

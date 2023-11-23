@@ -639,6 +639,7 @@ public class YamlConfigBuilderTest extends AbstractConfigBuilderTest {
                 + "      merge-policy:\n"
                 + "        batch-size: 23\n"
                 + "        class-name: CustomMergePolicy\n"
+                + "      namespace: ns1\n"
                 + "    default:\n"
                 + "      max-size: 42\n";
 
@@ -651,6 +652,7 @@ public class YamlConfigBuilderTest extends AbstractConfigBuilderTest {
         assertEquals(1, customQueueConfig.getEmptyQueueTtl());
         assertEquals("com.hazelcast.collection.impl.queue.model.PriorityElementComparator",
                 customQueueConfig.getPriorityComparatorClassName());
+        assertEquals("ns1", customQueueConfig.getNamespace());
 
         MergePolicyConfig mergePolicyConfig = customQueueConfig.getMergePolicyConfig();
         assertEquals("CustomMergePolicy", mergePolicyConfig.getPolicy());
@@ -780,7 +782,7 @@ public class YamlConfigBuilderTest extends AbstractConfigBuilderTest {
 
     @Override
     @Test
-    public void readReliableTopic() {
+    public void readReliableTopicConfig() {
         String yaml = ""
                 + "hazelcast:\n"
                 + "  reliable-topic:\n"
@@ -791,6 +793,7 @@ public class YamlConfigBuilderTest extends AbstractConfigBuilderTest {
                 + "      message-listeners:\n"
                 + "        - MessageListenerImpl\n"
                 + "        - MessageListenerImpl2\n"
+                + "      namespace: ns1\n"
                 + "    default:\n"
                 + "      read-batch-size: 42\n";
 
@@ -801,6 +804,7 @@ public class YamlConfigBuilderTest extends AbstractConfigBuilderTest {
         assertEquals(35, topicConfig.getReadBatchSize());
         assertFalse(topicConfig.isStatisticsEnabled());
         assertEquals(TopicOverloadPolicy.DISCARD_OLDEST, topicConfig.getTopicOverloadPolicy());
+        assertEquals("ns1", topicConfig.getNamespace());
 
         // checking listener configuration
         assertEquals(2, topicConfig.getMessageListenerConfigs().size());
@@ -813,6 +817,45 @@ public class YamlConfigBuilderTest extends AbstractConfigBuilderTest {
 
         ReliableTopicConfig defaultReliableTopicConfig = config.getReliableTopicConfig("default");
         assertEquals(42, defaultReliableTopicConfig.getReadBatchSize());
+    }
+
+    @Override
+    @Test
+    public void readTopicConfig() {
+        String yaml = ""
+                + "hazelcast:\n"
+                + "  topic:\n"
+                + "    custom:\n"
+                + "      statistics-enabled: false\n"
+                + "      global-ordering-enabled: true\n"
+                + "      multi-threading-enabled: false\n"
+                + "      message-listeners:\n"
+                + "        - MessageListenerImpl\n"
+                + "        - MessageListenerImpl2\n"
+                + "      namespace: ns1\n"
+                + "    default:\n"
+                + "      namespace: ns2\n";
+
+        Config config = buildConfig(yaml);
+
+        TopicConfig topicConfig = config.getTopicConfig("custom");
+
+        assertFalse(topicConfig.isStatisticsEnabled());
+        assertTrue(topicConfig.isGlobalOrderingEnabled());
+        assertFalse(topicConfig.isMultiThreadingEnabled());
+        assertEquals("ns1", topicConfig.getNamespace());
+
+        // checking listener configuration
+        assertEquals(2, topicConfig.getMessageListenerConfigs().size());
+        ListenerConfig listenerConfig1 = topicConfig.getMessageListenerConfigs().get(0);
+        assertEquals("MessageListenerImpl", listenerConfig1.getClassName());
+        assertNull(listenerConfig1.getImplementation());
+        ListenerConfig listenerConfig2 = topicConfig.getMessageListenerConfigs().get(1);
+        assertEquals("MessageListenerImpl2", listenerConfig2.getClassName());
+        assertNull(listenerConfig2.getImplementation());
+
+        TopicConfig defaultTopicConfig = config.getTopicConfig("default");
+        assertEquals("ns2", defaultTopicConfig.getNamespace());
     }
 
     @Override
@@ -836,6 +879,7 @@ public class YamlConfigBuilderTest extends AbstractConfigBuilderTest {
                 + "      merge-policy:\n"
                 + "        class-name: CustomMergePolicy\n"
                 + "        batch-size: 2342\n"
+                + "      namespace: ns1\n"
                 + "    default:\n"
                 + "      capacity: 42\n";
 
@@ -847,6 +891,7 @@ public class YamlConfigBuilderTest extends AbstractConfigBuilderTest {
         assertEquals(1, ringbufferConfig.getAsyncBackupCount());
         assertEquals(9, ringbufferConfig.getTimeToLiveSeconds());
         assertEquals(InMemoryFormat.OBJECT, ringbufferConfig.getInMemoryFormat());
+        assertEquals("ns1", ringbufferConfig.getNamespace());
 
         RingbufferStoreConfig ringbufferStoreConfig = ringbufferConfig.getRingbufferStoreConfig();
         assertFalse(ringbufferStoreConfig.isEnabled());
@@ -2152,7 +2197,8 @@ public class YamlConfigBuilderTest extends AbstractConfigBuilderTest {
                 + "          cache-entry-listener-factory:\n"
                 + "            class-name: com.example.cache.MyEntryListenerFactory\n"
                 + "          cache-entry-event-filter-factory:\n"
-                + "            class-name: com.example.cache.MyEntryEventFilterFactory\n";
+                + "            class-name: com.example.cache.MyEntryEventFilterFactory\n"
+                + "      namespace: ns1\n";
 
         Config config = buildConfig(yaml);
         CacheSimpleConfig cacheConfig = config.getCacheConfig("foobar");
@@ -2171,6 +2217,8 @@ public class YamlConfigBuilderTest extends AbstractConfigBuilderTest {
         assertEquals(InMemoryFormat.BINARY, cacheConfig.getInMemoryFormat());
         assertEquals(1, cacheConfig.getBackupCount());
         assertEquals(0, cacheConfig.getAsyncBackupCount());
+        assertEquals("ns1", cacheConfig.getNamespace());
+
         assertEquals(1000, cacheConfig.getEvictionConfig().getSize());
         assertEquals(MaxSizePolicy.ENTRY_COUNT,
                 cacheConfig.getEvictionConfig().getMaxSizePolicy());
@@ -2211,7 +2259,8 @@ public class YamlConfigBuilderTest extends AbstractConfigBuilderTest {
                 + "      pool-size: 2\n"
                 + "      split-brain-protection-ref: customSplitBrainProtectionRule\n"
                 + "      statistics-enabled: false\n"
-                + "      queue-capacity: 0\n";
+                + "      queue-capacity: 0\n"
+                + "      namespace: ns1\n";
 
         Config config = buildConfig(yaml);
         ExecutorConfig executorConfig = config.getExecutorConfig("foobar");
@@ -2221,6 +2270,7 @@ public class YamlConfigBuilderTest extends AbstractConfigBuilderTest {
         assertEquals("customSplitBrainProtectionRule", executorConfig.getSplitBrainProtectionName());
         assertFalse(executorConfig.isStatisticsEnabled());
         assertEquals(0, executorConfig.getQueueCapacity());
+        assertEquals("ns1", executorConfig.getNamespace());
     }
 
     @Override
@@ -2234,7 +2284,8 @@ public class YamlConfigBuilderTest extends AbstractConfigBuilderTest {
                 + "      durability: 3\n"
                 + "      capacity: 4\n"
                 + "      split-brain-protection-ref: customSplitBrainProtectionRule\n"
-                + "      statistics-enabled: false\n";
+                + "      statistics-enabled: false\n"
+                + "      namespace: ns1\n";
 
         Config config = buildConfig(yaml);
         DurableExecutorConfig durableExecutorConfig = config.getDurableExecutorConfig("foobar");
@@ -2245,6 +2296,7 @@ public class YamlConfigBuilderTest extends AbstractConfigBuilderTest {
         assertEquals(4, durableExecutorConfig.getCapacity());
         assertEquals("customSplitBrainProtectionRule", durableExecutorConfig.getSplitBrainProtectionName());
         assertFalse(durableExecutorConfig.isStatisticsEnabled());
+        assertEquals("ns1", durableExecutorConfig.getNamespace());
     }
 
     @Override
@@ -2261,7 +2313,8 @@ public class YamlConfigBuilderTest extends AbstractConfigBuilderTest {
                 + "      statistics-enabled: false\n"
                 + "      merge-policy:\n"
                 + "        batch-size: 99\n"
-                + "        class-name: PutIfAbsent";
+                + "        class-name: PutIfAbsent\n"
+                + "      namespace: ns1\n";
 
         Config config = buildConfig(yaml);
         ScheduledExecutorConfig scheduledExecutorConfig = config.getScheduledExecutorConfig("foobar");
@@ -2274,6 +2327,7 @@ public class YamlConfigBuilderTest extends AbstractConfigBuilderTest {
         assertEquals(99, scheduledExecutorConfig.getMergePolicyConfig().getBatchSize());
         assertEquals("PutIfAbsent", scheduledExecutorConfig.getMergePolicyConfig().getPolicy());
         assertFalse(scheduledExecutorConfig.isStatisticsEnabled());
+        assertEquals("ns1", scheduledExecutorConfig.getNamespace());
     }
 
     @Override
@@ -2355,7 +2409,8 @@ public class YamlConfigBuilderTest extends AbstractConfigBuilderTest {
                 + "          local: true\n"
                 + "      merge-policy:\n"
                 + "        batch-size: 23\n"
-                + "        class-name: CustomMergePolicy";
+                + "        class-name: CustomMergePolicy\n"
+                + "      namespace: ns1\n";
 
         Config config = buildConfig(yaml);
         assertFalse(config.getMultiMapConfigs().isEmpty());
@@ -2369,6 +2424,7 @@ public class YamlConfigBuilderTest extends AbstractConfigBuilderTest {
         assertEquals("com.hazelcast.examples.EntryListener", multiMapConfig.getEntryListenerConfigs().get(0).getClassName());
         assertTrue(multiMapConfig.getEntryListenerConfigs().get(0).isIncludeValue());
         assertTrue(multiMapConfig.getEntryListenerConfigs().get(0).isLocal());
+        assertEquals("ns1", multiMapConfig.getNamespace());
 
         MergePolicyConfig mergePolicyConfig = multiMapConfig.getMergePolicyConfig();
         assertEquals("CustomMergePolicy", mergePolicyConfig.getPolicy());
@@ -2389,7 +2445,8 @@ public class YamlConfigBuilderTest extends AbstractConfigBuilderTest {
                 + "      split-brain-protection-ref: customSplitBrainProtectionRule\n"
                 + "      merge-policy:\n"
                 + "        batch-size: 2342\n"
-                + "        class-name: CustomMergePolicy\n";
+                + "        class-name: CustomMergePolicy\n"
+                + "      namespace: ns1\n";
 
         Config config = buildConfig(yaml);
         ReplicatedMapConfig replicatedMapConfig = config.getReplicatedMapConfig("foobar");
@@ -2399,6 +2456,7 @@ public class YamlConfigBuilderTest extends AbstractConfigBuilderTest {
         assertFalse(replicatedMapConfig.isAsyncFillup());
         assertFalse(replicatedMapConfig.isStatisticsEnabled());
         assertEquals("customSplitBrainProtectionRule", replicatedMapConfig.getSplitBrainProtectionName());
+        assertEquals("ns1", replicatedMapConfig.getNamespace());
 
         MergePolicyConfig mergePolicyConfig = replicatedMapConfig.getMergePolicyConfig();
         assertEquals("CustomMergePolicy", mergePolicyConfig.getPolicy());
@@ -2422,7 +2480,8 @@ public class YamlConfigBuilderTest extends AbstractConfigBuilderTest {
                 + "        class-name: SplitBrainMergePolicy\n"
                 + "      item-listeners:\n"
                 + "         - include-value: true\n"
-                + "           class-name: com.hazelcast.examples.ItemListener\n";
+                + "           class-name: com.hazelcast.examples.ItemListener\n"
+                + "      namespace: ns1\n";
 
         Config config = buildConfig(yaml);
         ListConfig listConfig = config.getListConfig("foobar");
@@ -2434,6 +2493,7 @@ public class YamlConfigBuilderTest extends AbstractConfigBuilderTest {
         assertEquals(1, listConfig.getAsyncBackupCount());
         assertEquals(1, listConfig.getItemListenerConfigs().size());
         assertEquals("com.hazelcast.examples.ItemListener", listConfig.getItemListenerConfigs().get(0).getClassName());
+        assertEquals("ns1", listConfig.getNamespace());
 
         MergePolicyConfig mergePolicyConfig = listConfig.getMergePolicyConfig();
         assertEquals(100, mergePolicyConfig.getBatchSize());
@@ -2456,7 +2516,8 @@ public class YamlConfigBuilderTest extends AbstractConfigBuilderTest {
                 + "       class-name: SplitBrainMergePolicy\n"
                 + "     item-listeners:\n"
                 + "         - include-value: true\n"
-                + "           class-name: com.hazelcast.examples.ItemListener\n";
+                + "           class-name: com.hazelcast.examples.ItemListener\n"
+                + "     namespace: ns1\n";
 
         Config config = buildConfig(yaml);
         SetConfig setConfig = config.getSetConfig("foobar");
@@ -2469,6 +2530,7 @@ public class YamlConfigBuilderTest extends AbstractConfigBuilderTest {
         assertEquals(1, setConfig.getItemListenerConfigs().size());
         assertTrue(setConfig.getItemListenerConfigs().get(0).isIncludeValue());
         assertEquals("com.hazelcast.examples.ItemListener", setConfig.getItemListenerConfigs().get(0).getClassName());
+        assertEquals("ns1", setConfig.getNamespace());
 
         MergePolicyConfig mergePolicyConfig = setConfig.getMergePolicyConfig();
         assertEquals(42, mergePolicyConfig.getBatchSize());
@@ -2544,7 +2606,8 @@ public class YamlConfigBuilderTest extends AbstractConfigBuilderTest {
                 + "      entry-listeners:\n"
                 + "         - class-name: com.your-package.MyEntryListener\n"
                 + "           include-value: false\n"
-                + "           local: false\n";
+                + "           local: false\n"
+                + "      namespace: ns1\n";
 
         Config config = buildConfig(yaml);
         MapConfig mapConfig = config.getMapConfig("foobar");
@@ -2563,6 +2626,8 @@ public class YamlConfigBuilderTest extends AbstractConfigBuilderTest {
         assertEquals(MaxSizePolicy.PER_NODE, mapConfig.getEvictionConfig().getMaxSizePolicy());
         assertEquals(42, mapConfig.getEvictionConfig().getSize());
         assertTrue(mapConfig.isReadBackupData());
+        assertEquals("ns1", mapConfig.getNamespace());
+
         assertEquals(1, mapConfig.getIndexConfigs().size());
         assertEquals("age", mapConfig.getIndexConfigs().get(0).getAttributes().get(0));
         assertTrue(mapConfig.getIndexConfigs().get(0).getType() == IndexType.SORTED);

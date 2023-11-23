@@ -858,6 +858,10 @@ hazelcast:
       # receive window size multiplier, only applies to distributed edges
       receive-window-multiplier: 3
 
+  # TODO NS: Properly document
+  namespaces:
+    enabled: false
+
   # Some features of Hazelcast are configured through the system properties.
   # You can configure the same properties here. This configuration overrides the
   # system properties. For a full list of recognized properties see
