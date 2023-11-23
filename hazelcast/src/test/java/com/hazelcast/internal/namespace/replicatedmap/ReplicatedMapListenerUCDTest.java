@@ -16,11 +16,21 @@
 
 package com.hazelcast.internal.namespace.replicatedmap;
 
-public class ReplicatedMapEntryAddedUCDTest extends ReplicatedMapListenerUCDTest {
-    @Override
-    public void test() throws Exception {
-        map.put(1, 1);
+import com.hazelcast.config.Config;
+import com.hazelcast.config.EntryListenerConfig;
 
-        checkListenerFired("entryAdded");
+public abstract class ReplicatedMapListenerUCDTest extends ReplicatedMapUCDTest {
+    @Override
+    protected String[] getUserDefinedClassNames() {
+        return new String[] {"usercodedeployment.MyEntryListener", "usercodedeployment.ObservableListener"};
+    }
+
+    @Override
+    protected void mutateConfig(Config config) {
+        EntryListenerConfig entryListenerConfig = new EntryListenerConfig();
+        entryListenerConfig.setClassName(getUserDefinedClassNames()[0]);
+        replicatedMapConfig.addEntryListenerConfig(entryListenerConfig);
+
+        super.mutateConfig(config);
     }
 }

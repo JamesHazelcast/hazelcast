@@ -16,11 +16,13 @@
 
 package com.hazelcast.internal.namespace.replicatedmap;
 
-public class ReplicatedMapEntryAddedUCDTest extends ReplicatedMapListenerUCDTest {
+import java.util.concurrent.TimeUnit;
+
+public class ReplicatedMapEntryEvictedUCDTest extends ReplicatedMapListenerUCDTest {
     @Override
     public void test() throws Exception {
-        map.put(1, 1);
+        map.put(1, 1, 1, TimeUnit.MILLISECONDS);
 
-        checkListenerFired("entryAdded");
+        checkListenerFired("entryEvicted");
     }
 }
