@@ -29,6 +29,7 @@ public class MultiMapMapListenerUCDTest extends MultiMapUCDTest {
         map.put(1, 1);
         IMap<String, Boolean> map = instance.getMap("MultiMapMapListenerUCDTest");
 
+        // TODO NS refactor to use ObservableListener
         //TODO: is there any need to test the other methods of the MultiMapEntryListener ?
         assertTrueEventually(() -> {
             Boolean added = map.get("added");

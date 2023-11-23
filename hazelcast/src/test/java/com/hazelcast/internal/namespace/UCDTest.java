@@ -44,9 +44,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @see <a href="https://hazelcast.atlassian.net/browse/HZ-3597">HZ-3597 - Add unit tests for all @NamespacesSupported UDF
@@ -223,8 +225,11 @@ public abstract class UCDTest extends HazelcastTestSupport {
     }
 
     protected Object getClassInstance() throws ReflectiveOperationException {
-        return NamespaceAwareClassLoaderIntegrationTest.tryLoadClass(member, getNamespaceName(), getUserDefinedClassNames()[0])
-                .getDeclaredConstructor().newInstance();
+        return getClassObject().getDeclaredConstructor().newInstance();
+    }
+
+    protected Class<?> getClassObject() throws ReflectiveOperationException {
+        return NamespaceAwareClassLoaderIntegrationTest.tryLoadClass(member, getNamespaceName(), getUserDefinedClassNames()[0]);
     }
 
     protected String getNamespaceName() {
@@ -233,5 +238,31 @@ public abstract class UCDTest extends HazelcastTestSupport {
 
     private static String prettyPrintEnumName(String name) {
         return WordUtils.capitalizeFully(name.replace('_', StringUtil.SPACE));
+    }
+
+    /**
+     * We expect that listeners implement {@code usercodedeployment.ObservableListener}
+     * <p>
+     * When a listeners' event is fired, it calls {@code usercodedeployment.ObservableListener.record(Object)} which:
+     * <ol>
+     * <li>Creates an {@link IMap} with the name of the listener (derived, via reflection, from the caller) - e.g.
+     * {@code MyEntryListener}
+     * <li>Puts an entry in the map where:
+     * <ul>
+     * <li>Key = The name of the method in the listener (derived, via reflection, from the caller) - e.g. {@code entryAdded}
+     * <li>Value = {@link Object#toString()} of the event - this is because we cannot ensure the event is
+     * {@link java.io.Serializable} in it's native form
+     * </ul>
+     * </ol>
+     * <p>
+     * To check for this firing, we can {@link #assertTrueEventually(AssertTask)} a corresponding entry exists.
+     * <p>
+     * If this was documented in the class itself, it would get lost during compilation
+     * 
+     * @param key the name of the method in the listener that should've fired
+     */
+    public void checkListenerFired(String key) throws ReflectiveOperationException {
+        Map<String, ?> map = instance.getMap(getClassObject().getSimpleName());
+        assertTrueEventually(() -> assertTrue(map.containsKey(key)));
     }
 }

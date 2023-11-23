@@ -30,12 +30,14 @@ public class ListItemListenerUCDTest extends ListUCDTest {
         list.remove("item");
         assertNotNull(map);
 
+        // TODO NS refactor to use ObservableListener
         assertTrueEventually("The 'added' key should be set to true eventually", () -> {
             Boolean added = map.get("added");
             assertNotNull(added);
             assertTrue(added);
         });
 
+        // TODO NS refactor to use ObservableListener
         assertTrueEventually("The 'removed' key should be set to true eventually", () -> {
             Boolean removed = map.get("removed");
             assertNotNull(removed);

@@ -30,6 +30,7 @@ public class IMapMapEvictedListenerUCDTest extends IMapUCDTest {
     public void test() throws Exception {
         populate();
         map.evictAll();
+        // TODO NS refactor to use ObservableListener
         IMap<String, Boolean> map = instance.getMap("IMapMapEvictedListenerUCDTest");
         assertTrueEventually(() -> {
             Boolean evicted = map.get("mapEvicted");

@@ -28,6 +28,7 @@ public class IMapMapClearedUCDTest extends IMapUCDTest {
     public void test() throws Exception {
         populate();
         map.clear();
+        // TODO NS refactor to use ObservableListener
         IMap<String, Boolean> map = instance.getMap("IMapMapClearedUCDTest");
         assertTrueEventually(() -> {
             Boolean cleared = map.get("cleared");

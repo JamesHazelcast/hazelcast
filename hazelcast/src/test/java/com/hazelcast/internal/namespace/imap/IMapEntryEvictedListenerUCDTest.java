@@ -29,6 +29,7 @@ public class IMapEntryEvictedListenerUCDTest extends IMapUCDTest {
         map.put(1, 1);
         map.evict(1);
         IMap<String, Boolean> verificationMap = instance.getMap("IMapEntryEvictedListenerUCDTest");
+        // TODO NS refactor to use ObservableListener
         assertTrueEventually(() -> {
             Boolean evicted = verificationMap.get("evicted");
             assertNotNull(evicted);

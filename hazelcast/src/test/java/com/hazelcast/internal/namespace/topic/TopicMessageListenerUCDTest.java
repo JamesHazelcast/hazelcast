@@ -30,6 +30,7 @@ public class TopicMessageListenerUCDTest extends TopicUCDTest {
         IMap<String, Boolean> map = instance.getMap("TopicMessageListenerUCDTest");
         assertNotNull(map);
 
+        // TODO NS refactor to use ObservableListener
         assertTrueEventually("The 'processed' key should be set to true eventually", () -> {
             Boolean processed = map.get("processed");
             assertNotNull(processed);
