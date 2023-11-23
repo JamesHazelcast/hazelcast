@@ -16,31 +16,12 @@
 
 package com.hazelcast.internal.namespace.imap;
 
-import com.hazelcast.config.Config;
-import com.hazelcast.config.EntryListenerConfig;
-
-import java.util.List;
-
-public class IMapMapEvictedListenerUCDTest extends IMapUCDTest {
+public class IMapMapEvictedListenerUCDTest extends IMapEntryListenerUCDTest {
     @Override
     public void test() throws Exception {
         populate();
         map.evictAll();
 
         assertListenerFired("mapEvicted");
-    }
-
-    @Override
-    protected void mutateConfig(Config config) {
-        EntryListenerConfig entryListenerConfig = new EntryListenerConfig();
-        entryListenerConfig.setClassName(getUserDefinedClassNames()[0]);
-        mapConfig.setEntryListenerConfigs(List.of(entryListenerConfig));
-
-        super.mutateConfig(config);
-    }
-
-    @Override
-    protected String[] getUserDefinedClassNames() {
-        return new String[] {"usercodedeployment.MyEntryListener", "usercodedeployment.ObservableListener"};
     }
 }
