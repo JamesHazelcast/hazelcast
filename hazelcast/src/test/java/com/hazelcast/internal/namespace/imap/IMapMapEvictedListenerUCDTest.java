@@ -18,25 +18,16 @@ package com.hazelcast.internal.namespace.imap;
 
 import com.hazelcast.config.Config;
 import com.hazelcast.config.EntryListenerConfig;
-import com.hazelcast.map.IMap;
 
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class IMapMapEvictedListenerUCDTest extends IMapUCDTest {
     @Override
     public void test() throws Exception {
         populate();
         map.evictAll();
-        // TODO NS refactor to use ObservableListener
-        IMap<String, Boolean> map = instance.getMap("IMapMapEvictedListenerUCDTest");
-        assertTrueEventually(() -> {
-            Boolean evicted = map.get("mapEvicted");
-            assertNotNull(evicted);
-            assertTrue(evicted);
-        });
+
+        assertListenerFired("mapEvicted");
     }
 
     @Override
@@ -50,6 +41,6 @@ public class IMapMapEvictedListenerUCDTest extends IMapUCDTest {
 
     @Override
     protected String[] getUserDefinedClassNames() {
-        return new String[] {"usercodedeployment.IMapMapEvictedListener"};
+        return new String[] {"usercodedeployment.IMapMapEvictedListener", "usercodedeployment.ObservableListener"};
     }
 }

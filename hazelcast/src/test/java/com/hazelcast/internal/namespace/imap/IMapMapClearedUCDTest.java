@@ -18,23 +18,13 @@ package com.hazelcast.internal.namespace.imap;
 
 import com.hazelcast.config.Config;
 import com.hazelcast.config.EntryListenerConfig;
-import com.hazelcast.map.IMap;
-
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class IMapMapClearedUCDTest extends IMapUCDTest {
     @Override
     public void test() throws Exception {
         populate();
         map.clear();
-        // TODO NS refactor to use ObservableListener
-        IMap<String, Boolean> map = instance.getMap("IMapMapClearedUCDTest");
-        assertTrueEventually(() -> {
-            Boolean cleared = map.get("cleared");
-            assertNotNull(cleared);
-            assertTrue(cleared);
-        });
+        assertListenerFired("mapCleared");
     }
 
     @Override
@@ -47,6 +37,6 @@ public class IMapMapClearedUCDTest extends IMapUCDTest {
 
     @Override
     protected String[] getUserDefinedClassNames() {
-        return new String[] {"usercodedeployment.IMapMapClearedListener"};
+        return new String[] {"usercodedeployment.IMapMapClearedListener", "usercodedeployment.ObservableListener"};
     }
 }
