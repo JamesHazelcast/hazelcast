@@ -235,6 +235,7 @@ public class DynamicConfigYamlGenerator {
                     getTieredStoreConfigAsMap(subConfigAsObject.getTieredStoreConfig()));
             addNonNullToMap(subConfigAsMap, "partition-attributes",
                     getPartitioningAttributesAsList(subConfigAsObject.getPartitioningAttributeConfigs()));
+            addNonNullToMap(subConfigAsMap, "namespace", subConfigAsObject.getNamespace());
 
             child.put(subConfigAsObject.getName(), subConfigAsMap);
         }
@@ -299,6 +300,7 @@ public class DynamicConfigYamlGenerator {
                     getMerkleTreeConfigAsMap(subConfigAsObject.getMerkleTreeConfig()));
             addNonNullToMap(subConfigAsMap, "disable-per-entry-invalidation-events",
                     subConfigAsObject.isDisablePerEntryInvalidationEvents());
+            addNonNullToMap(subConfigAsMap, "namespace", subConfigAsObject.getNamespace());
 
             child.put(subConfigAsObject.getName(), subConfigAsMap);
         }
@@ -333,6 +335,7 @@ public class DynamicConfigYamlGenerator {
                     getQueueStoreConfigAsMap(subConfigAsObject.getQueueStoreConfig()));
             addNonNullToMap(subConfigAsMap, "split-brain-protection-ref",
                     subConfigAsObject.getSplitBrainProtectionName());
+            addNonNullToMap(subConfigAsMap, "namespace", subConfigAsObject.getNamespace());
             addNonNullToMap(subConfigAsMap, "merge-policy",
                     getMergePolicyConfigAsMap(subConfigAsObject.getMergePolicyConfig()));
 
@@ -393,6 +396,7 @@ public class DynamicConfigYamlGenerator {
                     getEntryListenerConfigsAsList(subConfigAsObject.getEntryListenerConfigs()));
             addNonNullToMap(subConfigAsMap, "merge-policy",
                     getMergePolicyConfigAsMap(subConfigAsObject.getMergePolicyConfig()));
+            addNonNullToMap(subConfigAsMap, "namespace", subConfigAsObject.getNamespace());
 
             child.put(subConfigAsObject.getName(), subConfigAsMap);
         }
@@ -421,6 +425,7 @@ public class DynamicConfigYamlGenerator {
                     getMergePolicyConfigAsMap(subConfigAsObject.getMergePolicyConfig()));
             addNonNullToMap(subConfigAsMap, "entry-listeners",
                     getEntryListenerConfigsAsList(subConfigAsObject.getListenerConfigs()));
+            addNonNullToMap(subConfigAsMap, "namespace", subConfigAsObject.getNamespace());
 
             child.put(subConfigAsObject.getName(), subConfigAsMap);
         }
@@ -477,6 +482,7 @@ public class DynamicConfigYamlGenerator {
                     getListenerConfigsAsList(subConfigAsObject.getMessageListenerConfigs()));
             addNonNullToMap(subConfigAsMap, "multi-threading-enabled",
                     subConfigAsObject.isMultiThreadingEnabled());
+            addNonNullToMap(subConfigAsMap, "namespace", subConfigAsObject.getNamespace());
 
             child.put(subConfigAsObject.getName(), subConfigAsMap);
         }
@@ -501,7 +507,7 @@ public class DynamicConfigYamlGenerator {
                     subConfigAsObject.getTopicOverloadPolicy().name());
             addNonNullToMap(subConfigAsMap, "message-listeners",
                     getListenerConfigsAsList(subConfigAsObject.getMessageListenerConfigs()));
-
+            addNonNullToMap(subConfigAsMap, "namespace", subConfigAsObject.getNamespace());
             child.put(subConfigAsObject.getName(), subConfigAsMap);
         }
 
@@ -525,6 +531,7 @@ public class DynamicConfigYamlGenerator {
                     subConfigAsObject.getQueueCapacity());
             addNonNullToMap(subConfigAsMap, "split-brain-protection-ref",
                     subConfigAsObject.getSplitBrainProtectionName());
+            addNonNullToMap(subConfigAsMap, "namespace", subConfigAsObject.getNamespace());
 
             child.put(subConfigAsObject.getName(), subConfigAsMap);
         }
@@ -551,6 +558,7 @@ public class DynamicConfigYamlGenerator {
                     subConfigAsObject.getSplitBrainProtectionName());
             addNonNullToMap(subConfigAsMap, "statistics-enabled",
                     subConfigAsObject.isStatisticsEnabled());
+            addNonNullToMap(subConfigAsMap, "namespace", subConfigAsObject.getNamespace());
 
             child.put(subConfigAsObject.getName(), subConfigAsMap);
         }
@@ -581,7 +589,7 @@ public class DynamicConfigYamlGenerator {
                     getMergePolicyConfigAsMap(subConfigAsObject.getMergePolicyConfig()));
             addNonNullToMap(subConfigAsMap, "statistics-enabled",
                     subConfigAsObject.isStatisticsEnabled());
-
+            addNonNullToMap(subConfigAsMap, "namespace", subConfigAsObject.getNamespace());
             child.put(subConfigAsObject.getName(), subConfigAsMap);
         }
 
@@ -1584,6 +1592,7 @@ public class DynamicConfigYamlGenerator {
                 getItemListenerConfigsAsList(collectionConfig.getItemListenerConfigs()));
         addNonNullToMap(subConfigAsMap, "merge-policy",
                 getMergePolicyConfigAsMap(collectionConfig.getMergePolicyConfig()));
+        addNonNullToMap(subConfigAsMap, "namespace", collectionConfig.getNamespace());
 
         return subConfigAsMap;
     }

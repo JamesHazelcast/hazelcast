@@ -748,6 +748,8 @@ public class HazelcastConfigBeanDefinitionParser extends AbstractHazelcastBeanDe
                     replicatedMapConfigBuilder.addPropertyValue("splitBrainProtectionName", getTextContent(childNode));
                 } else if ("merge-policy".equals(nodeName)) {
                     handleMergePolicyConfig(childNode, replicatedMapConfigBuilder);
+                } else if ("namespace".equals(nodeName)) {
+                    replicatedMapConfigBuilder.addPropertyValue("namespace", getTextContent(childNode));
                 }
             }
             replicatedMapManagedMap.put(name, replicatedMapConfigBuilder.getBeanDefinition());
@@ -1109,11 +1111,24 @@ public class HazelcastConfigBeanDefinitionParser extends AbstractHazelcastBeanDe
         }
 
         public void handleExecutor(Node node) {
-            createAndFillListedBean(node, ExecutorConfig.class, "name", executorManagedMap);
+            BeanDefinitionBuilder builder = createAndFillListedBean(node, ExecutorConfig.class, "name", executorManagedMap);
+
+            for (Node n : childElements(node)) {
+                if ("namespace".equals(cleanNodeName(n))) {
+                    builder.addPropertyValue("namespace", getTextContent(n));
+                }
+            }
         }
 
         public void handleDurableExecutor(Node node) {
-            createAndFillListedBean(node, DurableExecutorConfig.class, "name", durableExecutorManagedMap);
+            BeanDefinitionBuilder builder = createAndFillListedBean(node, DurableExecutorConfig.class, "name",
+                    durableExecutorManagedMap);
+
+            for (Node n : childElements(node)) {
+                if ("namespace".equals(cleanNodeName(n))) {
+                    builder.addPropertyValue("namespace", getTextContent(n));
+                }
+            }
         }
 
         public void handleScheduledExecutor(Node node) {
@@ -1124,6 +1139,8 @@ public class HazelcastConfigBeanDefinitionParser extends AbstractHazelcastBeanDe
                 String name = cleanNodeName(n);
                 if ("merge-policy".equals(name)) {
                     handleMergePolicyConfig(n, builder);
+                } else if ("namespace".equals(name)) {
+                    builder.addPropertyValue("namespace", getTextContent(n));
                 }
             }
         }
@@ -1189,6 +1206,8 @@ public class HazelcastConfigBeanDefinitionParser extends AbstractHazelcastBeanDe
                 if ("message-listeners".equals(cleanNodeName(childNode))) {
                     ManagedList listeners = parseListeners(childNode, ListenerConfig.class);
                     builder.addPropertyValue("messageListenerConfigs", listeners);
+                } else if ("namespace".equals(cleanNodeName(childNode))) {
+                    builder.addPropertyValue("namespace", getTextContent(childNode));
                 }
             }
             reliableTopicManagedMap.put(getAttribute(node, "name"), builder.getBeanDefinition());
@@ -1205,6 +1224,8 @@ public class HazelcastConfigBeanDefinitionParser extends AbstractHazelcastBeanDe
                     ringbufferConfigBuilder.addPropertyValue("splitBrainProtectionName", getTextContent(childNode));
                 } else if ("merge-policy".equals(nodeName)) {
                     handleMergePolicyConfig(childNode, ringbufferConfigBuilder);
+                } else if ("namespace".equals(nodeName)) {
+                    ringbufferConfigBuilder.addPropertyValue("namespace", getTextContent(childNode));
                 }
             }
             ringbufferManagedMap.put(getAttribute(node, "name"), ringbufferConfigBuilder.getBeanDefinition());
@@ -1238,6 +1259,8 @@ public class HazelcastConfigBeanDefinitionParser extends AbstractHazelcastBeanDe
                     queueConfigBuilder.addPropertyValue("splitBrainProtectionName", getTextContent(childNode));
                 } else if ("merge-policy".equals(nodeName)) {
                     handleMergePolicyConfig(childNode, queueConfigBuilder);
+                } else if ("namespace".equals(nodeName)) {
+                    queueConfigBuilder.addPropertyValue("namespace", getTextContent(childNode));
                 }
             }
             queueManagedMap.put(name, queueConfigBuilder.getBeanDefinition());
@@ -1295,6 +1318,8 @@ public class HazelcastConfigBeanDefinitionParser extends AbstractHazelcastBeanDe
                     listConfigBuilder.addPropertyValue("splitBrainProtectionName", getTextContent(childNode));
                 } else if ("merge-policy".equals(nodeName)) {
                     handleMergePolicyConfig(childNode, listConfigBuilder);
+                } else if ("namespace".equals(nodeName)) {
+                    listConfigBuilder.addPropertyValue("namespace", getTextContent(childNode));
                 }
             }
             listManagedMap.put(name, listConfigBuilder.getBeanDefinition());
@@ -1314,6 +1339,8 @@ public class HazelcastConfigBeanDefinitionParser extends AbstractHazelcastBeanDe
                     setConfigBuilder.addPropertyValue("splitBrainProtectionName", getTextContent(childNode));
                 } else if ("merge-policy".equals(nodeName)) {
                     handleMergePolicyConfig(childNode, setConfigBuilder);
+                } else if ("namespace".equals(nodeName)) {
+                    setConfigBuilder.addPropertyValue("namespace", getTextContent(childNode));
                 }
             }
             setManagedMap.put(name, setConfigBuilder.getBeanDefinition());
@@ -1385,6 +1412,8 @@ public class HazelcastConfigBeanDefinitionParser extends AbstractHazelcastBeanDe
                     handleTieredStoreConfig(mapConfigBuilder, childNode);
                 } else if ("partition-attributes".equals(nodeName)) {
                     handlePartitionAttributes(mapConfigBuilder, childNode);
+                } else if ("namespace".equals(nodeName)) {
+                    mapConfigBuilder.addPropertyValue("namespace", getTextContent(childNode));
                 }
             }
             mapConfigManagedMap.put(name, beanDefinition);
@@ -1570,6 +1599,8 @@ public class HazelcastConfigBeanDefinitionParser extends AbstractHazelcastBeanDe
                     handleEventJournalConfig(cacheConfigBuilder, childNode);
                 } else if ("merkle-tree".equals(nodeName)) {
                     handleMerkleTreeConfig(cacheConfigBuilder, childNode);
+                } else if ("namespace".equals(nodeName)) {
+                    cacheConfigBuilder.addPropertyValue("namespace", getTextContent(childNode));
                 }
             }
             cacheConfigManagedMap.put(name, cacheConfigBuilder.getBeanDefinition());
@@ -1802,6 +1833,8 @@ public class HazelcastConfigBeanDefinitionParser extends AbstractHazelcastBeanDe
                     multiMapConfigBuilder.addPropertyValue("splitBrainProtectionName", getTextContent(childNode));
                 } else if ("merge-policy".equals(nodeName)) {
                     handleMergePolicyConfig(childNode, multiMapConfigBuilder);
+                } else if ("namespace".equals(nodeName)) {
+                    multiMapConfigBuilder.addPropertyValue("namespace", getTextContent(childNode));
                 }
             }
             multiMapManagedMap.put(name, multiMapConfigBuilder.getBeanDefinition());
@@ -1825,6 +1858,8 @@ public class HazelcastConfigBeanDefinitionParser extends AbstractHazelcastBeanDe
                 } else if ("multi-threading-enabled".equals(cleanNodeName(childNode))) {
                     String multiThreadingEnabled = getTextContent(childNode);
                     topicConfigBuilder.addPropertyValue("multiThreadingEnabled", multiThreadingEnabled);
+                } else if ("namespace".equals(cleanNodeName(childNode))) {
+                    topicConfigBuilder.addPropertyValue("namespace", getTextContent(childNode));
                 }
             }
             topicManagedMap.put(name, topicConfigBuilder.getBeanDefinition());

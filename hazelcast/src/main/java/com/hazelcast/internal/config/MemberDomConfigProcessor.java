@@ -1216,6 +1216,8 @@ public class MemberDomConfigProcessor extends AbstractDomConfigProcessor {
                 name,
                 ExecutorConfig.class);
 
+        // todo?
+
         handleViaReflection(node, config, executorConfig);
     }
 
@@ -1225,6 +1227,8 @@ public class MemberDomConfigProcessor extends AbstractDomConfigProcessor {
                 config.getDurableExecutorConfigs(),
                 name,
                 DurableExecutorConfig.class);
+
+        // todo?
 
         handleViaReflection(node, config, durableExecutorConfig);
     }
@@ -1258,6 +1262,8 @@ public class MemberDomConfigProcessor extends AbstractDomConfigProcessor {
                 scheduledExecutorConfig.setSplitBrainProtectionName(getTextContent(child));
             } else if (matches("statistics-enabled", nodeName)) {
                 scheduledExecutorConfig.setStatisticsEnabled(getBooleanValue(getTextContent(child)));
+            } else if (matches("namespace", nodeName)) {
+                scheduledExecutorConfig.setNamespace(getTextContent(child));
             }
         }
 
@@ -1774,6 +1780,8 @@ public class MemberDomConfigProcessor extends AbstractDomConfigProcessor {
                 qConfig.setMergePolicyConfig(mpConfig);
             } else if (matches("priority-comparator-class-name", nodeName)) {
                 qConfig.setPriorityComparatorClassName(getTextContent(n));
+            } else if (matches("namespace", nodeName)) {
+                qConfig.setNamespace(getTextContent(n));
             }
         }
         config.addQueueConfig(qConfig);
@@ -1817,6 +1825,8 @@ public class MemberDomConfigProcessor extends AbstractDomConfigProcessor {
             } else if (matches("merge-policy", nodeName)) {
                 MergePolicyConfig mpConfig = createMergePolicyConfig(n, lConfig.getMergePolicyConfig());
                 lConfig.setMergePolicyConfig(mpConfig);
+            } else if (matches("namespace", nodeName)) {
+                lConfig.setNamespace(getTextContent(n));
             }
 
         }
@@ -1849,6 +1859,8 @@ public class MemberDomConfigProcessor extends AbstractDomConfigProcessor {
             } else if (matches("merge-policy", nodeName)) {
                 MergePolicyConfig mpConfig = createMergePolicyConfig(n, sConfig.getMergePolicyConfig());
                 sConfig.setMergePolicyConfig(mpConfig);
+            } else if (matches("namespace", nodeName)) {
+                sConfig.setNamespace(getTextContent(n));
             }
         }
         config.addSetConfig(sConfig);
@@ -1885,6 +1897,8 @@ public class MemberDomConfigProcessor extends AbstractDomConfigProcessor {
             } else if (matches("merge-policy", nodeName)) {
                 MergePolicyConfig mpConfig = createMergePolicyConfig(n, multiMapConfig.getMergePolicyConfig());
                 multiMapConfig.setMergePolicyConfig(mpConfig);
+            } else if (matches("namespace", nodeName)) {
+                multiMapConfig.setNamespace(getTextContent(n));
             }
         }
         config.addMultiMapConfig(multiMapConfig);
@@ -1928,6 +1942,8 @@ public class MemberDomConfigProcessor extends AbstractDomConfigProcessor {
                 replicatedMapConfig.setMergePolicyConfig(mpConfig);
             } else if (matches("split-brain-protection-ref", nodeName)) {
                 replicatedMapConfig.setSplitBrainProtectionName(getTextContent(n));
+            } else if (matches("namespace", nodeName)) {
+                replicatedMapConfig.setNamespace(getTextContent(n));
             }
         }
         config.addReplicatedMapConfig(replicatedMapConfig);
@@ -2140,6 +2156,8 @@ public class MemberDomConfigProcessor extends AbstractDomConfigProcessor {
                 cacheConfig.setDisablePerEntryInvalidationEvents(getBooleanValue(getTextContent(n)));
             } else if (matches("merkle-tree", nodeName)) {
                 handleViaReflection(n, cacheConfig, cacheConfig.getMerkleTreeConfig());
+            } else if (matches("namespace", nodeName)) {
+                cacheConfig.setNamespace(getTextContent(n));
             }
         }
         try {
@@ -2673,6 +2691,8 @@ public class MemberDomConfigProcessor extends AbstractDomConfigProcessor {
                 tConfig.setStatisticsEnabled(getBooleanValue(getTextContent(n)));
             } else if (matches("multi-threading-enabled", nodeName)) {
                 tConfig.setMultiThreadingEnabled(getBooleanValue(getTextContent(n)));
+            } else if (matches("namespace", nodeName)) {
+                tConfig.setNamespace(getTextContent(n));
             }
         }
         config.addTopicConfig(tConfig);
@@ -2774,6 +2794,8 @@ public class MemberDomConfigProcessor extends AbstractDomConfigProcessor {
                     topicConfig.addMessageListenerConfig(listenerConfig);
                     return null;
                 });
+            } else if (matches("namespace", nodeName)) {
+                topicConfig.setNamespace(getTextContent(n));
             }
         }
         config.addReliableTopicConfig(topicConfig);
@@ -2821,6 +2843,8 @@ public class MemberDomConfigProcessor extends AbstractDomConfigProcessor {
             } else if (matches("merge-policy", nodeName)) {
                 MergePolicyConfig mpConfig = createMergePolicyConfig(n, rbConfig.getMergePolicyConfig());
                 rbConfig.setMergePolicyConfig(mpConfig);
+            } else if (matches("namespace", nodeName)) {
+                rbConfig.setNamespace(getTextContent(n));
             }
         }
         config.addRingBufferConfig(rbConfig);
