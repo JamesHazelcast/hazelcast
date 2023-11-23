@@ -119,6 +119,8 @@
     <suppress checks="ExecutableStatementCount" files="com[\\/]hazelcast[\\/]config[\\/]CacheConfig"/>
     <suppress checks="ExecutableStatementCount"
               files="com[\\/]hazelcast[\\/]client[\\/]impl[\\/]protocol[\\/]codec[\\/]holder[\\/]CacheConfigHolder"/>
+    <suppress checks="MethodLength"
+              files="com[\\/]hazelcast[\\/]client[\\/]impl[\\/]protocol[\\/]codec[\\/]DynamicConfigAddMapConfigCodec"/>
     <suppress checks="ParameterNumber"
               files="com[\\/]hazelcast[\\/]client[\\/]impl[\\/]protocol[\\/]task[\\/]dynamicconfig[\\/]QueryCacheConfigHolder"/>
     <suppress checks="MethodCount" files="com[\\/]hazelcast[\\/]config[\\/]CacheSimpleConfig"/>
