@@ -48,11 +48,6 @@ public class PredicateConfigReadOnly extends PredicateConfig {
     }
 
     @Override
-    public PredicateConfig setNamespace(@Nullable String namespace) {
-        throw new UnsupportedOperationException("This config is read-only");
-    }
-
-    @Override
     public String toString() {
         return "PredicateConfigReadOnly{} " + super.toString();
     }

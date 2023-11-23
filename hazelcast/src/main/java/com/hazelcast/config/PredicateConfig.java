@@ -45,8 +45,6 @@ public class PredicateConfig implements IdentifiedDataSerializable, NamespaceAwa
 
     protected Predicate implementation;
 
-    protected @Nullable String namespace = DEFAULT_NAMESPACE;
-
     /**
      * Creates a PredicateConfig without className/implementation.
      */
@@ -67,7 +65,6 @@ public class PredicateConfig implements IdentifiedDataSerializable, NamespaceAwa
         implementation = config.getImplementation();
         className = config.getClassName();
         sql = config.getSql();
-        namespace = config.getNamespace();
     }
 
     /**
@@ -78,7 +75,6 @@ public class PredicateConfig implements IdentifiedDataSerializable, NamespaceAwa
      */
     public PredicateConfig(Predicate implementation, @Nullable String namespace) {
         this.implementation = isNotNull(implementation, "implementation");
-        this.namespace = namespace;
     }
 
     /**
@@ -161,30 +157,6 @@ public class PredicateConfig implements IdentifiedDataSerializable, NamespaceAwa
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Nullable
-    public String getNamespace() {
-        return namespace;
-    }
-
-    /**
-     * Associates the provided Namespace ID with this structure for {@link ClassLoader} awareness.
-     * <p>
-     * The behaviour of setting this to {@code null} is outlined in the documentation for
-     * {@link NamespaceAwareConfig#DEFAULT_NAMESPACE}.
-     *
-     * @param namespace The ID of the Namespace to associate with this structure.
-     * @return the updated {@link PredicateConfig} instance
-     * @since 5.4
-     */
-    public PredicateConfig setNamespace(@Nullable String namespace) {
-        this.namespace = namespace;
-        return this;
-    }
-
     @Override
     @SuppressWarnings("checkstyle:npathcomplexity")
     public boolean equals(Object o) {
@@ -202,9 +174,6 @@ public class PredicateConfig implements IdentifiedDataSerializable, NamespaceAwa
         if (!Objects.equals(sql, that.sql)) {
             return false;
         }
-        if (!Objects.equals(namespace, that.namespace)) {
-            return false;
-        }
         return Objects.equals(implementation, that.implementation);
     }
 
@@ -213,7 +182,6 @@ public class PredicateConfig implements IdentifiedDataSerializable, NamespaceAwa
         int result = className != null ? className.hashCode() : 0;
         result = 31 * result + (sql != null ? sql.hashCode() : 0);
         result = 31 * result + (implementation != null ? implementation.hashCode() : 0);
-        result = 31 * result + (namespace != null ? namespace.hashCode() : 0);
         return result;
     }
 
@@ -223,7 +191,6 @@ public class PredicateConfig implements IdentifiedDataSerializable, NamespaceAwa
                 + "className='" + className + '\''
                 + ", sql='" + sql + '\''
                 + ", implementation=" + implementation
-                + ", namespace=" + namespace
                 + '}';
     }
 
@@ -242,11 +209,6 @@ public class PredicateConfig implements IdentifiedDataSerializable, NamespaceAwa
         out.writeString(className);
         out.writeString(sql);
         out.writeObject(implementation);
-
-        // RU_COMPAT_5_3
-        if (out.getVersion().isGreaterOrEqual(V5_4)) {
-            out.writeString(namespace);
-        }
     }
 
     @Override
@@ -254,10 +216,5 @@ public class PredicateConfig implements IdentifiedDataSerializable, NamespaceAwa
         className = in.readString();
         sql = in.readString();
         implementation = in.readObject();
-
-        // RU_COMPAT_5_3
-        if (in.getVersion().isGreaterOrEqual(V5_4)) {
-            namespace = in.readString();
-        }
     }
 }
