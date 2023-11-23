@@ -19,14 +19,7 @@ package com.hazelcast.internal.namespace.multimap;
 import com.hazelcast.config.Config;
 import com.hazelcast.config.EntryListenerConfig;
 
-public class MultiMapMapListenerUCDTest extends MultiMapUCDTest {
-    @Override
-    public void test() throws Exception {
-        map.put(1, 1);
-
-        assertListenerFired("entryAdded");
-    }
-
+public abstract class MultiMapMapListenerUCDTest extends MultiMapUCDTest {
     @Override
     protected void mutateConfig(Config config) {
         EntryListenerConfig listenerConfig = new EntryListenerConfig();

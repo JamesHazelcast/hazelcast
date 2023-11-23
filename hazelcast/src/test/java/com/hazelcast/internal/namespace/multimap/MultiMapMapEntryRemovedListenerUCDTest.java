@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package com.hazelcast.internal.namespace.replicatedmap;
+package com.hazelcast.internal.namespace.multimap;
 
-import java.util.concurrent.TimeUnit;
-
-public class ReplicatedMapEntryEvictedUCDTest extends ReplicatedMapListenerUCDTest {
+public class MultiMapMapEntryRemovedListenerUCDTest extends MultiMapMapListenerUCDTest {
     @Override
     public void test() throws Exception {
-        map.put(1, 1, 1, TimeUnit.MILLISECONDS);
+        map.put(1, 1);
+        map.remove(1);
 
-        assertListenerFired("entryEvicted");
+        assertListenerFired("entryRemoved");
     }
 }
