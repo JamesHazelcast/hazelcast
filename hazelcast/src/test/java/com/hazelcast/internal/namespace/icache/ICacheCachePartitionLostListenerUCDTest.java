@@ -16,12 +16,10 @@
 
 package com.hazelcast.internal.namespace.icache;
 
-import com.hazelcast.cache.impl.event.CachePartitionLostListener;
-
 public class ICacheCachePartitionLostListenerUCDTest extends ICacheUCDTest {
     @Override
     public void test() throws Exception {
-        cache.addPartitionLostListener((CachePartitionLostListener) getClassInstance());
+        cache.addPartitionLostListener(getClassInstance());
 
         // It's not possible to exercise invocation easily outside of fault conditions
     }

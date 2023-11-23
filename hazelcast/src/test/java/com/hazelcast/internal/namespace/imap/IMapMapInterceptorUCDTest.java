@@ -16,14 +16,12 @@
 
 package com.hazelcast.internal.namespace.imap;
 
-import com.hazelcast.map.MapInterceptor;
-
 import static org.junit.Assert.assertEquals;
 
 public class IMapMapInterceptorUCDTest extends IMapUCDTest {
     @Override
     public void test() throws Exception {
-        map.addInterceptor((MapInterceptor) getClassInstance());
+        map.addInterceptor(getClassInstance());
 
         populate();
 

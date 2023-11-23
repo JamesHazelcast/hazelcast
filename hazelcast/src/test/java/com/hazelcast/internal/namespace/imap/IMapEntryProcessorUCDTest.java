@@ -16,8 +16,6 @@
 
 package com.hazelcast.internal.namespace.imap;
 
-import com.hazelcast.map.EntryProcessor;
-
 import static org.junit.Assert.assertEquals;
 
 public class IMapEntryProcessorUCDTest extends IMapUCDTest {
@@ -25,8 +23,7 @@ public class IMapEntryProcessorUCDTest extends IMapUCDTest {
     public void test() throws Exception {
         populate();
 
-        assertEquals(Integer.valueOf(2),
-                map.executeOnKey(map.keySet().iterator().next(), (EntryProcessor<Object, Object, Integer>) getClassInstance()));
+        assertEquals(Integer.valueOf(2), map.executeOnKey(map.keySet().iterator().next(), getClassInstance()));
     }
 
     @Override

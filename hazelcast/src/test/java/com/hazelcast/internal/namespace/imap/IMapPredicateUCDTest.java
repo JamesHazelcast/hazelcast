@@ -16,8 +16,6 @@
 
 package com.hazelcast.internal.namespace.imap;
 
-import com.hazelcast.query.Predicate;
-
 import static org.junit.Assert.assertFalse;
 
 public class IMapPredicateUCDTest extends IMapUCDTest {
@@ -25,7 +23,7 @@ public class IMapPredicateUCDTest extends IMapUCDTest {
     public void test() throws Exception {
         populate();
 
-        assertFalse(map.values((Predicate<Object, Object>) getClassInstance()).isEmpty());
+        assertFalse(map.values(getClassInstance()).isEmpty());
     }
 
     @Override

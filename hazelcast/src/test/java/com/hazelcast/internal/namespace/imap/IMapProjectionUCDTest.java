@@ -16,10 +16,6 @@
 
 package com.hazelcast.internal.namespace.imap;
 
-import com.hazelcast.projection.Projection;
-
-import java.util.Map.Entry;
-
 import static org.junit.Assert.assertNotNull;
 
 public class IMapProjectionUCDTest extends IMapUCDTest {
@@ -27,7 +23,7 @@ public class IMapProjectionUCDTest extends IMapUCDTest {
     public void test() throws Exception {
         populate();
 
-        assertNotNull(map.project((Projection<Entry<?, ?>, ?>) getClassInstance()));
+        assertNotNull(map.project(getClassInstance()));
     }
 
     @Override

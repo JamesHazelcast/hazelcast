@@ -258,8 +258,8 @@ public abstract class UCDTest extends HazelcastTestSupport {
         config.getNamespacesConfig().addNamespaceConfig(namespaceConfig);
     }
 
-    protected Object getClassInstance() throws ReflectiveOperationException {
-        return getClassObject().getDeclaredConstructor().newInstance();
+    protected <T> T getClassInstance() throws ReflectiveOperationException {
+        return (T) getClassObject().getDeclaredConstructor().newInstance();
     }
 
     protected Class<?> getClassObject() throws ReflectiveOperationException {

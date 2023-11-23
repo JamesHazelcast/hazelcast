@@ -16,7 +16,6 @@
 
 package com.hazelcast.internal.namespace.iexecutor;
 
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 
 import static org.junit.Assert.assertNotNull;
@@ -24,8 +23,7 @@ import static org.junit.Assert.assertNotNull;
 public class IExecutorSubmitToMemberTest extends IExecutorUCDTest {
     @Override
     public void test() throws InterruptedException, ExecutionException, ReflectiveOperationException {
-        assertNotNull(
-                executor.submitToMember((Callable<?>) getClassInstance(), member.getCluster().getLocalMember()).get());
+        assertNotNull(executor.submitToMember(getClassInstance(), member.getCluster().getLocalMember()).get());
     }
 
     @Override

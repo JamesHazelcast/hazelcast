@@ -16,8 +16,6 @@
 
 package com.hazelcast.internal.namespace.ringbuffer;
 
-import com.hazelcast.core.IFunction;
-
 import static org.junit.Assert.assertEquals;
 
 public class RingbufferIFunctionUCDTest extends RingbufferUCDTest {
@@ -25,9 +23,8 @@ public class RingbufferIFunctionUCDTest extends RingbufferUCDTest {
     public void test() throws Exception {
         ringBuffer.add(Byte.MIN_VALUE);
 
-        assertEquals(1,
-                ringBuffer.readManyAsync(ringBuffer.headSequence(), 0, 1, (IFunction<Object, Boolean>) getClassInstance())
-                        .toCompletableFuture().get().size());
+        assertEquals(1, ringBuffer.readManyAsync(ringBuffer.headSequence(), 0, 1, getClassInstance()).toCompletableFuture()
+                .get().size());
     }
 
     @Override

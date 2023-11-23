@@ -16,8 +16,6 @@
 
 package com.hazelcast.internal.namespace.icache;
 
-import javax.cache.processor.EntryProcessor;
-
 import static org.junit.Assert.assertEquals;
 
 public class ICacheEntryProcessorUCDTest extends ICacheUCDTest {
@@ -27,7 +25,7 @@ public class ICacheEntryProcessorUCDTest extends ICacheUCDTest {
 
         cache.put(KEY, 1);
 
-        assertEquals(Integer.valueOf(2), cache.invoke(KEY, (EntryProcessor<Integer, Integer, Object>) getClassInstance()));
+        assertEquals(Integer.valueOf(2), cache.invoke(KEY, getClassInstance()));
     }
 
     @Override

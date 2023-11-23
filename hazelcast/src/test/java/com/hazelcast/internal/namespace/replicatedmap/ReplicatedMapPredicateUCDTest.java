@@ -18,7 +18,6 @@ package com.hazelcast.internal.namespace.replicatedmap;
 
 import com.hazelcast.core.EntryAdapter;
 import com.hazelcast.core.EntryEvent;
-import com.hazelcast.query.Predicate;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -34,7 +33,7 @@ public class ReplicatedMapPredicateUCDTest extends ReplicatedMapUCDTest {
             public void onEntryEvent(EntryEvent<Object, Object> event) {
                 listenerEvent.complete(event);
             }
-        }, (Predicate<Object, Object>) getClassInstance());
+        }, getClassInstance());
 
         populate();
 
