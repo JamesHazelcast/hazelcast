@@ -36,7 +36,7 @@ public abstract class IMapUCDTest extends UCDTest {
     }
 
     protected void populate() {
-        map.put(1, 1);
+        map.set(1, 1);
     }
 
     @Override

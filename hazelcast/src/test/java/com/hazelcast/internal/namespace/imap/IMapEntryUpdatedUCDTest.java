@@ -16,18 +16,11 @@
 
 package com.hazelcast.internal.namespace.imap;
 
-import com.hazelcast.map.PartitionPredicateTest;
-
-public class IMapPartitionPredicateUCDTest extends IMapPredicateUCDTest {
+public class IMapEntryUpdatedUCDTest extends IMapEntryListenerUCDTest {
     @Override
-    protected void populate() {
-        for (int partitionId = 0; partitionId < PartitionPredicateTest.PARTITIONS; partitionId++) {
-            map.set(generateKeyForPartition(instance, partitionId), Void.TYPE);
-        }
-    }
-
-    @Override
-    protected String[] getUserDefinedClassNames() {
-        return new String[] {"usercodedeployment.TruePartition1PartitionPredicate"};
+    public void test() throws Exception {
+        populate();
+        map.set(1, 2);
+        assertListenerFired("entryUpdated");
     }
 }
