@@ -22,7 +22,6 @@ import com.hazelcast.config.IndexConfig;
 import com.hazelcast.config.QueryCacheConfig;
 import com.hazelcast.internal.serialization.SerializationService;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 

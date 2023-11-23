@@ -27,7 +27,6 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.Objects;
 
-import static com.hazelcast.internal.cluster.Versions.V5_4;
 import static com.hazelcast.internal.util.Preconditions.checkHasText;
 import static com.hazelcast.internal.util.Preconditions.isNotNull;
 

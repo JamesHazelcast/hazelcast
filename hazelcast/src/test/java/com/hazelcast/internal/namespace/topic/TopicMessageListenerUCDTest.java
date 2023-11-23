@@ -20,7 +20,7 @@ public class TopicMessageListenerUCDTest extends TopicUCDTest {
     @Override
     public void test() throws Exception {
         topic.publish(Byte.MIN_VALUE);
-        
+
         assertListenerFired("onMessage");
     }
 
