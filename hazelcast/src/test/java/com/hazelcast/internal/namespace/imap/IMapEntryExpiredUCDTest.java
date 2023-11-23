@@ -16,10 +16,12 @@
 
 package com.hazelcast.internal.namespace.imap;
 
-public class IMapEntryAddedUCDTest extends IMapEntryListenerUCDTest {
+import java.util.concurrent.TimeUnit;
+
+public class IMapEntryExpiredUCDTest extends IMapEntryListenerUCDTest {
     @Override
     public void test() throws Exception {
-        populate();
-        assertListenerFired("entryAdded");
+        map.put(1,  1, 1, TimeUnit.MILLISECONDS);
+        assertListenerFired("entryExpired");
     }
 }
