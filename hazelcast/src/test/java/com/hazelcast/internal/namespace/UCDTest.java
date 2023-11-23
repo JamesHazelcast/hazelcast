@@ -20,9 +20,11 @@ import com.google.common.collect.Lists;
 import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.client.test.TestHazelcastFactory;
 import com.hazelcast.config.Config;
+import com.hazelcast.config.ConfigXmlGenerator;
 import com.hazelcast.config.NamespaceConfig;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.instance.impl.NamespaceAwareClassLoaderIntegrationTest;
+import com.hazelcast.internal.dynamicconfig.DynamicConfigYamlGenerator;
 import com.hazelcast.jet.impl.deployment.MapResourceClassLoader;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
 import com.hazelcast.test.HazelcastParametrizedRunner;
@@ -90,10 +92,15 @@ public abstract class UCDTest extends HazelcastTestSupport {
     }
 
     protected enum ConfigStyle {
-        /** All configuration is done <strong>before</strong> the instance is started */
-        STATIC,
+        /** All configuration is set programmatically <strong>before</strong> the instance is started */
+        STATIC_PROGRAMMATIC,
         /** Where possible, configuration is changed <strong>after</strong> the instance has started */
-        DYNAMIC;
+        DYNAMIC,
+        /** All configuration is defined by a YAML configuration, derived from our programmatic config */
+        STATIC_YAML,
+        /** All configuration is defined by an XML configuration, derived from our programmatic config */
+        STATIC_XML;
+
 
         @Override
         public String toString() {
@@ -146,9 +153,10 @@ public abstract class UCDTest extends HazelcastTestSupport {
 
         config.getNamespacesConfig().setEnabled(assertionStyle == AssertionStyle.POSITIVE);
 
-        if (configStyle == ConfigStyle.STATIC) {
+        if (configStyle != ConfigStyle.DYNAMIC) {
             mutateConfig(config);
             registerClass(config);
+            config = convertConfig(config);
         }
 
         member = testHazelcastFactory.newHazelcastInstance(config);
@@ -171,6 +179,32 @@ public abstract class UCDTest extends HazelcastTestSupport {
             mutateConfig(instance.getConfig());
             registerClass(instance.getConfig());
         }
+    }
+
+    /**
+     * Where applicable, transforms our programmatic config into an XML/YAML variant and feeds
+     * it back into a new {@link Config} instance, thereby validating XML/YAML parsing.
+     *
+     * @param config the programmatic config to convert
+     * @return the newly converted {@link Config}
+     */
+    private Config convertConfig(Config config) {
+        String configString;
+        switch (configStyle) {
+            case STATIC_XML:
+                configString = new ConfigXmlGenerator(true, false).generate(config);
+                break;
+
+            case STATIC_YAML:
+                // TODO NS - replace with YAML variant once located
+                configString = new ConfigXmlGenerator(true, false).generate(config);
+                break;
+
+            default:
+                // No conversion necessary
+                return config;
+        }
+        return Config.loadFromString(configString);
     }
 
     /**
