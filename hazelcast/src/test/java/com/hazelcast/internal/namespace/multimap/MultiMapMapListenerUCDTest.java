@@ -18,24 +18,13 @@ package com.hazelcast.internal.namespace.multimap;
 
 import com.hazelcast.config.Config;
 import com.hazelcast.config.EntryListenerConfig;
-import com.hazelcast.map.IMap;
-
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MultiMapMapListenerUCDTest extends MultiMapUCDTest {
     @Override
     public void test() throws Exception {
         map.put(1, 1);
-        IMap<String, Boolean> map = instance.getMap("MultiMapMapListenerUCDTest");
 
-        // TODO NS refactor to use ObservableListener
-        //TODO: is there any need to test the other methods of the MultiMapEntryListener ?
-        assertTrueEventually(() -> {
-            Boolean added = map.get("added");
-            assertNotNull(added);
-            assertTrue(added);
-        });
+        assertListenerFired("entryAdded");
     }
 
     @Override
@@ -49,6 +38,6 @@ public class MultiMapMapListenerUCDTest extends MultiMapUCDTest {
 
     @Override
     protected String[] getUserDefinedClassNames() {
-        return new String[] {"usercodedeployment.MultiMapEntryListener"};
+        return new String[] {"usercodedeployment.MyEntryListener", "usercodedeployment.ObservableListener"};
     }
 }

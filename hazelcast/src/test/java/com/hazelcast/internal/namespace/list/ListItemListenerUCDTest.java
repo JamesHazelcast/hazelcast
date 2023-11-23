@@ -16,37 +16,18 @@
 
 package com.hazelcast.internal.namespace.list;
 
-import com.hazelcast.map.IMap;
-
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 public class ListItemListenerUCDTest extends ListUCDTest {
-
     @Override
     public void test() throws Exception {
-        IMap<String, Boolean> map = instance.getMap("ListItemListenerUCDTest");
         list.add("item");
+        assertListenerFired("itemAdded");
+
         list.remove("item");
-        assertNotNull(map);
-
-        // TODO NS refactor to use ObservableListener
-        assertTrueEventually("The 'added' key should be set to true eventually", () -> {
-            Boolean added = map.get("added");
-            assertNotNull(added);
-            assertTrue(added);
-        });
-
-        // TODO NS refactor to use ObservableListener
-        assertTrueEventually("The 'removed' key should be set to true eventually", () -> {
-            Boolean removed = map.get("removed");
-            assertNotNull(removed);
-            assertTrue(removed);
-        });
+        assertListenerFired("itemRemoved");
     }
 
     @Override
     protected String[] getUserDefinedClassNames() {
-        return new String[]{"usercodedeployment.ListItemListener"};
+        return new String[] {"usercodedeployment.MyItemListener", "usercodedeployment.ObservableListener"};
     }
 }

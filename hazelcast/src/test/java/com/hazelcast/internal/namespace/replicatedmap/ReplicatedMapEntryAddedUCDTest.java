@@ -21,6 +21,6 @@ public class ReplicatedMapEntryAddedUCDTest extends ReplicatedMapListenerUCDTest
     public void test() throws Exception {
         map.put(1, 1);
 
-        checkListenerFired("entryAdded");
+        assertListenerFired("entryAdded");
     }
 }

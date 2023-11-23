@@ -261,7 +261,7 @@ public abstract class UCDTest extends HazelcastTestSupport {
      * 
      * @param key the name of the method in the listener that should've fired
      */
-    public void checkListenerFired(String key) throws ReflectiveOperationException {
+    public void assertListenerFired(String key) throws ReflectiveOperationException {
         Map<String, ?> map = instance.getMap(getClassObject().getSimpleName());
         assertTrueEventually(() -> assertTrue(map.containsKey(key)));
     }
