@@ -19,6 +19,8 @@ package com.hazelcast.internal.config;
 import com.hazelcast.config.PredicateConfig;
 import com.hazelcast.query.Predicate;
 
+import javax.annotation.Nullable;
+
 /**
  * Contains the configuration for a Predicate.
  *
@@ -42,6 +44,11 @@ public class PredicateConfigReadOnly extends PredicateConfig {
 
     @Override
     public PredicateConfig setSql(String sql) {
+        throw new UnsupportedOperationException("This config is read-only");
+    }
+
+    @Override
+    public PredicateConfig setNamespace(@Nullable String namespace) {
         throw new UnsupportedOperationException("This config is read-only");
     }
 

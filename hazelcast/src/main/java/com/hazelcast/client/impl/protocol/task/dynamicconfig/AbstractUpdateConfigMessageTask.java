@@ -59,7 +59,7 @@ public abstract class AbstractUpdateConfigMessageTask<P> extends AbstractMessage
 
     @Override
     public Object[] getParameters() {
-        // TODO NS: may have to specify for security
+        // todo: may have to specify for security
         return new Object[0];
     }
 

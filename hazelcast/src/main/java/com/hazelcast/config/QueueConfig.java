@@ -375,19 +375,27 @@ public class QueueConfig implements IdentifiedDataSerializable, NamedConfig, Ver
     }
 
     /**
-     * TODO NS: Documentation
-     * @since 5.4
+     * {@inheritDoc}
      */
+    @Override
+    @Nullable
     public String getNamespace() {
         return namespace;
     }
 
     /**
-     * TODO NS: Documentation
+     * Associates the provided Namespace ID with this structure for {@link ClassLoader} awareness.
+     * <p>
+     * The behaviour of setting this to {@code null} is outlined in the documentation for
+     * {@link NamespaceAwareConfig#DEFAULT_NAMESPACE}.
+     *
+     * @param namespace The ID of the Namespace to associate with this structure.
+     * @return the updated {@link QueueConfig} instance
      * @since 5.4
      */
-    public void setNamespace(@Nullable String namespace) {
+    public QueueConfig setNamespace(@Nullable String namespace) {
         this.namespace = namespace;
+        return this;
     }
 
     @Override
