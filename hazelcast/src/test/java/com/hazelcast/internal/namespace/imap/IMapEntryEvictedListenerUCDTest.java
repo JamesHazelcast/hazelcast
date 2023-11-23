@@ -22,7 +22,7 @@ import com.hazelcast.config.EntryListenerConfig;
 public class IMapEntryEvictedListenerUCDTest extends IMapUCDTest {
     @Override
     public void test() throws Exception {
-        map.put(1, 1);
+        populate();
         map.evict(1);
 
         assertListenerFired("entryEvicted");
@@ -39,6 +39,6 @@ public class IMapEntryEvictedListenerUCDTest extends IMapUCDTest {
 
     @Override
     protected String[] getUserDefinedClassNames() {
-        return new String[] {"usercodedeployment.IMapEntryEvictedListener", "usercodedeployment.ObservableListener"};
+        return new String[] {"usercodedeployment.MyEntryListener", "usercodedeployment.ObservableListener"};
     }
 }

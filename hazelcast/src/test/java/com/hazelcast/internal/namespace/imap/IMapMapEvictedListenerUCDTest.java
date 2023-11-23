@@ -41,6 +41,6 @@ public class IMapMapEvictedListenerUCDTest extends IMapUCDTest {
 
     @Override
     protected String[] getUserDefinedClassNames() {
-        return new String[] {"usercodedeployment.IMapMapEvictedListener", "usercodedeployment.ObservableListener"};
+        return new String[] {"usercodedeployment.MyEntryListener", "usercodedeployment.ObservableListener"};
     }
 }

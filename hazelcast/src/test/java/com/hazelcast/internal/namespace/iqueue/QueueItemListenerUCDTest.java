@@ -18,30 +18,15 @@ package com.hazelcast.internal.namespace.iqueue;
 
 import com.hazelcast.config.Config;
 import com.hazelcast.config.ItemListenerConfig;
-import com.hazelcast.map.IMap;
-
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class QueueItemListenerUCDTest extends IQueueUCDTest {
     @Override
     public void test() throws Exception {
         queue.add("item");
+        assertListenerFired("itemAdded");
+
         queue.remove("item");
-        IMap<String, Boolean> map = instance.getMap("QueueItemListenerUCDTest");
-        assertNotNull(map);
-
-        assertTrueEventually("The 'added' key should be set to true eventually", () -> {
-            Boolean added = map.get("added");
-            assertNotNull(added);
-            assertTrue(added);
-        });
-
-        assertTrueEventually("The 'removed' key should be set to true eventually", () -> {
-            Boolean removed = map.get("removed");
-            assertNotNull(removed);
-            assertTrue(removed);
-        });
+        assertListenerFired("itemRemoved");
     }
 
     @Override
@@ -55,6 +40,6 @@ public class QueueItemListenerUCDTest extends IQueueUCDTest {
 
     @Override
     protected String[] getUserDefinedClassNames() {
-        return new String[]{"usercodedeployment.QueueItemListener"};
+        return new String[] {"usercodedeployment.MyItemListener", "usercodedeployment.ObservableListener"};
     }
 }

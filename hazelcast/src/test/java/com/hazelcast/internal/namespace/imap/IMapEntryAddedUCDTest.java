@@ -22,8 +22,7 @@ import com.hazelcast.config.EntryListenerConfig;
 public class IMapEntryAddedUCDTest extends IMapUCDTest {
     @Override
     public void test() throws Exception {
-        map.put(1, 1);        
-
+        populate();
         assertListenerFired("entryAdded");
     }
 
@@ -38,6 +37,6 @@ public class IMapEntryAddedUCDTest extends IMapUCDTest {
 
     @Override
     protected String[] getUserDefinedClassNames() {
-        return new String[] {"usercodedeployment.IMapEntryAddedListener", "usercodedeployment.ObservableListener"};
+        return new String[] {"usercodedeployment.MyEntryListener", "usercodedeployment.ObservableListener"};
     }
 }
