@@ -16,24 +16,21 @@
 
 package com.hazelcast.internal.namespace.set;
 
-import com.hazelcast.collection.ISet;
-import com.hazelcast.config.SetConfig;
-import com.hazelcast.internal.namespace.UCDTest;
+import com.hazelcast.config.Config;
+import com.hazelcast.config.ItemListenerConfig;
 
-public abstract class SetUCDTest extends UCDTest {
-    protected SetConfig setConfig;
-    protected ISet<Object> set;
-
+public abstract class SetListenerUCDTest extends SetUCDTest {
     @Override
-    public void setUpInstance() throws ReflectiveOperationException {
-        setConfig = new SetConfig(objectName);
-        setConfig.setNamespace(getNamespaceName());
-        super.setUpInstance();
+    protected void mutateConfig(Config config) {
+        ItemListenerConfig listenerConfig = new ItemListenerConfig();
+        listenerConfig.setClassName(getUserDefinedClassNames()[0]);
 
-        set = instance.getSet(objectName);
+        setConfig.addItemListenerConfig(listenerConfig);
+        config.addSetConfig(setConfig);
     }
 
-    protected void populate() {
-        set.add("item");
+    @Override
+    protected String[] getUserDefinedClassNames() {
+        return new String[] {"usercodedeployment.MyItemListener", "usercodedeployment.ObservableListener"};
     }
 }

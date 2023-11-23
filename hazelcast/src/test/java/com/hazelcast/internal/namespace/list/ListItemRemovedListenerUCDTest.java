@@ -14,26 +14,13 @@
  * limitations under the License.
  */
 
-package com.hazelcast.internal.namespace.set;
+package com.hazelcast.internal.namespace.list;
 
-import com.hazelcast.collection.ISet;
-import com.hazelcast.config.SetConfig;
-import com.hazelcast.internal.namespace.UCDTest;
-
-public abstract class SetUCDTest extends UCDTest {
-    protected SetConfig setConfig;
-    protected ISet<Object> set;
-
+public class ListItemRemovedListenerUCDTest extends ListListenerUCDTest {
     @Override
-    public void setUpInstance() throws ReflectiveOperationException {
-        setConfig = new SetConfig(objectName);
-        setConfig.setNamespace(getNamespaceName());
-        super.setUpInstance();
-
-        set = instance.getSet(objectName);
-    }
-
-    protected void populate() {
-        set.add("item");
+    public void test() throws Exception {
+        populate();
+        list.remove("item");
+        assertListenerFired("itemRemoved");
     }
 }

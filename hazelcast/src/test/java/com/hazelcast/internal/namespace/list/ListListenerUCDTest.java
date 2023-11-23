@@ -16,25 +16,23 @@
 
 package com.hazelcast.internal.namespace.list;
 
-import com.hazelcast.collection.IList;
-import com.hazelcast.config.ListConfig;
-import com.hazelcast.internal.namespace.UCDTest;
+import com.hazelcast.config.Config;
+import com.hazelcast.config.ItemListenerConfig;
 
-public abstract class ListUCDTest extends UCDTest {
-    protected ListConfig listConfig;
-    protected IList<Object> list;
+import java.util.List;
 
+public abstract class ListListenerUCDTest extends ListUCDTest {
     @Override
-    public void setUpInstance() throws ReflectiveOperationException {
-        listConfig = new ListConfig(objectName);
-        listConfig.setNamespace(getNamespaceName());
+    protected void mutateConfig(Config config) {
+        ItemListenerConfig itemListenerConfig = new ItemListenerConfig();
+        itemListenerConfig.setClassName(getUserDefinedClassNames()[0]);
 
-        super.setUpInstance();
-
-        list = instance.getList(objectName);
+        listConfig.setItemListenerConfigs(List.of(itemListenerConfig));
+        config.addListConfig(listConfig);
     }
 
-    protected void populate() {
-        list.add("item");
+    @Override
+    protected String[] getUserDefinedClassNames() {
+        return new String[] {"usercodedeployment.MyItemListener", "usercodedeployment.ObservableListener"};
     }
 }

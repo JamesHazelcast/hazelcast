@@ -14,20 +14,13 @@
  * limitations under the License.
  */
 
-package com.hazelcast.internal.namespace.list;
+package com.hazelcast.internal.namespace.set;
 
-public class ListItemListenerUCDTest extends ListUCDTest {
+public class SetItemRemovedListenerUCDTest extends SetListenerUCDTest {
     @Override
     public void test() throws Exception {
-        list.add("item");
-        assertListenerFired("itemAdded");
-
-        list.remove("item");
+        populate();
+        set.remove("item");
         assertListenerFired("itemRemoved");
-    }
-
-    @Override
-    protected String[] getUserDefinedClassNames() {
-        return new String[] {"usercodedeployment.MyItemListener", "usercodedeployment.ObservableListener"};
     }
 }
