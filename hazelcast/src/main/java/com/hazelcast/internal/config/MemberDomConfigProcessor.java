@@ -1216,8 +1216,6 @@ public class MemberDomConfigProcessor extends AbstractDomConfigProcessor {
                 name,
                 ExecutorConfig.class);
 
-        // todo ?
-
         handleViaReflection(node, config, executorConfig);
     }
 
@@ -1227,8 +1225,6 @@ public class MemberDomConfigProcessor extends AbstractDomConfigProcessor {
                 config.getDurableExecutorConfigs(),
                 name,
                 DurableExecutorConfig.class);
-
-        // todo ?
 
         handleViaReflection(node, config, durableExecutorConfig);
     }
