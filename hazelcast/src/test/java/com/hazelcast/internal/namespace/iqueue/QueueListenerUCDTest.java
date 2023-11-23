@@ -19,16 +19,7 @@ package com.hazelcast.internal.namespace.iqueue;
 import com.hazelcast.config.Config;
 import com.hazelcast.config.ItemListenerConfig;
 
-public class QueueItemListenerUCDTest extends IQueueUCDTest {
-    @Override
-    public void test() throws Exception {
-        queue.add("item");
-        assertListenerFired("itemAdded");
-
-        queue.remove("item");
-        assertListenerFired("itemRemoved");
-    }
-
+public abstract class QueueListenerUCDTest extends IQueueUCDTest {
     @Override
     protected void mutateConfig(Config config) {
         ItemListenerConfig listenerConfig = new ItemListenerConfig();
