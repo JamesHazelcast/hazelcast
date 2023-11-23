@@ -517,13 +517,25 @@ public class CacheConfig<K, V> extends AbstractCacheConfig<K, V> implements Vers
 
 
 
-    /** @since 5.4 */
+    /**
+     * {@inheritDoc}
+     */
     @Override
+    @Nullable
     public String getNamespace() {
         return namespace;
     }
 
-    /** @since 5.4 */
+    /**
+     * Associates the provided Namespace ID with this structure for {@link ClassLoader} awareness.
+     * <p>
+     * The behaviour of setting this to {@code null} is outlined in the documentation for
+     * {@link NamespaceAwareConfig#DEFAULT_NAMESPACE}.
+     *
+     * @param namespace The ID of the Namespace to associate with this structure.
+     * @return the updated {@link ExecutorConfig} instance
+     * @since 5.4
+     */
     public CacheConfig<K, V> setNamespace(@Nullable String namespace) {
         this.namespace = namespace;
         return this;

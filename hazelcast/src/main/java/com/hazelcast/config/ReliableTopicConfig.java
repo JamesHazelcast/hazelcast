@@ -298,15 +298,28 @@ public class ReliableTopicConfig implements IdentifiedDataSerializable, NamedCon
         return this;
     }
 
-    /** @since 5.4 */
+    /**
+     * {@inheritDoc}
+     */
     @Override
+    @Nullable
     public String getNamespace() {
         return namespace;
     }
 
-    /** @since 5.4 */
-    public void setNamespace(@Nullable String namespace) {
+    /**
+     * Associates the provided Namespace ID with this structure for {@link ClassLoader} awareness.
+     * <p>
+     * The behaviour of setting this to {@code null} is outlined in the documentation for
+     * {@link NamespaceAwareConfig#DEFAULT_NAMESPACE}.
+     *
+     * @param namespace The ID of the Namespace to associate with this structure.
+     * @return the updated {@link ReliableTopicConfig} instance
+     * @since 5.4
+     */
+    public ReliableTopicConfig setNamespace(@Nullable String namespace) {
         this.namespace = namespace;
+        return this;
     }
 
     @Override

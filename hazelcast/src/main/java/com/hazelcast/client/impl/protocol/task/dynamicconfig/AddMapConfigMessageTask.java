@@ -107,7 +107,7 @@ public class AddMapConfigMessageTask
         if (parameters.queryCacheConfigs != null && !parameters.queryCacheConfigs.isEmpty()) {
             List<QueryCacheConfig> queryCacheConfigs = new ArrayList<>(parameters.queryCacheConfigs.size());
             for (QueryCacheConfigHolder holder : parameters.queryCacheConfigs) {
-                queryCacheConfigs.add(holder.asQueryCacheConfig(serializationService));
+                queryCacheConfigs.add(holder.asQueryCacheConfig(serializationService, parameters.namespace));
             }
             config.setQueryCacheConfigs(queryCacheConfigs);
         }

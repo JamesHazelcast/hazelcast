@@ -44,8 +44,6 @@ public class QueryCacheConfigHolder {
     private EvictionConfigHolder evictionConfigHolder;
     private List<ListenerConfigHolder> listenerConfigs;
     private List<IndexConfig> indexConfigs;
-    private boolean isNamespaceExists;
-    private @Nullable String namespace;
 
     public QueryCacheConfigHolder() {
     }
@@ -54,8 +52,7 @@ public class QueryCacheConfigHolder {
                                   boolean populate, boolean coalesce, String inMemoryFormat, String name,
                                   PredicateConfigHolder predicateConfigHolder, EvictionConfigHolder evictionConfigHolder,
                                   List<ListenerConfigHolder> listenerConfigs, List<IndexConfig> indexConfigs,
-                                  boolean serializeKeysExist, boolean serializeKeys, boolean isNamespaceExists,
-                                  @Nullable String namespace) {
+                                  boolean serializeKeysExist, boolean serializeKeys) {
         this.batchSize = batchSize;
         this.bufferSize = bufferSize;
         this.delaySeconds = delaySeconds;
@@ -70,8 +67,6 @@ public class QueryCacheConfigHolder {
         this.evictionConfigHolder = evictionConfigHolder;
         this.listenerConfigs = listenerConfigs;
         this.indexConfigs = indexConfigs;
-        this.isNamespaceExists = isNamespaceExists;
-        this.namespace = namespace;
     }
 
     public int getBatchSize() {
@@ -178,19 +173,7 @@ public class QueryCacheConfigHolder {
         return serializeKeys;
     }
 
-    public void setNamespaceExists(boolean isNamespaceExists) {
-        this.isNamespaceExists = isNamespaceExists;
-    }
-
-    public String getNamespace() {
-        return namespace;
-    }
-
-    public void setNamespace(@Nullable String namespace) {
-        this.namespace = namespace;
-    }
-
-    public QueryCacheConfig asQueryCacheConfig(SerializationService serializationService) {
+    public QueryCacheConfig asQueryCacheConfig(SerializationService serializationService, String namespace) {
         QueryCacheConfig config = new QueryCacheConfig();
         config.setBatchSize(batchSize);
         config.setBufferSize(bufferSize);
@@ -214,9 +197,6 @@ public class QueryCacheConfigHolder {
         config.setPopulate(populate);
         if (serializeKeysExist) {
             config.setSerializeKeys(serializeKeys);
-        }
-        if (isNamespaceExists) {
-            config.setNamespace(namespace);
         }
         return config;
     }
@@ -249,8 +229,6 @@ public class QueryCacheConfigHolder {
         holder.setPredicateConfigHolder(PredicateConfigHolder.of(config.getPredicateConfig(), serializationService));
         holder.setPopulate(config.isPopulate());
         holder.setSerializeKeys(config.isSerializeKeys());
-        holder.setNamespaceExists(config.getNamespace() != null);
-        holder.setNamespace(config.getNamespace());
         return holder;
     }
 

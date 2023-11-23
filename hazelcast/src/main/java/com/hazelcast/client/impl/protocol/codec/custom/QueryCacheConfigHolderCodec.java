@@ -58,7 +58,6 @@ public final class QueryCacheConfigHolderCodec {
         EvictionConfigHolderCodec.encode(clientMessage, queryCacheConfigHolder.getEvictionConfigHolder());
         ListMultiFrameCodec.encodeNullable(clientMessage, queryCacheConfigHolder.getListenerConfigs(), ListenerConfigHolderCodec::encode);
         ListMultiFrameCodec.encodeNullable(clientMessage, queryCacheConfigHolder.getIndexConfigs(), IndexConfigCodec::encode);
-        CodecUtil.encodeNullable(clientMessage, queryCacheConfigHolder.getNamespace(), StringCodec::encode);
 
         clientMessage.add(END_FRAME.copy());
     }
@@ -87,15 +86,9 @@ public final class QueryCacheConfigHolderCodec {
         com.hazelcast.client.impl.protocol.task.dynamicconfig.EvictionConfigHolder evictionConfigHolder = EvictionConfigHolderCodec.decode(iterator);
         java.util.List<com.hazelcast.client.impl.protocol.task.dynamicconfig.ListenerConfigHolder> listenerConfigs = ListMultiFrameCodec.decodeNullable(iterator, ListenerConfigHolderCodec::decode);
         java.util.List<com.hazelcast.config.IndexConfig> indexConfigs = ListMultiFrameCodec.decodeNullable(iterator, IndexConfigCodec::decode);
-        boolean isNamespaceExists = false;
-        java.lang.String namespace = null;
-        if (!iterator.peekNext().isEndFrame()) {
-            namespace = CodecUtil.decodeNullable(iterator, StringCodec::decode);
-            isNamespaceExists = true;
-        }
 
         fastForwardToEndFrame(iterator);
 
-        return new com.hazelcast.client.impl.protocol.task.dynamicconfig.QueryCacheConfigHolder(batchSize, bufferSize, delaySeconds, includeValue, populate, coalesce, inMemoryFormat, name, predicateConfigHolder, evictionConfigHolder, listenerConfigs, indexConfigs, isSerializeKeysExists, serializeKeys, isNamespaceExists, namespace);
+        return new com.hazelcast.client.impl.protocol.task.dynamicconfig.QueryCacheConfigHolder(batchSize, bufferSize, delaySeconds, includeValue, populate, coalesce, inMemoryFormat, name, predicateConfigHolder, evictionConfigHolder, listenerConfigs, indexConfigs, isSerializeKeysExists, serializeKeys);
     }
 }

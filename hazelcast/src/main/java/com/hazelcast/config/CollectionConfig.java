@@ -271,15 +271,28 @@ public abstract class CollectionConfig<T extends CollectionConfig>
         return (T) this;
     }
 
-    /** @since 5.4 */
+    /**
+     * {@inheritDoc}
+     */
     @Override
+    @Nullable
     public String getNamespace() {
         return namespace;
     }
 
-    /** @since 5.4 */
-    public void setNamespace(@Nullable String namespace) {
+    /**
+     * Associates the provided Namespace ID with this structure for {@link ClassLoader} awareness.
+     * <p>
+     * The behaviour of setting this to {@code null} is outlined in the documentation for
+     * {@link NamespaceAwareConfig#DEFAULT_NAMESPACE}.
+     *
+     * @param namespace The ID of the Namespace to associate with this structure.
+     * @return the updated {@link CollectionConfig} instance
+     * @since 5.4
+     */
+    public T setNamespace(@Nullable String namespace) {
         this.namespace = namespace;
+        return (T) this;
     }
 
     @Override
