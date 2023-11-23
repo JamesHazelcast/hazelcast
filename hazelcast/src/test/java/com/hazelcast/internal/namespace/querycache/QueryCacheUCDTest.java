@@ -30,7 +30,6 @@ public abstract class QueryCacheUCDTest extends IMapUCDTest {
         String cacheName = randomName();
 
         queryCacheConfig = new QueryCacheConfig(cacheName);
-        queryCacheConfig.setNamespace(getNamespaceName());
 
         super.setUpInstance();
 

@@ -44,7 +44,7 @@ import static com.hazelcast.internal.util.Preconditions.checkPositive;
  */
 
 @SuppressWarnings("checkstyle:methodcount")
-public class QueryCacheConfig implements IdentifiedDataSerializable, NamespaceAwareConfig, Versioned {
+public class QueryCacheConfig implements IdentifiedDataSerializable {
 
     /**
      * By default, after reaching this minimum size, node immediately sends buffered events to {@code QueryCache}.
@@ -143,8 +143,6 @@ public class QueryCacheConfig implements IdentifiedDataSerializable, NamespaceAw
 
     private List<IndexConfig> indexConfigs;
 
-    private @Nullable String namespace = DEFAULT_NAMESPACE;
-
     public QueryCacheConfig() {
     }
 
@@ -165,7 +163,6 @@ public class QueryCacheConfig implements IdentifiedDataSerializable, NamespaceAw
         this.evictionConfig = other.evictionConfig;
         this.entryListenerConfigs = other.entryListenerConfigs;
         this.indexConfigs = other.indexConfigs;
-        this.namespace = other.namespace;
     }
 
     /**
@@ -462,17 +459,6 @@ public class QueryCacheConfig implements IdentifiedDataSerializable, NamespaceAw
         return this;
     }
 
-    /** @since 5.4 **/
-    @Override
-    public String getNamespace() {
-        return namespace;
-    }
-
-    /** @since 5.4 **/
-    public void setNamespace(@Nullable String namespace) {
-        this.namespace = namespace;
-    }
-
     @Override
     public int getFactoryId() {
         return ConfigDataSerializerHook.F_ID;
@@ -498,11 +484,6 @@ public class QueryCacheConfig implements IdentifiedDataSerializable, NamespaceAw
         writeNullableList(entryListenerConfigs, out);
         writeNullableList(indexConfigs, out);
         out.writeBoolean(serializeKeys);
-
-        // RU_COMPAT_5_3
-        if (out.getVersion().isGreaterOrEqual(V5_4)) {
-            out.writeString(namespace);
-        }
     }
 
     @Override
@@ -520,11 +501,6 @@ public class QueryCacheConfig implements IdentifiedDataSerializable, NamespaceAw
         entryListenerConfigs = readNullableList(in);
         indexConfigs = readNullableList(in);
         serializeKeys = in.readBoolean();
-
-        // RU_COMPAT_5_3
-        if (in.getVersion().isGreaterOrEqual(V5_4)) {
-            namespace = in.readString();
-        }
     }
 
     @Override
@@ -575,9 +551,6 @@ public class QueryCacheConfig implements IdentifiedDataSerializable, NamespaceAw
         if (!Objects.equals(entryListenerConfigs, that.entryListenerConfigs)) {
             return false;
         }
-        if (!Objects.equals(namespace, that.namespace)) {
-            return false;
-        }
         return Objects.equals(indexConfigs, that.indexConfigs);
     }
 
@@ -597,7 +570,6 @@ public class QueryCacheConfig implements IdentifiedDataSerializable, NamespaceAw
         result = 31 * result + (evictionConfig != null ? evictionConfig.hashCode() : 0);
         result = 31 * result + (entryListenerConfigs != null ? entryListenerConfigs.hashCode() : 0);
         result = 31 * result + (indexConfigs != null ? indexConfigs.hashCode() : 0);
-        result = 31 * result + (namespace != null ? namespace.hashCode() : 0);
         return result;
     }
 
@@ -617,7 +589,6 @@ public class QueryCacheConfig implements IdentifiedDataSerializable, NamespaceAw
                 + ", evictionConfig=" + evictionConfig
                 + ", entryListenerConfigs=" + entryListenerConfigs
                 + ", indexConfigs=" + indexConfigs
-                + ", namespace=" + namespace
                 + '}';
     }
 }
