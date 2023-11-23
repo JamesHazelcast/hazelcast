@@ -23,6 +23,6 @@ public class ReplicatedMapEntryEvictedUCDTest extends ReplicatedMapListenerUCDTe
     public void test() throws Exception {
         map.put(1, 1, 1, TimeUnit.MILLISECONDS);
 
-        assertListenerFired("entryEvicted");
+        assertListenerFired("entryLoaded");
     }
 }
