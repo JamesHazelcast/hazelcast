@@ -54,7 +54,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -473,13 +472,13 @@ public abstract class UCDTest extends HazelcastTestSupport {
      * @param key the name of the method in the listener that should've fired
      */
     protected void assertListenerFired(String key) throws ReflectiveOperationException {
-        Map<String, ?> map = instance.getMap(getClassObject().getSimpleName());
+        Collection<String> map = instance.getSet(getClassObject().getSimpleName());
         assertTrueEventually(() -> {
             if (LOGGER.isFinestEnabled()) {
-                LOGGER.finest("Checking map for values, currently contains %s", map.keySet());
+                LOGGER.finest("Checking map for values, currently contains %s", map);
             }
 
-            assertTrue(map.containsKey(key));
+            assertTrue(map.contains(key));
         });
     }
 }
