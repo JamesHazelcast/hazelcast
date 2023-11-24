@@ -59,7 +59,6 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -145,6 +144,7 @@ public abstract class UCDTest extends HazelcastTestSupport {
                 throw ExceptionUtil.sneakyThrow(e);
             }
         }), NAME_IN_CONFIG(UCDTest::addClassNameToConfig), INSTANCE_IN_DATA_STRUCTURE((instance) -> {
+            // TODO NS if time, we should try to fix this bug to get more test coverage
             throw new UnsupportedOperationException(
                     "Typically used for listener registration, but due to a bug this doesn't work - https://github.com/hazelcast/hazelcast/issues/26062");
 
