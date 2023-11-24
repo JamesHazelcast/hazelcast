@@ -156,7 +156,7 @@ public abstract class UCDTest extends HazelcastTestSupport {
 
         private final Consumer<UCDTest> action;
 
-        private ClassRegistrationStyle(Consumer<UCDTest> action) {
+        ClassRegistrationStyle(Consumer<UCDTest> action) {
             this.action = action;
         }
 
