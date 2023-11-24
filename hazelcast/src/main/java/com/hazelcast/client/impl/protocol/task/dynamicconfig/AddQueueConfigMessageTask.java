@@ -24,6 +24,7 @@ import com.hazelcast.config.QueueConfig;
 import com.hazelcast.config.QueueStoreConfig;
 import com.hazelcast.instance.impl.Node;
 import com.hazelcast.internal.dynamicconfig.DynamicConfigurationAwareConfig;
+import com.hazelcast.internal.namespace.NamespaceUtil;
 import com.hazelcast.internal.nio.Connection;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
 import com.hazelcast.security.SecurityInterceptorConstants;
@@ -60,7 +61,8 @@ public class AddQueueConfigMessageTask
         config.setSplitBrainProtectionName(parameters.splitBrainProtectionName);
         config.setStatisticsEnabled(parameters.statisticsEnabled);
         if (parameters.queueStoreConfig != null) {
-            QueueStoreConfig storeConfig = parameters.queueStoreConfig.asQueueStoreConfig(serializationService);
+            QueueStoreConfig storeConfig = NamespaceUtil.callWithNamespace(parameters.namespace,
+                    () -> parameters.queueStoreConfig.asQueueStoreConfig(serializationService));
             config.setQueueStoreConfig(storeConfig);
         }
         if (parameters.listenerConfigs != null && !parameters.listenerConfigs.isEmpty()) {
