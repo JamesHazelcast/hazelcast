@@ -26,7 +26,6 @@ import com.hazelcast.config.ListenerConfig;
 import com.hazelcast.config.MapConfig;
 import com.hazelcast.config.NamespaceConfig;
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.IExecutorService;
 import com.hazelcast.instance.impl.NamespaceAwareClassLoaderIntegrationTest;
 import com.hazelcast.internal.util.ExceptionUtil;
 import com.hazelcast.jet.impl.deployment.MapResourceClassLoader;
@@ -53,7 +52,6 @@ import org.junit.runners.Parameterized.Parameters;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -111,7 +109,7 @@ public abstract class UCDTest extends HazelcastTestSupport {
     }
 
     // TODO NS Should these be moved into their own classes?
-    protected enum ConfigStyle {
+    private enum ConfigStyle {
         /** All configuration is set programmatically <strong>before</strong> the instance is started */
         STATIC_PROGRAMMATIC,
         /** Where possible, configuration is changed <strong>after</strong> the instance has started */
@@ -134,7 +132,7 @@ public abstract class UCDTest extends HazelcastTestSupport {
      * <p>
      * called methods are expected to be inherited and extended so must call a method in the enclosing class.
      */
-    protected enum ClassRegistrationStyle {
+    private enum ClassRegistrationStyle {
         INSTANCE_IN_CONFIG(instance -> {
             assumeThat("Can only create instances with a dynamic configuration, i.e. where the cluster is already up & running",
                     instance.configStyle, is(ConfigStyle.DYNAMIC));
@@ -169,7 +167,7 @@ public abstract class UCDTest extends HazelcastTestSupport {
     }
 
     // TODO NS Should these be moved into their own classes?
-    protected enum AssertionStyle {
+    public enum AssertionStyle {
         /** Happy path - assert the functionality works when configured correctly */
         POSITIVE,
         /**
@@ -186,14 +184,10 @@ public abstract class UCDTest extends HazelcastTestSupport {
 
     @Parameters(name = "Connection: {0}, Config: {1}, Class Registration: {2}, Assertion: {3}")
     public static Iterable<Object[]> parameters() {
-        // TODO NS Just wasn't working, was like the listener wasn't firing - to be investigated properly
-        ClassRegistrationStyle[] classRegistrationStyleFiltered = Arrays.stream(ClassRegistrationStyle.values())
-                .filter(style -> style != ClassRegistrationStyle.NAME_IN_CONFIG).toArray(ClassRegistrationStyle[]::new);
-
         // TODO NS We likely don't need this much overlap - we should manually define test parameters if possible
         return Lists
                 .cartesianProduct(List.of(ConnectionStyle.values()), List.of(ConfigStyle.values()),
-                        List.of(classRegistrationStyleFiltered), List.of(AssertionStyle.values()))
+                        List.of(ClassRegistrationStyle.values()), List.of(AssertionStyle.values()))
                 .stream().map(Collection::toArray)::iterator;
 
         // Hardcode paramaters for debugging purposes
@@ -248,10 +242,18 @@ public abstract class UCDTest extends HazelcastTestSupport {
                 throw new IllegalArgumentException(connectionStyle.toString());
         }
 
-        initialiseDataStructure();
+        // If you want to apply configuration on the data structure, obviously you need to initialize it first
+        if (classRegistrationStyle == ClassRegistrationStyle.INSTANCE_IN_DATA_STRUCTURE) {
+            initialiseDataStructure();
+        }
 
         if (configStyle == ConfigStyle.DYNAMIC) {
             setupConfigs(instance.getConfig());
+        }
+
+        // But if you want to apply configuration via config, then you need to do this before you initialize it
+        if (classRegistrationStyle != ClassRegistrationStyle.INSTANCE_IN_DATA_STRUCTURE) {
+            initialiseDataStructure();
         }
     }
 
