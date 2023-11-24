@@ -30,7 +30,7 @@ public class QueryCacheGetUCDTest extends QueryCacheUCDTest {
     protected String[] getUserDefinedClassNames() {
         return new String[] {"usercodedeployment.TruePredicate"};
     }
-    
+
     @Override
     protected void addClassInstanceToConfig() throws ReflectiveOperationException {
         queryCacheConfig.getPredicateConfig().setImplementation(getClassInstance());
