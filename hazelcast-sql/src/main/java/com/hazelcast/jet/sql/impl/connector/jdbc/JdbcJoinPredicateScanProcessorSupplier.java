@@ -16,7 +16,6 @@
 
 package com.hazelcast.jet.sql.impl.connector.jdbc;
 
-import com.hazelcast.function.FunctionEx;
 import com.hazelcast.jet.impl.AutoCloseableTraversers;
 import com.hazelcast.jet.impl.util.AutoCloseableTraverser;
 import com.hazelcast.jet.sql.impl.JetJoinInfo;
@@ -29,7 +28,6 @@ import com.hazelcast.sql.impl.expression.Expression;
 import com.hazelcast.sql.impl.row.JetSqlRow;
 
 import javax.annotation.Nonnull;
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -59,9 +57,9 @@ public class JdbcJoinPredicateScanProcessorSupplier
     public JdbcJoinPredicateScanProcessorSupplier(
             @Nonnull String dataConnectionName,
             @Nonnull String query,
-            List<FunctionEx<Object, ?>> converters, @Nonnull JetJoinInfo joinInfo,
+            @Nonnull JetJoinInfo joinInfo,
             List<Expression<?>> projections) {
-        super(dataConnectionName, query, converters, joinInfo, projections);
+        super(dataConnectionName, query, joinInfo, projections);
     }
 
     protected AutoCloseableTraverser<JetSqlRow> joinRows(Iterable<JetSqlRow> leftRows) {
@@ -87,19 +85,10 @@ public class JdbcJoinPredicateScanProcessorSupplier
 
     // Return an iterator that can traverse leftRowsList and ResultSet of unionAllSql
     private JoinPredicateScanResultSetIterator<JetSqlRow> joinUnionAll(List<JetSqlRow> leftRowsList, String unionAllSql) {
-        Connection connection = dataConnection.getConnection();
-        TypeResolver typeResolver = JdbcSqlConnector.typeResolver(connection);
         return new JoinPredicateScanResultSetIterator<>(
                 dataConnection.getConnection(),
                 unionAllSql,
-                new JoinPredicateScanRowMapper(
-                        expressionEvalContext,
-                        typeResolver,
-                        converters,
-                        projections,
-                        joinInfo,
-                        leftRowsList
-                ),
+                new JoinPredicateScanRowMapper(expressionEvalContext, projections, joinInfo, leftRowsList),
                 new JoinPredicatePreparedStatementSetter(joinInfo, leftRowsList)
         );
     }

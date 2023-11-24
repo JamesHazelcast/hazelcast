@@ -42,11 +42,7 @@ public abstract class AbstractAtomicRegisterSnapshotTest<T> extends HazelcastRaf
 
     @Before
     public void setup() {
-        setLicense();
         instances = newInstances(3);
-    }
-
-    protected void setLicense() {
     }
 
     protected CPSubsystem getCPSubsystem() {

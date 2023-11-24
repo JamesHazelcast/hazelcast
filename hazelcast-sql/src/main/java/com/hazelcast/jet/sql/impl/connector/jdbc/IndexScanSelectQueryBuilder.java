@@ -16,7 +16,6 @@
 
 package com.hazelcast.jet.sql.impl.connector.jdbc;
 
-import com.hazelcast.function.FunctionEx;
 import com.hazelcast.jet.sql.impl.JetJoinInfo;
 import com.hazelcast.sql.impl.expression.predicate.OrPredicate;
 import org.apache.calcite.rex.RexNode;
@@ -55,7 +54,6 @@ class IndexScanSelectQueryBuilder extends AbstractQueryBuilder {
     protected static final String ROW_NUMBER_ALIAS = "CONFIDENTIAL_ROWNUM";
 
     private final List<Integer> dynamicParams = new ArrayList<>();
-    private final List<FunctionEx<Object, ?>> converters = new ArrayList<>();
 
     IndexScanSelectQueryBuilder(JdbcTable table,
                                 SqlDialect dialect,
@@ -74,8 +72,6 @@ class IndexScanSelectQueryBuilder extends AbstractQueryBuilder {
             }
         };
         this.query = selectQueryBuilder.query();
-        this.converters.addAll(selectQueryBuilder.converters());
-        this.converters.add(FunctionEx.identity()); // for CONFIDENTIAL_ROWNUM
 
         // Create the where clause from indices
         StringBuilder stringBuilder = new StringBuilder(this.query);
@@ -119,9 +115,5 @@ class IndexScanSelectQueryBuilder extends AbstractQueryBuilder {
             sb.append(" AND ")
                     .append(predicateFragment);
         }
-    }
-
-    public List<FunctionEx<Object, ?>> converters() {
-        return converters;
     }
 }

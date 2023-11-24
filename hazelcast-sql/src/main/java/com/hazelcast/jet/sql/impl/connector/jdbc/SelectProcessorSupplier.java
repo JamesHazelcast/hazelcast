@@ -32,10 +32,13 @@ import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import static java.util.Collections.singleton;
 import static java.util.Objects.requireNonNull;
@@ -51,6 +54,7 @@ public class SelectProcessorSupplier
 
     private transient ExpressionEvalContext evalContext;
     private transient volatile BiFunctionEx<ResultSet, Integer, ?>[] valueGetters;
+    private String dialectName;
 
     @SuppressWarnings("unused")
     public SelectProcessorSupplier() {
@@ -59,11 +63,13 @@ public class SelectProcessorSupplier
     public SelectProcessorSupplier(@Nonnull String dataConnectionName,
                                    @Nonnull String query,
                                    @Nonnull int[] parameterPositions,
-                                   @Nonnull List<FunctionEx<Object, ?>> converters) {
+                                   @Nonnull List<FunctionEx<Object, ?>> converters,
+                                   @Nonnull String dialectName) {
         super(dataConnectionName);
         this.query = requireNonNull(query, "query must not be null");
         this.parameterPositions = requireNonNull(parameterPositions, "parameterPositions must not be null");
         this.converters = converters;
+        this.dialectName = dialectName;
     }
 
     @Override
@@ -80,8 +86,6 @@ public class SelectProcessorSupplier
         Processor processor = new ReadJdbcP<>(
                 () -> dataConnection.getConnection(),
                 (connection, parallelism, index) -> {
-                    TypeResolver typeResolver = JdbcSqlConnector.typeResolver(connection);
-
                     PreparedStatement statement = connection.prepareStatement(query);
                     List<Object> arguments = evalContext.getArguments();
                     for (int j = 0; j < parameterPositions.length; j++) {
@@ -89,7 +93,7 @@ public class SelectProcessorSupplier
                     }
                     try {
                         ResultSet rs = statement.executeQuery();
-                        valueGetters = JdbcSqlConnector.prepareValueGettersFromMetadata(typeResolver, rs, converters::get);
+                        valueGetters = prepareValueGettersFromMetadata(rs);
                         return rs;
                     } catch (SQLException e) {
                         statement.close();
@@ -111,6 +115,22 @@ public class SelectProcessorSupplier
         return singleton(processor);
     }
 
+    private BiFunctionEx<ResultSet, Integer, ?>[] prepareValueGettersFromMetadata(ResultSet rs) throws SQLException {
+        ResultSetMetaData metaData = rs.getMetaData();
+
+        BiFunctionEx<ResultSet, Integer, Object>[] valueGetters = new BiFunctionEx[metaData.getColumnCount()];
+        for (int j = 0; j < metaData.getColumnCount(); j++) {
+            String type = metaData.getColumnTypeName(j + 1).toUpperCase(Locale.ROOT);
+            Map<String, BiFunctionEx<ResultSet, Integer, ?>> getters = GettersProvider.getGetters(dialectName);
+            FunctionEx<? super Object, ?> converterFn = converters.get(j);
+            valueGetters[j] = getters.getOrDefault(
+                    type,
+                    (resultSet, n) -> rs.getObject(n)
+            ).andThen(converterFn);
+        }
+        return valueGetters;
+    }
+
 
     @Override
     public void writeData(ObjectDataOutput out) throws IOException {
@@ -118,6 +138,7 @@ public class SelectProcessorSupplier
         out.writeString(query);
         out.writeIntArray(parameterPositions);
         out.writeObject(converters);
+        out.writeString(dialectName);
     }
 
     @Override
@@ -126,6 +147,6 @@ public class SelectProcessorSupplier
         query = in.readString();
         parameterPositions = in.readIntArray();
         converters = in.readObject();
+        dialectName = in.readString();
     }
-
 }

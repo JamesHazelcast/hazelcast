@@ -86,7 +86,7 @@ public class MappingColumnsTable extends InfoSchemaTable {
                         field.externalName(),
                         i + 1,
                         String.valueOf(true),
-                        field.type().getTypeFamily().toString()
+                        field.type().getTypeFamily().name()
                 };
                 rows.add(row);
             }

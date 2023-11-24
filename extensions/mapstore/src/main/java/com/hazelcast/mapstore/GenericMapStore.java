@@ -19,6 +19,7 @@ package com.hazelcast.mapstore;
 import com.hazelcast.dataconnection.impl.JdbcDataConnection;
 import com.hazelcast.map.MapLoaderLifecycleSupport;
 import com.hazelcast.map.MapStore;
+import com.hazelcast.nio.serialization.genericrecord.GenericRecord;
 
 import java.sql.SQLException;
 import java.util.Collection;
@@ -57,23 +58,16 @@ import static com.hazelcast.mapstore.JdbcParameters.convert;
  * Note : When GenericMapStore uses GenericRecord as value, even if the GenericRecord contains the primary key as a field,
  * the primary key is still received from @{link {@link com.hazelcast.map.IMap} method call
  *
- * @param <K> type of the key
- * @param <V> type of the value
+ * @param <K>
  */
-public class GenericMapStore<K, V> extends GenericMapLoader<K, V>
-        implements MapStore<K, V>, MapLoaderLifecycleSupport {
+public class GenericMapStore<K> extends GenericMapLoader<K>
+        implements MapStore<K, GenericRecord>, MapLoaderLifecycleSupport {
 
     @Override
-    public void store(K key, V value) {
+    public void store(K key, GenericRecord record) {
         awaitSuccessfulInit();
 
-        JdbcParameters jdbcParameters = convert(
-                key,
-                value,
-                columnMetadataList,
-                genericMapStoreProperties.idColumn,
-                genericMapStoreProperties.singleColumnAsValue
-        );
+        JdbcParameters jdbcParameters = convert(key, record, columnMetadataList, genericMapStoreProperties.idColumn);
 
         try {
             sqlService.execute(queries.storeSink(), jdbcParameters.getParams()).close();
@@ -93,10 +87,10 @@ public class GenericMapStore<K, V> extends GenericMapLoader<K, V>
     }
 
     @Override
-    public void storeAll(Map<K, V> map) {
+    public void storeAll(Map<K, GenericRecord> map) {
         awaitSuccessfulInit();
 
-        for (Entry<K, V> entry : map.entrySet()) {
+        for (Entry<K, GenericRecord> entry : map.entrySet()) {
             store(entry.getKey(), entry.getValue());
         }
     }

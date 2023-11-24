@@ -21,8 +21,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import static org.assertj.core.util.Lists.newArrayList;
-
 public class SinkJdbcSqlConnectorTest extends JdbcSqlTestSupport {
 
     private String tableName;
@@ -44,9 +42,7 @@ public class SinkJdbcSqlConnectorTest extends JdbcSqlTestSupport {
 
         execute("SINK INTO " + tableName + " VALUES (0, 'name-0')");
 
-        assertJdbcRowsAnyOrder(tableName,
-                newArrayList(Integer.class, String.class),
-                new Row(0, "name-0"));
+        assertJdbcRowsAnyOrder(tableName, new Row(0, "name-0"));
     }
 
     @Test
@@ -57,9 +53,7 @@ public class SinkJdbcSqlConnectorTest extends JdbcSqlTestSupport {
 
         execute("SINK INTO " + mappingName + " VALUES (0, 'name-0')");
 
-        assertJdbcRowsAnyOrder(tableName,
-                newArrayList(Integer.class, String.class),
-                new Row(0, "name-0"));
+        assertJdbcRowsAnyOrder(tableName, new Row(0, "name-0"));
     }
 
     @Test
@@ -75,9 +69,7 @@ public class SinkJdbcSqlConnectorTest extends JdbcSqlTestSupport {
 
         execute("SINK INTO " + tableName + " VALUES (0, 'name-0')");
 
-        assertJdbcRowsAnyOrder(tableName,
-                newArrayList(Integer.class, String.class),
-                new Row(0, "name-0"));
+        assertJdbcRowsAnyOrder(tableName, new Row(0, "name-0"));
     }
 
     @Test
@@ -88,7 +80,6 @@ public class SinkJdbcSqlConnectorTest extends JdbcSqlTestSupport {
         execute("SINK INTO " + tableName + " (name, id) VALUES ('name-0', 0), ('name-1', 1)");
 
         assertJdbcRowsAnyOrder(tableName,
-                newArrayList(Integer.class, String.class),
                 new Row(0, "name-0"),
                 new Row(1, "name-1")
         );
@@ -108,7 +99,6 @@ public class SinkJdbcSqlConnectorTest extends JdbcSqlTestSupport {
         execute("SINK INTO " + tableName + " (fullName, id) VALUES ('name-0', 0), ('name-1', 1)");
 
         assertJdbcRowsAnyOrder(tableName,
-                newArrayList(Integer.class, String.class),
                 new Row(0, "name-0"),
                 new Row(1, "name-1")
         );
@@ -122,7 +112,6 @@ public class SinkJdbcSqlConnectorTest extends JdbcSqlTestSupport {
         execute("SINK INTO " + tableName + " SELECT v,'name-' || v FROM TABLE(generate_series(0,4))");
 
         assertJdbcRowsAnyOrder(tableName,
-                newArrayList(Integer.class, String.class),
                 new Row(0, "name-0"),
                 new Row(1, "name-1"),
                 new Row(2, "name-2"),
@@ -140,7 +129,6 @@ public class SinkJdbcSqlConnectorTest extends JdbcSqlTestSupport {
         execute("SINK INTO " + tableName + " (name, id) VALUES ('name-0', 0)");
 
         assertJdbcRowsAnyOrder(tableName,
-                newArrayList(Integer.class, String.class),
                 new Row(0, "name-0")
         );
     }
@@ -154,7 +142,6 @@ public class SinkJdbcSqlConnectorTest extends JdbcSqlTestSupport {
         insertItems(tableName, 2);
 
         assertJdbcRowsAnyOrder(tableName,
-                newArrayList(Integer.class, String.class),
                 new Row(0, "name-0"),
                 new Row(1, "name-1")
         );
@@ -162,7 +149,6 @@ public class SinkJdbcSqlConnectorTest extends JdbcSqlTestSupport {
         execute("SINK INTO " + tableName + " (name, id) VALUES ('name-2', 0), ('name-3', 1)");
 
         assertJdbcRowsAnyOrder(tableName,
-                newArrayList(Integer.class, String.class),
                 new Row(0, "name-2"),
                 new Row(1, "name-3")
         );

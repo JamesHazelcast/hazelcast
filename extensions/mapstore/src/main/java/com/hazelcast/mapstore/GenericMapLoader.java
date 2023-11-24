@@ -28,6 +28,7 @@ import com.hazelcast.jet.impl.util.Util;
 import com.hazelcast.logging.ILogger;
 import com.hazelcast.map.MapLoader;
 import com.hazelcast.map.MapLoaderLifecycleSupport;
+import com.hazelcast.nio.serialization.genericrecord.GenericRecord;
 import com.hazelcast.spi.impl.NodeEngineImpl;
 import com.hazelcast.spi.impl.executionservice.ExecutionService;
 import com.hazelcast.spi.properties.ClusterProperty;
@@ -84,10 +85,9 @@ import static java.util.stream.Collectors.toMap;
  * The GenericMapLoader creates a SQL mapping with name "__map-store." + mapName.
  * This mapping is removed when the map is destroyed.
  *
- * @param <K> type of the key
- * @param <V> type of the value
+ * @param <K>
  */
-public class GenericMapLoader<K, V> implements MapLoader<K, V>, MapLoaderLifecycleSupport {
+public class GenericMapLoader<K> implements MapLoader<K, GenericRecord>, MapLoaderLifecycleSupport {
 
     /**
      * Property key to define data connection
@@ -117,11 +117,6 @@ public class GenericMapLoader<K, V> implements MapLoader<K, V>, MapLoaderLifecyc
      * Property key to control loading of all keys when IMap is first created
      */
     public static final String LOAD_ALL_KEYS_PROPERTY = "load-all-keys";
-
-    /**
-     * Property key to decide on getting a single column as the value
-     */
-    public static final String SINGLE_COLUMN_AS_VALUE = "single-column-as-value";
 
     /**
      * Timeout for initialization of GenericMapLoader
@@ -306,27 +301,21 @@ public class GenericMapLoader<K, V> implements MapLoader<K, V>, MapLoaderLifecyc
     }
 
     @Override
-    public V load(K key) {
+    public GenericRecord load(K key) {
         awaitSuccessfulInit();
 
         try (SqlResult queryResult = sqlService.execute(queries.load(), key)) {
             Iterator<SqlRow> it = queryResult.iterator();
 
-            V value = null;
+            GenericRecord genericRecord = null;
             if (it.hasNext()) {
                 SqlRow sqlRow = it.next();
                 if (it.hasNext()) {
                     throw new IllegalStateException("multiple matching rows for a key " + key);
                 }
-                // If there is a single column as the value, return that column as the value
-                if (queryResult.getRowMetadata().getColumnCount() == 2 && genericMapStoreProperties.singleColumnAsValue) {
-                    value = sqlRow.getObject(1);
-                } else {
-                    //noinspection unchecked
-                    value = (V) toGenericRecord(sqlRow, genericMapStoreProperties);
-                }
+                genericRecord = toGenericRecord(sqlRow, genericMapStoreProperties);
             }
-            return value;
+            return genericRecord;
         }
     }
 
@@ -334,7 +323,7 @@ public class GenericMapLoader<K, V> implements MapLoader<K, V>, MapLoaderLifecyc
      * Size of the {@code keys} collection is limited by {@link ClusterProperty#MAP_LOAD_CHUNK_SIZE}
      */
     @Override
-    public Map<K, V> loadAll(Collection<K> keys) {
+    public Map<K, GenericRecord> loadAll(Collection<K> keys) {
         awaitSuccessfulInit();
 
         Object[] keysArray = keys.toArray();
@@ -343,20 +332,12 @@ public class GenericMapLoader<K, V> implements MapLoader<K, V>, MapLoaderLifecyc
         try (SqlResult queryResult = sqlService.execute(sql, keysArray)) {
             Iterator<SqlRow> it = queryResult.iterator();
 
-            Map<K, V> result = new HashMap<>();
-
+            Map<K, GenericRecord> result = new HashMap<>();
             while (it.hasNext()) {
                 SqlRow sqlRow = it.next();
-                // If there is a single column as the value, return that column as the value
-                if (queryResult.getRowMetadata().getColumnCount() == 2 && genericMapStoreProperties.singleColumnAsValue) {
-                    K id = sqlRow.getObject(genericMapStoreProperties.idColumn);
-                    result.put(id, sqlRow.getObject(1));
-                } else {
-                    K id = sqlRow.getObject(genericMapStoreProperties.idColumn);
-                    //noinspection unchecked
-                    V record = (V) toGenericRecord(sqlRow, genericMapStoreProperties);
-                    result.put(id, record);
-                }
+                K id = sqlRow.getObject(genericMapStoreProperties.idColumn);
+                GenericRecord record = toGenericRecord(sqlRow, genericMapStoreProperties);
+                result.put(id, record);
             }
             return result;
         }

@@ -144,19 +144,30 @@ public abstract class UCDTest extends HazelcastTestSupport {
                 throw ExceptionUtil.sneakyThrow(e);
             }
         }), NAME_IN_CONFIG(UCDTest::addClassNameToConfig), INSTANCE_IN_DATA_STRUCTURE((instance) -> {
-            assumeThat("Can only create instances with a dynamic configuration, i.e. where the cluster is already up & running",
-                    instance.configStyle, is(ConfigStyle.DYNAMIC));
+            // TODO NS
+            // ObservableListener relies on putting the value in an IMap accessed via HazelcastInstanceAware
+            // But HazelcastInstanceAware is only available on listeners registered via config, NOT on those registered on the
+            // data
+            // structure directly
+            // E.G. AbstractCollectionProxyImpl.initialize() iterates through the configs
+            // Reproducer - https://hazelcast.slack.com/archives/C05SUMN6UJH/p1700811091142359
+            // Either we fix this, or come up with another way to read the values back
+            throw new UnsupportedOperationException();
 
-            try {
-                instance.addClassInstanceToDataStructure();
-            } catch (ReflectiveOperationException e) {
-                throw ExceptionUtil.sneakyThrow(e);
-            }
+            // assumeThat("Can only create instances with a dynamic configuration, i.e. where the cluster is already up &
+            // running",
+            // instance.configStyle, is(ConfigStyle.DYNAMIC));
+            //
+            // try {
+            // instance.addClassInstanceToDataStructure();
+            // } catch (ReflectiveOperationException e) {
+            // throw ExceptionUtil.sneakyThrow(e);
+            // }
         }), NONE((instance) -> assumeTrue("Skipping as configuration not supported", instance.isNoClassRegistrationAllowed()));
 
         private final Consumer<UCDTest> action;
 
-        ClassRegistrationStyle(Consumer<UCDTest> action) {
+        private ClassRegistrationStyle(Consumer<UCDTest> action) {
             this.action = action;
         }
 
@@ -186,21 +197,17 @@ public abstract class UCDTest extends HazelcastTestSupport {
     public static Iterable<Object[]> parameters() {
         // TODO NS fix this
         ClassRegistrationStyle[] classRegistrationStyleFiltered = Arrays.stream(ClassRegistrationStyle.values()).filter(style ->
-        // ObservableListener relies on putting the value in an IMap accessed via HazelcastInstanceAware
-        // But HazelcastInstanceAware is only available on listeners registered via config, NOT on those registered on the data
-        // structure directly
-        // E.G. AbstractCollectionProxyImpl.initialize() iterates through the configs
-        style != ClassRegistrationStyle.INSTANCE_IN_DATA_STRUCTURE
-        // TODO NS Just wasn't working, was like the listener wasn't firing - to be investigated properly
-                && style != ClassRegistrationStyle.NAME_IN_CONFIG).toArray(ClassRegistrationStyle[]::new);
+        // TODO Just wasn't working, was like the listener wasn't firing - to be investigated properly
+                style != ClassRegistrationStyle.NAME_IN_CONFIG).toArray(ClassRegistrationStyle[]::new);
 
         return Lists
                 .cartesianProduct(List.of(ConnectionStyle.values()), List.of(ConfigStyle.values()),
                         List.of(classRegistrationStyleFiltered), List.of(AssertionStyle.values()))
                 .stream().map(Collection::toArray)::iterator;
 
-         // Hardcode paramaters for debugging purposes
-         // return List.<Object[]>of(new Object[] {ConnectionStyle.EMBEDDED, ConfigStyle.DYNAMIC, ClassRegistrationStyle.NAME_IN_CONFIG, AssertionStyle.POSITIVE});
+        // Hardcode paramaters for debugging purposes
+        // return List.<Object[]>of(new Object[] {ConnectionStyle.EMBEDDED, ConfigStyle.DYNAMIC,
+        // ClassRegistrationStyle.NAME_IN_CONFIG, AssertionStyle.POSITIVE});
     }
 
     @BeforeClass

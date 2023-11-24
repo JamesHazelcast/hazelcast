@@ -131,7 +131,6 @@ public class SelectJdbcSqlConnectorTest extends JdbcSqlTestSupport {
         );
     }
 
-
     @Test
     public void selectAllFromTableWhereIdColumn() {
         assertRowsAnyOrder(

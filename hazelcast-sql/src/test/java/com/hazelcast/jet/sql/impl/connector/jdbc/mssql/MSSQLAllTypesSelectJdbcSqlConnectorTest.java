@@ -25,6 +25,7 @@ import org.junit.experimental.categories.Category;
 
 import static org.assertj.core.api.Assumptions.assumeThat;
 
+
 @Category(NightlyTest.class)
 public class MSSQLAllTypesSelectJdbcSqlConnectorTest extends AllTypesSelectJdbcSqlConnectorTest {
 

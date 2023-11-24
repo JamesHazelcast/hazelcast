@@ -18,10 +18,6 @@ package com.hazelcast.test.jdbc;
 
 import org.testcontainers.containers.MariaDBContainer;
 
-import java.util.Arrays;
-
-import static java.util.stream.Collectors.joining;
-
 public class MariaDBDatabaseProvider implements TestDatabaseProvider {
 
     public static final String TEST_MARIADB_VERSION = System.getProperty("test.mariadb.version", "10.3");
@@ -50,13 +46,5 @@ public class MariaDBDatabaseProvider implements TestDatabaseProvider {
             container.stop();
             container = null;
         }
-    }
-
-    @Override
-    public String quote(String[] parts) {
-        return Arrays.stream(parts)
-                .map(part -> '`' + part.replaceAll("`", "``") + '`')
-                .collect(joining("."));
-
     }
 }

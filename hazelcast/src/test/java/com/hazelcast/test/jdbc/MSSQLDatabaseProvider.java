@@ -73,9 +73,11 @@ public class MSSQLDatabaseProvider implements TestDatabaseProvider {
     @Override
     public String createSchemaQuery(String schemaName) {
         return "IF NOT EXISTS ("
-                + " SELECT 0 FROM information_schema.schemata WHERE schema_name = '" + schemaName + "')"
+                + " SELECT 0 FROM information_schema.schemata WHERE schema_name = '"
+                + schemaName + "'"
+                + ")"
                 + " BEGIN"
-                + " EXEC sp_executesql N'CREATE SCHEMA " + quote(schemaName) + "';"
+                + " EXEC sp_executesql N'CREATE SCHEMA " + schemaName + "';"
                 + " END";
     }
 }

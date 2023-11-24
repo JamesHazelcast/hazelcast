@@ -23,11 +23,10 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.util.Lists.newArrayList;
 
 public class InsertJdbcSqlConnectorTest extends JdbcSqlTestSupport {
 
-    protected String tableName;
+    private String tableName;
 
     @BeforeClass
     public static void beforeClass() {
@@ -48,9 +47,7 @@ public class InsertJdbcSqlConnectorTest extends JdbcSqlTestSupport {
 
         execute("INSERT INTO " + tableName + " VALUES (0, 'name-0')");
 
-        assertJdbcRowsAnyOrder(tableName,
-                newArrayList(Integer.class, String.class),
-                new Row(0, "name-0"));
+        assertJdbcRowsAnyOrder(tableName, new Row(0, "name-0"));
     }
 
     @Test
@@ -61,9 +58,7 @@ public class InsertJdbcSqlConnectorTest extends JdbcSqlTestSupport {
 
         execute("INSERT INTO " + mappingName + " VALUES (0, 'name-0')");
 
-        assertJdbcRowsAnyOrder(tableName,
-                newArrayList(Integer.class, String.class),
-                new Row(0, "name-0"));
+        assertJdbcRowsAnyOrder(tableName, new Row(0, "name-0"));
     }
 
     @Test
@@ -79,9 +74,7 @@ public class InsertJdbcSqlConnectorTest extends JdbcSqlTestSupport {
 
         execute("INSERT INTO " + tableName + " VALUES (0, 'name-0')");
 
-        assertJdbcRowsAnyOrder(tableName,
-                newArrayList(Integer.class, String.class),
-                new Row(0, "name-0"));
+        assertJdbcRowsAnyOrder(tableName, new Row(0, "name-0"));
     }
 
     @Test
@@ -92,7 +85,6 @@ public class InsertJdbcSqlConnectorTest extends JdbcSqlTestSupport {
         execute("INSERT INTO " + tableName + " (name, id) VALUES ('name-0', 0), ('name-1', 1)");
 
         assertJdbcRowsAnyOrder(tableName,
-                newArrayList(Integer.class, String.class),
                 new Row(0, "name-0"),
                 new Row(1, "name-1")
         );
@@ -112,7 +104,6 @@ public class InsertJdbcSqlConnectorTest extends JdbcSqlTestSupport {
         execute("INSERT INTO " + tableName + " (fullName, id) VALUES ('name-0', 0), ('name-1', 1)");
 
         assertJdbcRowsAnyOrder(tableName,
-                newArrayList(Integer.class, String.class),
                 new Row(0, "name-0"),
                 new Row(1, "name-1")
         );
@@ -126,7 +117,6 @@ public class InsertJdbcSqlConnectorTest extends JdbcSqlTestSupport {
         execute("INSERT INTO " + tableName + " SELECT v,'name-' || v FROM TABLE(generate_series(0,4))");
 
         assertJdbcRowsAnyOrder(tableName,
-                newArrayList(Integer.class, String.class),
                 new Row(0, "name-0"),
                 new Row(1, "name-1"),
                 new Row(2, "name-2"),
@@ -157,7 +147,6 @@ public class InsertJdbcSqlConnectorTest extends JdbcSqlTestSupport {
         execute("INSERT INTO " + tableName + " (name, id) VALUES ('name-0', 0)");
 
         assertJdbcRowsAnyOrder(tableName,
-                newArrayList(Integer.class, String.class),
                 new Row(0, "name-0")
         );
     }

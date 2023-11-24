@@ -43,7 +43,6 @@ import org.apache.calcite.plan.Contexts;
 import org.apache.calcite.plan.ConventionTraitDef;
 import org.apache.calcite.plan.HazelcastRelOptCluster;
 import org.apache.calcite.plan.RelTraitSet;
-import org.apache.calcite.plan.hep.HepProgram;
 import org.apache.calcite.plan.volcano.VolcanoPlanner;
 import org.apache.calcite.prepare.Prepare;
 import org.apache.calcite.rel.RelCollationTraitDef;
@@ -112,19 +111,13 @@ public final class OptimizerContext {
             List<List<String>> searchPaths,
             List<Object> arguments,
             IMapResolver iMapResolver,
-            HepProgram subqueryRewriterProgram,
-            SqlSecurityContext securityContext
+            SqlSecurityContext securityContext,
+            boolean cyclicUserTypesAreAllowed
     ) {
         // Resolve tables.
         HazelcastSchema rootSchema = HazelcastSchemaUtils.createRootSchema(schema);
 
-        return create(
-                rootSchema,
-                searchPaths,
-                arguments,
-                iMapResolver,
-                subqueryRewriterProgram,
-                securityContext);
+        return create(rootSchema, searchPaths, arguments, iMapResolver, securityContext, cyclicUserTypesAreAllowed);
     }
 
     public static OptimizerContext create(
@@ -132,8 +125,8 @@ public final class OptimizerContext {
             List<List<String>> schemaPaths,
             List<Object> arguments,
             IMapResolver iMapResolver,
-            HepProgram subqueryRewriterProgram,
-            SqlSecurityContext ssc
+            SqlSecurityContext ssc,
+            boolean cyclicUserTypesAreAllowed
     ) {
         Prepare.CatalogReader catalogReader = createCatalogReader(rootSchema, schemaPaths);
         HazelcastSqlValidator validator = new HazelcastSqlValidator(catalogReader, arguments, iMapResolver, ssc);
@@ -142,7 +135,7 @@ public final class OptimizerContext {
         HazelcastRelOptCluster cluster = createCluster(volcanoPlanner, ssc);
 
         QueryParser parser = new QueryParser(validator);
-        QueryConverter converter = new QueryConverter(validator, catalogReader, cluster, subqueryRewriterProgram);
+        QueryConverter converter = new QueryConverter(validator, catalogReader, cluster, cyclicUserTypesAreAllowed);
         QueryPlanner planner = new QueryPlanner(volcanoPlanner);
 
         return new OptimizerContext(cluster, parser, converter, planner);
@@ -223,9 +216,7 @@ public final class OptimizerContext {
         return planner;
     }
 
-    private static HazelcastRelOptCluster createCluster(
-            VolcanoPlanner planner,
-            SqlSecurityContext securityContext) {
+    private static HazelcastRelOptCluster createCluster(VolcanoPlanner planner, SqlSecurityContext securityContext) {
         HazelcastRelOptCluster cluster = HazelcastRelOptCluster.create(
                 planner,
                 HazelcastRexBuilder.INSTANCE,

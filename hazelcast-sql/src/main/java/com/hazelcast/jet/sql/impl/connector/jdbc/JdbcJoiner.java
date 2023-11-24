@@ -60,7 +60,6 @@ public final class JdbcJoiner {
             return new JdbcJoinFullScanProcessorSupplier(
                     jdbcTable.getDataConnectionName(),
                     selectQueryForRightSide,
-                    queryBuilder.converters(),
                     joinInfo,
                     context.convertProjection(projection)
             );
@@ -77,7 +76,6 @@ public final class JdbcJoiner {
             return new JdbcJoinPredicateScanProcessorSupplier(
                     jdbcTable.getDataConnectionName(),
                     selectQueryForRightSide,
-                    queryBuilder.converters(),
                     joinInfo,
                     context.convertProjection(projection)
             );

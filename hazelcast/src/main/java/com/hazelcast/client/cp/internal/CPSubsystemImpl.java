@@ -57,7 +57,6 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
-import static com.hazelcast.cp.internal.CPSubsystemImpl.CPMAP_LICENSE_MESSAGE;
 import static com.hazelcast.internal.util.Preconditions.checkNotNull;
 
 /**
@@ -151,7 +150,7 @@ public class CPSubsystemImpl implements CPSubsystem {
 
     @Override
     public <K, V> CPMap<K, V> getMap(@Nonnull String name) {
-        throw new UnsupportedOperationException(CPMAP_LICENSE_MESSAGE);
+        throw new UnsupportedOperationException("CPMap is not supported in Open Source");
     }
 
     private static class CPMembershipEventHandler extends CPSubsystemAddMembershipListenerCodec.AbstractEventHandler
