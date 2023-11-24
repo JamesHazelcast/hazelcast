@@ -16,7 +16,10 @@
 
 package com.hazelcast.internal.namespace.icache;
 
+import com.hazelcast.cache.CacheTestSupport;
 import com.hazelcast.cache.ICache;
+import com.hazelcast.cache.impl.AbstractHazelcastCachingProvider;
+import com.hazelcast.config.CacheConfig;
 import com.hazelcast.config.CacheSimpleConfig;
 import com.hazelcast.config.Config;
 import com.hazelcast.internal.namespace.UCDTest;
@@ -32,7 +35,23 @@ public abstract class ICacheUCDTest extends UCDTest {
     }
 
     @Override
-    protected void initialiseDataStructure() {
+    protected void initialiseDataStructure() throws Exception {
+        final AbstractHazelcastCachingProvider cachingProvider;
+
+        switch (connectionStyle) {
+            case CLIENT_TO_MEMBER:
+                cachingProvider = CacheTestSupport.createClientCachingProvider(instance);
+                break;
+            case EMBEDDED:
+            case MEMBER_TO_MEMBER:
+                cachingProvider = CacheTestSupport.createServerCachingProvider(instance);
+                break;
+            default:
+                throw new IllegalArgumentException(connectionStyle.toString());
+
+        }
+
+        cachingProvider.getCacheManager().createCache(objectName, new CacheConfig<>(cacheConfig));
         cache = instance.getCacheManager().getCache(objectName);
     }
 

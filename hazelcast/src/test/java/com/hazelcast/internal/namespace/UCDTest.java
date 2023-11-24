@@ -209,7 +209,7 @@ public abstract class UCDTest extends HazelcastTestSupport {
     }
 
     /** Don't annotate children with {@code @Before}, framework controls test execution */
-    private void setUpInstance() throws IOException {
+    private void setUpInstance() throws Exception {
         initialiseConfig();
 
         Config config = smallInstanceConfigWithoutJetAndMetrics();
@@ -278,7 +278,7 @@ public abstract class UCDTest extends HazelcastTestSupport {
      * <p>
      * Don't annotate children with {@code @Before}, framework controls test execution
      */
-    protected abstract void initialiseDataStructure();
+    protected abstract void initialiseDataStructure() throws Exception;
 
     /**
      * Where applicable, transforms our programmatic config into an XML/YAML variant and feeds it back into a new {@link Config}
