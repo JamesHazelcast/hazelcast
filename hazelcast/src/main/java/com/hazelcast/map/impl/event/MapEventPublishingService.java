@@ -18,6 +18,7 @@ package com.hazelcast.map.impl.event;
 
 import com.hazelcast.core.EntryEvent;
 import com.hazelcast.internal.namespace.NamespaceUtil;
+import com.hazelcast.map.impl.MapService;
 import com.hazelcast.spi.impl.eventservice.EventPublishingService;
 import com.hazelcast.map.IMapEvent;
 import com.hazelcast.map.MapEvent;
@@ -102,7 +103,7 @@ public class MapEventPublishingService implements EventPublishingService<Object,
             return;
         }
 
-        String namespace = MapServiceContext.lookupMapNamespace(nodeEngine, mapName);
+        String namespace = MapService.lookupNamespace(nodeEngine, mapName);
         if (cleanup) {
             NamespaceUtil.cleanupNamespace(nodeEngine, namespace);
         } else {

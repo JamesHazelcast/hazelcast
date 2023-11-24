@@ -17,7 +17,6 @@
 package com.hazelcast.map.impl.operation;
 
 import com.hazelcast.core.ManagedContext;
-import com.hazelcast.internal.namespace.NamespaceUtil;
 import com.hazelcast.internal.nio.IOUtil;
 import com.hazelcast.internal.serialization.Data;
 import com.hazelcast.internal.serialization.SerializationService;
@@ -145,7 +144,7 @@ public class MultipleEntryOperation extends MapOperation
     @Override
     protected void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
-        entryProcessor = NamespaceUtil.callWithNamespace(getNamespace(), in::readObject);
+        entryProcessor = callWithNamespaceAwareness(in::readObject);
         int size = in.readInt();
         keys = createHashSet(size);
         for (int i = 0; i < size; i++) {

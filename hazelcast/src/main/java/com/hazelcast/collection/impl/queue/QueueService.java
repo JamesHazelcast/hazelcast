@@ -273,7 +273,7 @@ public class QueueService implements ManagedService, MigrationAwareService, Tran
             return;
         }
 
-        NamespaceUtil.runWithNamespace(nodeEngine, getNamespace(event.getName()), () -> {
+        NamespaceUtil.runWithNamespace(nodeEngine, lookupNamespace(event.getName()), () -> {
             if (event.eventType.equals(ItemEventType.ADDED)) {
                 listener.itemAdded(itemEvent);
             } else {
@@ -454,7 +454,26 @@ public class QueueService implements ManagedService, MigrationAwareService, Tran
         }
     }
 
-    public String getNamespace(String queueName) {
+    /**
+     * Looks up the UCD Namespace ID associated with the specified queue name. This starts
+     * by looking for an existing {@link QueueContainer} and checking its defined
+     * {@link QueueConfig}. If the {@link QueueContainer} does not exist (containers are
+     * created lazily), then fallback to checking the Node's config tree directly.
+     *
+     * @param nodeEngine {@link NodeEngine} implementation of this member for service and config lookups
+     * @param queueName  The name of the {@link com.hazelcast.collection.IQueue} to lookup for
+     * @return the Namespace ID if found, or {@code null} otherwise.
+     */
+    public static String lookupNamespace(NodeEngine nodeEngine, String queueName) {
+        if (nodeEngine.getNamespaceService().isEnabled()) {
+            QueueService service = nodeEngine.getService(SERVICE_NAME);
+            return service.lookupNamespace(queueName);
+        }
+        return null;
+    }
+
+    // For faster access within the service
+    private String lookupNamespace(String queueName) {
         QueueContainer container = getExistingContainerOrNull(queueName);
         if (container != null) {
             return container.getConfig().getNamespace();

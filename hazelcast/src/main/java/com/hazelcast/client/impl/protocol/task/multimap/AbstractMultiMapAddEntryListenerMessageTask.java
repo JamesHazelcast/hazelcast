@@ -25,7 +25,7 @@ import com.hazelcast.instance.impl.Node;
 import com.hazelcast.internal.nio.Connection;
 import com.hazelcast.map.MapEvent;
 import com.hazelcast.map.impl.DataAwareEntryEvent;
-import com.hazelcast.map.impl.MapServiceContext;
+import com.hazelcast.map.impl.MapService;
 import com.hazelcast.multimap.impl.MultiMapService;
 import com.hazelcast.internal.serialization.Data;
 import com.hazelcast.security.SecurityInterceptorConstants;
@@ -77,8 +77,7 @@ public abstract class AbstractMultiMapAddEntryListenerMessageTask<P>
 
     @Override
     public Permission getNamespacePermission() {
-        MultiMapService service = getService(getServiceName());
-        String namespace = service.getNamespace(getDistributedObjectName());
+        String namespace = MultiMapService.lookupNamespace(nodeEngine, getDistributedObjectName());
         return namespace != null ? new NamespacePermission(namespace, ActionConstants.ACTION_USE) : null;
     }
 
@@ -129,6 +128,6 @@ public abstract class AbstractMultiMapAddEntryListenerMessageTask<P>
 
     @Override
     protected String getNamespace() {
-        return MapServiceContext.lookupMapNamespace(nodeEngine, getDistributedObjectName());
+        return MapService.lookupNamespace(nodeEngine, getDistributedObjectName());
     }
 }

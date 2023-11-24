@@ -139,7 +139,8 @@ public class ReliableTopicProxy<E> extends AbstractDistributedObject<ReliableTop
             }
 
             if (listenerConfig.getClassName() != null) {
-                ClassLoader loader = nodeEngine.getNamespaceService().getClassLoaderForNamespace(getService().getNamespace(name));
+                String namespace = ReliableTopicService.lookupNamespace(nodeEngine, name);
+                ClassLoader loader = nodeEngine.getNamespaceService().getClassLoaderForNamespace(namespace);
                 Object object = ClassLoaderUtil.newInstance(loader, listenerConfig.getClassName());
 
                 if (!(object instanceof MessageListener)) {

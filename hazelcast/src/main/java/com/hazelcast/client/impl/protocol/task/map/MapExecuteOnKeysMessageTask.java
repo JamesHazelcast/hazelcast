@@ -25,7 +25,6 @@ import com.hazelcast.map.impl.MapEntries;
 import com.hazelcast.map.impl.MapService;
 import com.hazelcast.internal.nio.Connection;
 import com.hazelcast.internal.serialization.Data;
-import com.hazelcast.map.impl.MapServiceContext;
 import com.hazelcast.map.impl.operation.MapOperationProvider;
 import com.hazelcast.security.SecurityInterceptorConstants;
 import com.hazelcast.security.permission.ActionConstants;
@@ -123,6 +122,6 @@ public class MapExecuteOnKeysMessageTask
 
     @Override
     protected String getNamespace() {
-        return MapServiceContext.lookupMapNamespace(nodeEngine, getDistributedObjectName());
+        return MapService.lookupNamespace(nodeEngine, getDistributedObjectName());
     }
 }

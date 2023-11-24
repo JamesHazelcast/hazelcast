@@ -27,6 +27,7 @@ import com.hazelcast.internal.partition.PartitionReplicationEvent;
 import com.hazelcast.internal.services.DistributedObjectNamespace;
 import com.hazelcast.internal.services.ObjectNamespace;
 import com.hazelcast.internal.services.ServiceNamespace;
+import com.hazelcast.spi.impl.NodeEngine;
 import com.hazelcast.spi.impl.operationservice.Operation;
 
 import java.util.Collection;
@@ -167,11 +168,21 @@ public class CacheService extends AbstractCacheService {
         return new DistributedObjectNamespace(SERVICE_NAME, cacheName);
     }
 
-    public String getNamespace(String cacheName) {
-        // No regular containers available, fallback to config
-        CacheSimpleConfig config = nodeEngine.getConfig().getCacheConfig(cacheName);
-        if (config != null) {
-            return config.getNamespace();
+    /**
+     * Looks up the UCD Namespace ID associated with the specified cache name. This is done
+     * by checking the Node's config tree directly.
+     *
+     * @param engine    {@link NodeEngine} implementation of this member for service and config lookups
+     * @param cacheName The name of the {@link com.hazelcast.cache.ICache} to lookup for
+     * @return the Namespace ID if found, or {@code null} otherwise.
+     */
+    public static String lookupNamespace(NodeEngine engine, String cacheName) {
+        if (engine.getNamespaceService().isEnabled()) {
+            // No regular containers available, fallback to config
+            CacheSimpleConfig config = engine.getConfig().getCacheConfig(cacheName);
+            if (config != null) {
+                return config.getNamespace();
+            }
         }
         return null;
     }

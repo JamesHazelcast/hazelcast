@@ -16,7 +16,6 @@
 
 package com.hazelcast.map.impl.operation;
 
-import com.hazelcast.internal.namespace.NamespaceUtil;
 import com.hazelcast.internal.nio.IOUtil;
 import com.hazelcast.map.EntryProcessor;
 import com.hazelcast.map.impl.MapDataSerializerHook;
@@ -68,7 +67,7 @@ public class MultipleEntryOperationFactory extends AbstractMapOperationFactory {
             Data key = IOUtil.readData(in);
             keys.add(key);
         }
-        this.entryProcessor = NamespaceUtil.callWithNamespace(getNamespace(), in::readObject);
+        this.entryProcessor = callWithNamespaceAwareness(in::readObject);
     }
 
     @Override

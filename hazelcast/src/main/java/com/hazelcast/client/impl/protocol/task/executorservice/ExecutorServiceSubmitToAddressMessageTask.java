@@ -55,7 +55,7 @@ public class ExecutorServiceSubmitToAddressMessageTask
         if (securityContext != null) {
             Subject subject = endpoint.getSubject();
             Object taskObject = NamespaceUtil.callWithNamespace(nodeEngine,
-                    DistributedExecutorService.getNamespace(parameters.name),
+                    DistributedExecutorService.lookupNamespace(nodeEngine, parameters.name),
                     () -> serializationService.toObject(parameters.callable));
             Callable callable;
             if (taskObject instanceof Runnable) {

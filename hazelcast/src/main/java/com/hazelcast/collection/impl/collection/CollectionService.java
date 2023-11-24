@@ -117,7 +117,7 @@ public abstract class CollectionService implements ManagedService, RemoteService
             return;
         }
 
-        String namespace = getNamespace(event.getName());
+        String namespace = lookupNamespace(event.getName());
         NamespaceUtil.runWithNamespace(nodeEngine, namespace, () -> {
             if (event.getEventType().equals(ItemEventType.ADDED)) {
                 listener.itemAdded(itemEvent);
@@ -251,5 +251,7 @@ public abstract class CollectionService implements ManagedService, RemoteService
         }
     }
 
-    public abstract String getNamespace(String collectionName);
+    // For faster access within the service, primary calling points are from static
+    //     methods in implementing services
+    protected abstract String lookupNamespace(String collectionName);
 }

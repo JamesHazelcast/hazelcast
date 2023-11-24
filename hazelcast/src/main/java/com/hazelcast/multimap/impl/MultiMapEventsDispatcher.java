@@ -102,7 +102,7 @@ class MultiMapEventsDispatcher {
     }
 
     private void dispatch0(IMapEvent event, EntryListener listener) {
-        String namespace = multiMapService.getNamespace(event.getName());
+        String namespace = MultiMapService.lookupNamespace(multiMapService.getNodeEngine(), event.getName());
         NamespaceUtil.setupNamespace(multiMapService.getNodeEngine(), namespace);
         try {
             switch (event.getEventType()) {

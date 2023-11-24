@@ -99,6 +99,6 @@ public class ExecutorServiceSubmitToPartitionMessageTask
 
     @Override
     protected String getNamespace() {
-        return DistributedExecutorService.getNamespace(parameters.name);
+        return DistributedExecutorService.lookupNamespace(nodeEngine, parameters.name);
     }
 }

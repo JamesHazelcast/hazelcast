@@ -30,7 +30,6 @@ import com.hazelcast.internal.serialization.Data;
 import com.hazelcast.internal.util.ExceptionUtil;
 import com.hazelcast.internal.util.collection.InflatableSet;
 import com.hazelcast.map.impl.MapService;
-import com.hazelcast.map.impl.MapServiceContext;
 import com.hazelcast.map.impl.query.QueryResult;
 import com.hazelcast.map.impl.query.QueryResultRow;
 import com.hazelcast.map.impl.querycache.accumulator.AccumulatorInfo;
@@ -68,7 +67,7 @@ public class MapPublisherCreateMessageTask
         Collection<MemberImpl> members = clusterService.getMemberImpls();
         List<Future> futures = new ArrayList<Future>(members.size());
         NamespaceUtil.runWithNamespace(nodeEngine,
-                MapServiceContext.lookupMapNamespace(nodeEngine, parameters.mapName),
+                MapService.lookupNamespace(nodeEngine, parameters.mapName),
                 () -> createInvocations(members, futures));
 
         return fetchMapSnapshotFrom(futures);

@@ -18,6 +18,8 @@ package com.hazelcast.map.impl.operation;
 
 import com.hazelcast.config.MapConfig;
 import com.hazelcast.config.MapStoreConfig;
+import com.hazelcast.internal.namespace.NamespaceUtil;
+import com.hazelcast.internal.namespace.impl.NodeEngineThreadLocalContext;
 import com.hazelcast.internal.nearcache.impl.invalidation.Invalidator;
 import com.hazelcast.internal.serialization.Data;
 import com.hazelcast.internal.services.ObjectNamespace;
@@ -44,6 +46,7 @@ import com.hazelcast.map.impl.recordstore.expiry.ExpiryMetadata;
 import com.hazelcast.map.impl.wan.WanMapEntryView;
 import com.hazelcast.memory.NativeOutOfMemoryError;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
+import com.hazelcast.spi.impl.NodeEngine;
 import com.hazelcast.spi.impl.operationservice.AbstractNamedOperation;
 import com.hazelcast.spi.impl.operationservice.BackupOperation;
 import com.hazelcast.spi.impl.operationservice.BlockingOperation;
@@ -55,6 +58,7 @@ import com.hazelcast.wan.impl.CallerProvenance;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 
@@ -532,10 +536,13 @@ public abstract class MapOperation extends AbstractNamedOperation
     }
 
     /**
-     * Utility method for obtaining the Namespace associated with the underlying IMap
-     * used in this operation - primarily for Namespace aware deserialization
+     * Utility method for executing code within the context of the Namespace associated
+     * with IMaps - if one does not exist, this code is executed as if it were called
+     * directly in place of this method.
      */
-    protected String getNamespace() {
-        return MapServiceContext.getNamespace(name);
+    protected <T> T callWithNamespaceAwareness(Callable<T> callable) {
+        NodeEngine engine = NodeEngineThreadLocalContext.getNamespaceThreadLocalContext();
+        String namespace = MapService.lookupNamespace(engine, name);
+        return NamespaceUtil.callWithNamespace(engine, namespace, callable);
     }
 }

@@ -23,7 +23,7 @@ import com.hazelcast.internal.serialization.SerializationService;
 import com.hazelcast.internal.util.IterationType;
 import com.hazelcast.internal.util.collection.PartitionIdSet;
 import com.hazelcast.map.impl.MapDataSerializerHook;
-import com.hazelcast.map.impl.MapServiceContext;
+import com.hazelcast.map.impl.MapService;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
@@ -159,7 +159,7 @@ public class Query implements IdentifiedDataSerializable, Versioned {
         this.mapName = in.readString();
 
         NodeEngine engine = NodeEngineThreadLocalContext.getNamespaceThreadLocalContext();
-        String namespace = MapServiceContext.lookupMapNamespace(engine, mapName);
+        String namespace = MapService.lookupNamespace(engine, mapName);
         NamespaceUtil.setupNamespace(engine, namespace);
         try {
             this.predicate = in.readObject();

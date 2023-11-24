@@ -389,11 +389,21 @@ public class ReplicatedMapService implements ManagedService, RemoteService, Even
         provide(descriptor, context, REPLICATED_MAP_PREFIX, getStats());
     }
 
-    public String getNamespace(String mapName) {
-        // No regular containers available, fallback to config
-        ReplicatedMapConfig config = getReplicatedMapConfig(mapName);
-        if (config != null) {
-            return config.getNamespace();
+    /**
+     * Looks up the UCD Namespace ID associated with the specified replicated map name. This is done
+     * by checking the Node's config tree directly.
+     *
+     * @param engine  {@link NodeEngine} implementation of this member for service and config lookups
+     * @param mapName The name of the {@link com.hazelcast.replicatedmap.ReplicatedMap} to lookup for
+     * @return the Namespace ID if found, or {@code null} otherwise.
+     */
+    public static String lookupNamespace(NodeEngine engine, String mapName) {
+        if (engine.getNamespaceService().isEnabled()) {
+            // No regular containers available, fallback to config
+            ReplicatedMapConfig config = engine.getConfig().findReplicatedMapConfig(mapName);
+            if (config != null) {
+                return config.getNamespace();
+            }
         }
         return null;
     }

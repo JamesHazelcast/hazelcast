@@ -284,7 +284,7 @@ public class QueryOperation extends AbstractNamedOperation implements ReadonlyOp
             }
 
             String mapName = query.getMapName();
-            String namespace = MapServiceContext.lookupMapNamespace(getNodeEngine(), mapName);
+            String namespace = MapService.lookupNamespace(getNodeEngine(), mapName);
             NamespaceUtil.setupNamespace(getNodeEngine(), namespace);
             try {
                 queryRunner.beforeOperation(partitionId, mapName);

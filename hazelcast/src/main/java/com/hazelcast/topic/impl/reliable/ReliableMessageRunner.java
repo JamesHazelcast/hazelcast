@@ -45,7 +45,7 @@ public class ReliableMessageRunner<E> extends MessageRunner<E> {
         this.clusterService = clusterService;
         this.proxy = proxy;
         this.nodeEngine = proxy.getNodeEngine();
-        this.namespace = proxy.getService().getNamespace(proxy.getName());
+        this.namespace = ReliableTopicService.lookupNamespace(nodeEngine, proxy.getName());
     }
 
     @Override

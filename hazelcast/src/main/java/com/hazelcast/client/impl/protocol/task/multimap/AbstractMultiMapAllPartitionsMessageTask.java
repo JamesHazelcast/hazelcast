@@ -50,7 +50,6 @@ public abstract class AbstractMultiMapAllPartitionsMessageTask<P> extends Abstra
 
     @Override
     protected String getNamespace() {
-        MultiMapService service = getService(MultiMapService.SERVICE_NAME);
-        return service.getNamespace(getDistributedObjectName());
+        return MultiMapService.lookupNamespace(nodeEngine, getDistributedObjectName());
     }
 }

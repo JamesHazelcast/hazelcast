@@ -26,6 +26,7 @@ import com.hazelcast.internal.serialization.InternalSerializationService;
 import com.hazelcast.logging.ILogger;
 import com.hazelcast.map.impl.LazyMapEntry;
 import com.hazelcast.map.impl.MapContainer;
+import com.hazelcast.map.impl.MapService;
 import com.hazelcast.map.impl.MapServiceContext;
 import com.hazelcast.map.impl.PartitionContainer;
 import com.hazelcast.map.impl.iterator.MapEntriesWithCursor;
@@ -149,7 +150,7 @@ public class PartitionScanRunner {
         RecordStore recordStore = partitionContainer.getRecordStore(mapName);
         Extractors extractors = mapServiceContext.getExtractors(mapName);
 
-        return NamespaceUtil.callWithNamespace(nodeEngine, MapServiceContext.lookupMapNamespace(nodeEngine, mapName), () -> {
+        return NamespaceUtil.callWithNamespace(nodeEngine, MapService.lookupNamespace(nodeEngine, mapName), () -> {
             IterationPointer[] localPointers = pointers;
             while (resultList.size() < fetchSize && localPointers[localPointers.length - 1].getIndex() >= 0) {
                 MapEntriesWithCursor cursor = recordStore.fetchEntries(localPointers, fetchSize - resultList.size());

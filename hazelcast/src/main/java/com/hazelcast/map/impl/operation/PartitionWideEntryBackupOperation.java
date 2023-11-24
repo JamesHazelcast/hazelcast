@@ -19,11 +19,14 @@ package com.hazelcast.map.impl.operation;
 import com.hazelcast.config.InMemoryFormat;
 import com.hazelcast.core.EntryEventType;
 import com.hazelcast.internal.namespace.NamespaceUtil;
+import com.hazelcast.internal.namespace.impl.NodeEngineThreadLocalContext;
 import com.hazelcast.internal.serialization.Data;
 import com.hazelcast.map.EntryProcessor;
 import com.hazelcast.map.impl.MapDataSerializerHook;
+import com.hazelcast.map.impl.MapService;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
+import com.hazelcast.spi.impl.NodeEngine;
 import com.hazelcast.spi.impl.operationservice.BackupOperation;
 
 import java.io.IOException;
@@ -104,7 +107,9 @@ public class PartitionWideEntryBackupOperation extends AbstractMultipleEntryBack
     @Override
     protected void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
-        NamespaceUtil.setupNamespace(getNamespace());
+        NodeEngine engine = NodeEngineThreadLocalContext.getNamespaceThreadLocalContext();
+        String namespace = MapService.lookupNamespace(engine, name);
+        NamespaceUtil.setupNamespace(engine, namespace);
         backupProcessor = in.readObject();
         afterReadInternal();
     }
@@ -115,7 +120,9 @@ public class PartitionWideEntryBackupOperation extends AbstractMultipleEntryBack
      * overridden, the overriding class <b>must handle Namespace cleanup</b>
      */
     protected void afterReadInternal() {
-        NamespaceUtil.cleanupNamespace(getNamespace());
+        NodeEngine engine = NodeEngineThreadLocalContext.getNamespaceThreadLocalContext();
+        String namespace = MapService.lookupNamespace(engine, name);
+        NamespaceUtil.cleanupNamespace(engine, namespace);
     }
 
     @Override

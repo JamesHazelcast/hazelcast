@@ -39,7 +39,6 @@ import com.hazelcast.map.impl.ComputeIfPresentEntryProcessor;
 import com.hazelcast.map.impl.KeyValueConsumingEntryProcessor;
 import com.hazelcast.map.impl.MapEntryReplacingEntryProcessor;
 import com.hazelcast.map.impl.MapService;
-import com.hazelcast.map.impl.MapServiceContext;
 import com.hazelcast.map.impl.MergeEntryProcessor;
 import com.hazelcast.map.impl.SimpleEntryView;
 import com.hazelcast.map.impl.iterator.MapIterable;
@@ -966,7 +965,7 @@ public class MapProxyImpl<K, V> extends MapProxySupport<K, V> implements EventJo
 
         // HazelcastInstanceAware handled by cloning
         Projection<? super Map.Entry<K, V>, R> clonedProjection =
-                NamespaceUtil.callWithNamespace(getNodeEngine(), MapServiceContext.lookupMapNamespace(getNodeEngine(), name),
+                NamespaceUtil.callWithNamespace(getNodeEngine(), MapService.lookupNamespace(getNodeEngine(), name),
                         () -> serializationService.toObject(serializationService.toData(projection)));
 
         QueryResult result = executeQueryInternal(predicate, null, clonedProjection, IterationType.VALUE, target);

@@ -381,7 +381,7 @@ public class EntryOperation extends LockAwareOperation
     @Override
     protected void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
-        entryProcessor = NamespaceUtil.callWithNamespace(getNamespace(), in::readObject);
+        entryProcessor = callWithNamespaceAwareness(in::readObject);
     }
 
     @Override

@@ -83,7 +83,7 @@ public class TopicAddMessageListenerMessageTask
 
     @Override
     public Permission getNamespacePermission() {
-        String namespace = TopicService.getNamespace(nodeEngine, getDistributedObjectName());
+        String namespace = TopicService.lookupNamespace(nodeEngine, getDistributedObjectName());
         return namespace != null ? new NamespacePermission(namespace, ActionConstants.ACTION_USE) : null;
     }
 
@@ -133,6 +133,6 @@ public class TopicAddMessageListenerMessageTask
 
     @Override
     protected String getNamespace() {
-        return TopicService.getNamespace(nodeEngine, parameters.name);
+        return TopicService.lookupNamespace(nodeEngine, parameters.name);
     }
 }
