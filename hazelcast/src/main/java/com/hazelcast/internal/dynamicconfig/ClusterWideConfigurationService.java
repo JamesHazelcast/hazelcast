@@ -30,6 +30,7 @@ import com.hazelcast.config.ListConfig;
 import com.hazelcast.config.MapConfig;
 import com.hazelcast.config.MerkleTreeConfig;
 import com.hazelcast.config.MultiMapConfig;
+import com.hazelcast.config.NamespaceAwareConfig;
 import com.hazelcast.config.NamespaceConfig;
 import com.hazelcast.config.PNCounterConfig;
 import com.hazelcast.config.QueueConfig;
@@ -44,6 +45,7 @@ import com.hazelcast.core.HazelcastException;
 import com.hazelcast.internal.cluster.ClusterService;
 import com.hazelcast.internal.cluster.ClusterVersionListener;
 import com.hazelcast.internal.management.operation.UpdateTcpIpMemberListOperation;
+import com.hazelcast.internal.namespace.NamespaceUtil;
 import com.hazelcast.internal.serialization.Data;
 import com.hazelcast.internal.serialization.SerializationService;
 import com.hazelcast.internal.services.CoreService;
@@ -275,6 +277,13 @@ public class ClusterWideConfigurationService implements
     private IdentifiedDataSerializable cloneConfig(IdentifiedDataSerializable config) {
         SerializationService serializationService = nodeEngine.getSerializationService();
         Data data = serializationService.toData(config);
+        // Certain configs can contain definitions for UDFs (such as ItemListenerConfig), so
+        //     we should wrap the deserialization in Namespace awareness where applicable
+        if (config instanceof NamespaceAwareConfig) {
+            NamespaceAwareConfig nsAware = (NamespaceAwareConfig) config;
+            return NamespaceUtil.callWithNamespace(nodeEngine, nsAware.getNamespace(),
+                    () -> serializationService.toObject(data));
+        }
         return serializationService.toObject(data);
     }
 
