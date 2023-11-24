@@ -61,7 +61,7 @@ public class AddQueueConfigMessageTask
         config.setSplitBrainProtectionName(parameters.splitBrainProtectionName);
         config.setStatisticsEnabled(parameters.statisticsEnabled);
         if (parameters.queueStoreConfig != null) {
-            QueueStoreConfig storeConfig = NamespaceUtil.callWithNamespace(parameters.namespace,
+            QueueStoreConfig storeConfig = NamespaceUtil.callWithNamespace(nodeEngine, parameters.namespace,
                     () -> parameters.queueStoreConfig.asQueueStoreConfig(serializationService));
             config.setQueueStoreConfig(storeConfig);
         }
