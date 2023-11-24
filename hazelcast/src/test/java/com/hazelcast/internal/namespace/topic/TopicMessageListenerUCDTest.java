@@ -16,12 +16,40 @@
 
 package com.hazelcast.internal.namespace.topic;
 
+import com.hazelcast.config.ListenerConfig;
+
 public class TopicMessageListenerUCDTest extends TopicUCDTest {
     @Override
     public void test() throws Exception {
         topic.publish(Byte.MIN_VALUE);
 
         assertListenerFired("onMessage");
+    }
+
+    @Override
+    protected void addClassInstanceToConfig() throws ReflectiveOperationException {
+        ListenerConfig listenerConfig = new ListenerConfig();
+        listenerConfig.setImplementation(getClassInstance());
+
+        reliableTopicConfig.addMessageListenerConfig(listenerConfig);
+    }
+
+    @Override
+    protected void addClassNameToConfig() {
+        ListenerConfig listenerConfig = new ListenerConfig();
+        listenerConfig.setClassName(getUserDefinedClassNames()[0]);
+
+        reliableTopicConfig.addMessageListenerConfig(listenerConfig);
+    }
+
+    @Override
+    protected void addClassInstanceToDataStructure() throws ReflectiveOperationException {
+        topic.addMessageListener(getClassInstance());
+    }
+
+    @Override
+    protected boolean isNoClassRegistrationAllowed() {
+        return false;
     }
 
     @Override

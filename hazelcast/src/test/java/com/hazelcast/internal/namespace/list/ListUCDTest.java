@@ -17,6 +17,7 @@
 package com.hazelcast.internal.namespace.list;
 
 import com.hazelcast.collection.IList;
+import com.hazelcast.config.Config;
 import com.hazelcast.config.ListConfig;
 import com.hazelcast.internal.namespace.UCDTest;
 
@@ -25,13 +26,19 @@ public abstract class ListUCDTest extends UCDTest {
     protected IList<Object> list;
 
     @Override
-    public void setUpInstance() throws ReflectiveOperationException {
+    protected void initialiseConfig() {
         listConfig = new ListConfig(objectName);
         listConfig.setNamespace(getNamespaceName());
+    }
 
-        super.setUpInstance();
-
+    @Override
+    protected void initialiseDataStructure() {
         list = instance.getList(objectName);
+    }
+
+    @Override
+    protected void registerConfig(Config config) {
+        config.addListConfig(listConfig);
     }
 
     protected void populate() {

@@ -26,12 +26,13 @@ public abstract class IMapUCDTest extends UCDTest {
     protected IMap<Object, Object> map;
 
     @Override
-    public void setUpInstance() throws ReflectiveOperationException {
+    protected void initialiseConfig() {
         mapConfig = new MapConfig(objectName);
         mapConfig.setNamespace(getNamespaceName());
+    }
 
-        super.setUpInstance();
-
+    @Override
+    protected void initialiseDataStructure() {
         map = instance.getMap(objectName);
     }
 
@@ -40,7 +41,7 @@ public abstract class IMapUCDTest extends UCDTest {
     }
 
     @Override
-    protected void mutateConfig(Config config) {
+    protected void registerConfig(Config config) {
         config.addMapConfig(mapConfig);
     }
 }

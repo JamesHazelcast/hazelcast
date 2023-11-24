@@ -26,20 +26,22 @@ public abstract class QueryCacheUCDTest extends IMapUCDTest {
     protected QueryCache<Object, Object> cache;
 
     @Override
-    public void setUpInstance() throws ReflectiveOperationException {
-        String cacheName = randomName();
-
-        queryCacheConfig = new QueryCacheConfig(cacheName);
-
-        super.setUpInstance();
-
-        cache = member.getMap(objectName).getQueryCache(cacheName);
+    protected void initialiseConfig() {
+        super.initialiseConfig();
+        queryCacheConfig = new QueryCacheConfig(randomName());
+        mapConfig.setNamespace(getNamespaceName());
     }
 
     @Override
-    protected void mutateConfig(Config config) {
+    protected void initialiseDataStructure() {
+        super.initialiseDataStructure();
+        cache = member.getMap(objectName).getQueryCache(queryCacheConfig.getName());
+    }
+
+    @Override
+    protected void registerConfig(Config config) {
         mapConfig.addQueryCacheConfig(queryCacheConfig);
 
-        super.mutateConfig(config);
+        super.registerConfig(config);
     }
 }

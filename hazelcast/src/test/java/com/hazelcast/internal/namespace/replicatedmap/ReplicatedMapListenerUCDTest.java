@@ -16,21 +16,35 @@
 
 package com.hazelcast.internal.namespace.replicatedmap;
 
-import com.hazelcast.config.Config;
 import com.hazelcast.config.EntryListenerConfig;
 
 public abstract class ReplicatedMapListenerUCDTest extends ReplicatedMapUCDTest {
     @Override
-    protected String[] getUserDefinedClassNames() {
-        return new String[] {"usercodedeployment.MyEntryListener", "usercodedeployment.ObservableListener"};
+    protected void addClassInstanceToConfig() throws ReflectiveOperationException {
+        EntryListenerConfig entryListenerConfig = new EntryListenerConfig();
+        entryListenerConfig.setImplementation(getClassInstance());
+        replicatedMapConfig.addEntryListenerConfig(entryListenerConfig);
     }
 
     @Override
-    protected void mutateConfig(Config config) {
-        EntryListenerConfig entryListenerConfig = new EntryListenerConfig();
-        entryListenerConfig.setClassName(getUserDefinedClassNames()[0]);
-        replicatedMapConfig.addEntryListenerConfig(entryListenerConfig);
+    protected void addClassNameToConfig() {
+        EntryListenerConfig listenerConfig = new EntryListenerConfig();
+        listenerConfig.setClassName(getUserDefinedClassNames()[0]);
+        replicatedMapConfig.addEntryListenerConfig(listenerConfig);
+    }
 
-        super.mutateConfig(config);
+    @Override
+    protected void addClassInstanceToDataStructure() throws ReflectiveOperationException {
+        map.addEntryListener(getClassInstance(), true);
+    }
+
+    @Override
+    protected boolean isNoClassRegistrationAllowed() {
+        return false;
+    }
+
+    @Override
+    protected String[] getUserDefinedClassNames() {
+        return new String[] {"usercodedeployment.MyEntryListener", "usercodedeployment.ObservableListener"};
     }
 }

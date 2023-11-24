@@ -26,17 +26,19 @@ public abstract class DurableExecutorUCDTest extends UCDTest {
     protected DurableExecutorService executor;
 
     @Override
-    public void setUpInstance() throws ReflectiveOperationException {
+    protected void initialiseConfig() {
         durableExecutorConfig = new DurableExecutorConfig(objectName);
         durableExecutorConfig.setNamespace(getNamespaceName());
-
-        super.setUpInstance();
-
-        executor = instance.getDurableExecutorService(objectName);
     }
 
     @Override
-    protected void mutateConfig(Config config) {
+    protected void initialiseDataStructure() {
+        executor = instance.getDurableExecutorService(objectName);
+    }
+
+
+    @Override
+    protected void registerConfig(Config config) {
         config.addDurableExecutorConfig(durableExecutorConfig);
     }
 }

@@ -27,17 +27,18 @@ public abstract class IScheduledExecutorUCDTest extends UCDTest {
     protected IScheduledExecutorService executor;
 
     @Override
-    public void setUpInstance() throws ReflectiveOperationException {
+    protected void initialiseConfig() {
         scheduledExecutorConfig = new ScheduledExecutorConfig(objectName);
         scheduledExecutorConfig.setNamespace(getNamespaceName());
+    }
 
-        super.setUpInstance();
-
+    @Override
+    protected void initialiseDataStructure() {
         executor = instance.getScheduledExecutorService(objectName);
     }
 
     @Override
-    protected void mutateConfig(Config config) {
+    protected void registerConfig(Config config) {
         config.addScheduledExecutorConfig(scheduledExecutorConfig);
     }
 

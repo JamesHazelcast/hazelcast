@@ -17,7 +17,6 @@
 package com.hazelcast.internal.namespace.imap;
 
 import com.hazelcast.config.AttributeConfig;
-import com.hazelcast.config.Config;
 import com.hazelcast.query.Predicates;
 import org.junit.Before;
 
@@ -47,9 +46,12 @@ public class IMapValueExtractorUCDTest extends IMapUCDTest {
     }
 
     @Override
-    protected void mutateConfig(Config config) {
+    protected void addClassNameToConfig() {
         mapConfig.addAttributeConfig(new AttributeConfig(attributeName, getUserDefinedClassNames()[0]));
+    }
 
-        super.mutateConfig(config);
+    @Override
+    protected boolean isNoClassRegistrationAllowed() {
+        return false;
     }
 }

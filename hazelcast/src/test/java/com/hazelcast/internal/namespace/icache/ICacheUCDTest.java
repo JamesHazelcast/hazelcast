@@ -20,25 +20,24 @@ import com.hazelcast.cache.ICache;
 import com.hazelcast.config.CacheSimpleConfig;
 import com.hazelcast.config.Config;
 import com.hazelcast.internal.namespace.UCDTest;
-import org.junit.Before;
 
 public abstract class ICacheUCDTest extends UCDTest {
     protected CacheSimpleConfig cacheConfig;
     protected ICache<Integer, Integer> cache;
 
     @Override
-    @Before
-    public void setUpInstance() throws ReflectiveOperationException {
+    protected void initialiseConfig() {
         cacheConfig = new CacheSimpleConfig(objectName);
         cacheConfig.setNamespace(getNamespaceName());
+    }
 
-        super.setUpInstance();
-
+    @Override
+    protected void initialiseDataStructure() {
         cache = instance.getCacheManager().getCache(objectName);
     }
 
     @Override
-    protected void mutateConfig(Config config) {
+    protected void registerConfig(Config config) {
         config.addCacheConfig(cacheConfig);
     }
 }

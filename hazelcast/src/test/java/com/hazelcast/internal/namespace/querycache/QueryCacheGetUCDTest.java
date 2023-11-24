@@ -16,8 +16,6 @@
 
 package com.hazelcast.internal.namespace.querycache;
 
-import com.hazelcast.config.Config;
-
 import static org.junit.Assert.assertNotNull;
 
 public class QueryCacheGetUCDTest extends QueryCacheUCDTest {
@@ -32,11 +30,19 @@ public class QueryCacheGetUCDTest extends QueryCacheUCDTest {
     protected String[] getUserDefinedClassNames() {
         return new String[] {"usercodedeployment.TruePredicate"};
     }
+    
+    @Override
+    protected void addClassInstanceToConfig() throws ReflectiveOperationException {
+        queryCacheConfig.getPredicateConfig().setImplementation(getClassInstance());
+    }
 
     @Override
-    protected void mutateConfig(Config config) {
+    protected void addClassNameToConfig() {
         queryCacheConfig.getPredicateConfig().setClassName(getUserDefinedClassNames()[0]);
+    }
 
-        super.mutateConfig(config);
+    @Override
+    protected boolean isNoClassRegistrationAllowed() {
+        return false;
     }
 }

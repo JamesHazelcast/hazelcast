@@ -26,12 +26,13 @@ public abstract class ReplicatedMapUCDTest extends UCDTest {
     protected ReplicatedMap<Object, Object> map;
 
     @Override
-    public void setUpInstance() throws ReflectiveOperationException {
+    protected void initialiseConfig() {
         replicatedMapConfig = new ReplicatedMapConfig(objectName);
         replicatedMapConfig.setNamespace(getNamespaceName());
+    }
 
-        super.setUpInstance();
-
+    @Override
+    protected void initialiseDataStructure() {
         map = member.getReplicatedMap(objectName);
     }
 
@@ -40,7 +41,7 @@ public abstract class ReplicatedMapUCDTest extends UCDTest {
     }
 
     @Override
-    protected void mutateConfig(Config config) {
+    protected void registerConfig(Config config) {
         config.addReplicatedMapConfig(replicatedMapConfig);
     }
 }

@@ -16,17 +16,33 @@
 
 package com.hazelcast.internal.namespace.iqueue;
 
-import com.hazelcast.config.Config;
 import com.hazelcast.config.ItemListenerConfig;
 
 public abstract class QueueListenerUCDTest extends IQueueUCDTest {
     @Override
-    protected void mutateConfig(Config config) {
+    protected void addClassInstanceToConfig() throws ReflectiveOperationException {
+        ItemListenerConfig listenerConfig = new ItemListenerConfig();
+        listenerConfig.setImplementation(getClassInstance());
+
+        queueConfig.addItemListenerConfig(listenerConfig);
+    }
+
+    @Override
+    protected void addClassNameToConfig() {
         ItemListenerConfig listenerConfig = new ItemListenerConfig();
         listenerConfig.setClassName(getUserDefinedClassNames()[0]);
 
         queueConfig.addItemListenerConfig(listenerConfig);
-        super.mutateConfig(config);
+    }
+
+    @Override
+    protected void addClassInstanceToDataStructure() throws ReflectiveOperationException {
+        queue.addItemListener(getClassInstance(), true);
+    }
+
+    @Override
+    protected boolean isNoClassRegistrationAllowed() {
+        return false;
     }
 
     @Override

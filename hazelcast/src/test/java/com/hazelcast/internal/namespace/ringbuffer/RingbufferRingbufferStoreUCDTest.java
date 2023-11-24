@@ -16,7 +16,6 @@
 
 package com.hazelcast.internal.namespace.ringbuffer;
 
-import com.hazelcast.config.Config;
 import com.hazelcast.config.RingbufferStoreConfig;
 
 import static org.junit.Assert.assertEquals;
@@ -33,9 +32,17 @@ public class RingbufferRingbufferStoreUCDTest extends RingbufferUCDTest {
     }
 
     @Override
-    protected void mutateConfig(Config config) {
-        ringBufferConfig.setRingbufferStoreConfig(new RingbufferStoreConfig().setClassName(getUserDefinedClassNames()[0]));
+    protected void addClassInstanceToConfig() throws ReflectiveOperationException {
+        ringBufferConfig.setRingbufferStoreConfig(new RingbufferStoreConfig().setStoreImplementation(getClassInstance()));
+    }
 
-        super.mutateConfig(config);
+    @Override
+    protected void addClassNameToConfig() {
+        ringBufferConfig.setRingbufferStoreConfig(new RingbufferStoreConfig().setClassName(getUserDefinedClassNames()[0]));
+    }
+
+    @Override
+    protected boolean isNoClassRegistrationAllowed() {
+        return false;
     }
 }

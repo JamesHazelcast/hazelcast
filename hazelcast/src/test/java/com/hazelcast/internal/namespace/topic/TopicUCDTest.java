@@ -17,31 +17,27 @@
 package com.hazelcast.internal.namespace.topic;
 
 import com.hazelcast.config.Config;
-import com.hazelcast.config.ListenerConfig;
 import com.hazelcast.config.ReliableTopicConfig;
 import com.hazelcast.internal.namespace.UCDTest;
 import com.hazelcast.topic.ITopic;
 
 public abstract class TopicUCDTest extends UCDTest {
-
     protected ReliableTopicConfig reliableTopicConfig;
     protected ITopic<Object> topic;
 
     @Override
-    public void setUpInstance() throws ReflectiveOperationException {
+    protected void initialiseConfig() {
         reliableTopicConfig = new ReliableTopicConfig(objectName);
         reliableTopicConfig.setNamespace(getNamespaceName());
-        super.setUpInstance();
+    }
 
+    @Override
+    protected void initialiseDataStructure() {
         topic = instance.getReliableTopic(objectName);
     }
 
     @Override
-    protected void mutateConfig(Config config) {
-        ListenerConfig listenerConfig = new ListenerConfig();
-        listenerConfig.setClassName(getUserDefinedClassNames()[0]);
-
-        reliableTopicConfig.addMessageListenerConfig(listenerConfig);
+    protected void registerConfig(Config config) {
         config.addReliableTopicConfig(reliableTopicConfig);
     }
 }

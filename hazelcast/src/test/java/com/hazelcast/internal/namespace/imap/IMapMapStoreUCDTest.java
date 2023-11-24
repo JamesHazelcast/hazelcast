@@ -16,7 +16,6 @@
 
 package com.hazelcast.internal.namespace.imap;
 
-import com.hazelcast.config.Config;
 import com.hazelcast.config.MapStoreConfig;
 
 import static org.junit.Assert.assertNotNull;
@@ -28,10 +27,18 @@ public class IMapMapStoreUCDTest extends IMapUCDTest {
     }
 
     @Override
-    protected void mutateConfig(Config config) {
-        mapConfig.setMapStoreConfig(new MapStoreConfig().setClassName(getUserDefinedClassNames()[0]));
+    protected void addClassInstanceToConfig() throws ReflectiveOperationException {
+        mapConfig.setMapStoreConfig(new MapStoreConfig().setImplementation(getClassInstance()));
+    }
 
-        super.mutateConfig(config);
+    @Override
+    protected void addClassNameToConfig() {
+        mapConfig.setMapStoreConfig(new MapStoreConfig().setClassName(getUserDefinedClassNames()[0]));
+    }
+
+    @Override
+    protected boolean isNoClassRegistrationAllowed() {
+        return false;
     }
 
     @Override

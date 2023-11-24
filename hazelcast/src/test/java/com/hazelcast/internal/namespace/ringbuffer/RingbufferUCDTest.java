@@ -26,17 +26,18 @@ public abstract class RingbufferUCDTest extends UCDTest {
     protected Ringbuffer<Object> ringBuffer;
 
     @Override
-    public void setUpInstance() throws ReflectiveOperationException {
+    protected void initialiseConfig() {
         ringBufferConfig = new RingbufferConfig(objectName);
         ringBufferConfig.setNamespace(getNamespaceName());
+    }
 
-        super.setUpInstance();
-
+    @Override
+    protected void initialiseDataStructure() {
         ringBuffer = instance.getRingbuffer(objectName);
     }
 
     @Override
-    protected void mutateConfig(Config config) {
+    protected void registerConfig(Config config) {
         config.addRingBufferConfig(ringBufferConfig);
     }
 }

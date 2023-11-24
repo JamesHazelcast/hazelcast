@@ -26,17 +26,18 @@ public abstract class IExecutorUCDTest extends UCDTest {
     protected IExecutorService executor;
 
     @Override
-    public void setUpInstance() throws ReflectiveOperationException {
+    protected void initialiseConfig() {
         executorConfig = new ExecutorConfig(objectName);
         executorConfig.setNamespace(getNamespaceName());
+    }
 
-        super.setUpInstance();
-
+    @Override
+    protected void initialiseDataStructure() {
         executor = instance.getExecutorService(objectName);
     }
 
     @Override
-    protected void mutateConfig(Config config) {
+    protected void registerConfig(Config config) {
         config.addExecutorConfig(executorConfig);
     }
 }

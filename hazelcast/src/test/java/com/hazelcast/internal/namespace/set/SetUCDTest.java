@@ -17,6 +17,7 @@
 package com.hazelcast.internal.namespace.set;
 
 import com.hazelcast.collection.ISet;
+import com.hazelcast.config.Config;
 import com.hazelcast.config.SetConfig;
 import com.hazelcast.internal.namespace.UCDTest;
 
@@ -25,12 +26,19 @@ public abstract class SetUCDTest extends UCDTest {
     protected ISet<Object> set;
 
     @Override
-    public void setUpInstance() throws ReflectiveOperationException {
+    protected void initialiseConfig() {
         setConfig = new SetConfig(objectName);
         setConfig.setNamespace(getNamespaceName());
-        super.setUpInstance();
+    }
 
+    @Override
+    protected void initialiseDataStructure() {
         set = instance.getSet(objectName);
+    }
+
+    @Override
+    protected void registerConfig(Config config) {
+        config.addSetConfig(setConfig);
     }
 
     protected void populate() {

@@ -22,17 +22,17 @@ import com.hazelcast.internal.namespace.UCDTest;
 import com.hazelcast.multimap.MultiMap;
 
 public abstract class MultiMapUCDTest extends UCDTest {
-
     protected MultiMapConfig mapConfig;
     protected MultiMap<Object, Object> map;
 
     @Override
-    public void setUpInstance() throws ReflectiveOperationException {
+    protected void initialiseConfig() {
         mapConfig = new MultiMapConfig(objectName);
         mapConfig.setNamespace(getNamespaceName());
+    }
 
-        super.setUpInstance();
-
+    @Override
+    protected void initialiseDataStructure() {
         map = instance.getMultiMap(objectName);
     }
 
@@ -41,7 +41,7 @@ public abstract class MultiMapUCDTest extends UCDTest {
     }
 
     @Override
-    protected void mutateConfig(Config config) {
+    protected void registerConfig(Config config) {
         config.addMultiMapConfig(mapConfig);
     }
 }

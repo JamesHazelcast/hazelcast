@@ -16,7 +16,6 @@
 
 package com.hazelcast.internal.namespace.iqueue;
 
-import com.hazelcast.config.Config;
 import com.hazelcast.config.QueueStoreConfig;
 
 import static org.junit.Assert.assertFalse;
@@ -33,9 +32,17 @@ public class IQueueQueueStoreUCDTest extends IQueueUCDTest {
     }
 
     @Override
-    protected void mutateConfig(Config config) {
-        queueConfig.setQueueStoreConfig(new QueueStoreConfig().setEnabled(true).setClassName(getUserDefinedClassNames()[0]));
+    protected void addClassInstanceToConfig() throws ReflectiveOperationException {
+        queueConfig.setQueueStoreConfig(new QueueStoreConfig().setEnabled(true).setStoreImplementation(getClassInstance()));
+    }
 
-        super.mutateConfig(config);
+    @Override
+    protected void addClassNameToConfig() {
+        queueConfig.setQueueStoreConfig(new QueueStoreConfig().setEnabled(true).setClassName(getUserDefinedClassNames()[0]));
+    }
+
+    @Override
+    protected boolean isNoClassRegistrationAllowed() {
+        return false;
     }
 }

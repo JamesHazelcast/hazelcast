@@ -26,17 +26,18 @@ public abstract class IQueueUCDTest extends UCDTest {
     protected IQueue<Object> queue;
 
     @Override
-    public void setUpInstance() throws ReflectiveOperationException {
+    protected void initialiseConfig() {
         queueConfig = new QueueConfig(objectName);
         queueConfig.setNamespace(getNamespaceName());
+    }
 
-        super.setUpInstance();
-
+    @Override
+    protected void initialiseDataStructure() {
         queue = instance.getQueue(objectName);
     }
 
     @Override
-    protected void mutateConfig(Config config) {
+    protected void registerConfig(Config config) {
         config.addQueueConfig(queueConfig);
     }
 }
