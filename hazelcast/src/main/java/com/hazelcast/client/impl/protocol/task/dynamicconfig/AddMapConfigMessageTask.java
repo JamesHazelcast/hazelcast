@@ -28,6 +28,7 @@ import com.hazelcast.config.PartitioningStrategyConfig;
 import com.hazelcast.config.QueryCacheConfig;
 import com.hazelcast.instance.impl.Node;
 import com.hazelcast.internal.dynamicconfig.DynamicConfigurationAwareConfig;
+import com.hazelcast.internal.namespace.NamespaceUtil;
 import com.hazelcast.internal.nio.Connection;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
 import com.hazelcast.partition.PartitioningStrategy;
@@ -84,7 +85,7 @@ public class AddMapConfigMessageTask
         config.setPerEntryStatsEnabled(parameters.perEntryStatsEnabled);
         config.setIndexConfigs(parameters.indexConfigs);
         if (parameters.mapStoreConfig != null) {
-            config.setMapStoreConfig(parameters.mapStoreConfig.asMapStoreConfig(serializationService));
+            NamespaceUtil.callWithNamespace(parameters.namespace, () -> config.setMapStoreConfig(parameters.mapStoreConfig.asMapStoreConfig(serializationService)));
         }
         config.setTimeToLiveSeconds(parameters.timeToLiveSeconds);
         config.setMaxIdleSeconds(parameters.maxIdleSeconds);
