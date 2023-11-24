@@ -37,7 +37,7 @@ public abstract class QueueListenerUCDTest extends IQueueUCDTest {
 
     @Override
     protected void addClassInstanceToDataStructure() throws ReflectiveOperationException {
-        queue.addItemListener(getClassInstance(), true);
+        queue.addItemListener(getClassInstance(), false);
     }
 
     @Override

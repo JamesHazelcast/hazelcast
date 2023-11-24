@@ -35,7 +35,7 @@ public abstract class IMapEntryListenerUCDTest extends IMapUCDTest {
 
     @Override
     protected void addClassInstanceToDataStructure() throws ReflectiveOperationException {
-        map.addEntryListener(getClassInstance(), true);
+        map.addEntryListener(getClassInstance(), false);
     }
 
     @Override

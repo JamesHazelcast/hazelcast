@@ -35,7 +35,7 @@ public abstract class SetListenerUCDTest extends SetUCDTest {
 
     @Override
     protected void addClassInstanceToDataStructure() throws ReflectiveOperationException {
-        set.addItemListener(getClassInstance(), true);
+        set.addItemListener(getClassInstance(), false);
     }
 
     @Override

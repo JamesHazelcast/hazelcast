@@ -35,7 +35,7 @@ public abstract class ListListenerUCDTest extends ListUCDTest {
 
     @Override
     protected void addClassInstanceToDataStructure() throws ReflectiveOperationException {
-        list.addItemListener(getClassInstance(), true);
+        list.addItemListener(getClassInstance(), false);
     }
 
     @Override
