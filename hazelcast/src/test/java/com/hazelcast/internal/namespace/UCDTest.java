@@ -26,6 +26,7 @@ import com.hazelcast.config.ListenerConfig;
 import com.hazelcast.config.MapConfig;
 import com.hazelcast.config.NamespaceConfig;
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.core.IExecutorService;
 import com.hazelcast.instance.impl.NamespaceAwareClassLoaderIntegrationTest;
 import com.hazelcast.internal.util.ExceptionUtil;
 import com.hazelcast.jet.impl.deployment.MapResourceClassLoader;
@@ -189,6 +190,7 @@ public abstract class UCDTest extends HazelcastTestSupport {
         ClassRegistrationStyle[] classRegistrationStyleFiltered = Arrays.stream(ClassRegistrationStyle.values())
                 .filter(style -> style != ClassRegistrationStyle.NAME_IN_CONFIG).toArray(ClassRegistrationStyle[]::new);
 
+        // TODO NS We likely don't need this much overlap - we should manually define test parameters if possible
         return Lists
                 .cartesianProduct(List.of(ConnectionStyle.values()), List.of(ConfigStyle.values()),
                         List.of(classRegistrationStyleFiltered), List.of(AssertionStyle.values()))
