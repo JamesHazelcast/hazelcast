@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 public class IMapEntryExpiredUCDTest extends IMapEntryListenerUCDTest {
     @Override
     public void test() throws Exception {
-        map.set(1,  1, 1, TimeUnit.MILLISECONDS);
+        map.set(1, 1, 1, TimeUnit.MILLISECONDS);
         assertListenerFired("entryExpired");
     }
 }

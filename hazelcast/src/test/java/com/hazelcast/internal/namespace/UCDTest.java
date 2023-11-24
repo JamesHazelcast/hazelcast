@@ -141,7 +141,7 @@ public abstract class UCDTest extends HazelcastTestSupport {
             } catch (ReflectiveOperationException e) {
                 throw ExceptionUtil.sneakyThrow(e);
             }
-        }), NAME_IN_CONFIG(UCDTest::addClassNameToConfig), INSTANCE_IN_DATA_STRUCTURE((instance) -> {
+        }), NAME_IN_CONFIG(UCDTest::addClassNameToConfig), INSTANCE_IN_DATA_STRUCTURE(instance -> {
             // TODO NS if time, we should try to fix this bug to get more test coverage
             throw new UnsupportedOperationException(
                     "Typically used for listener registration, but due to a bug this doesn't work - https://github.com/hazelcast/hazelcast/issues/26062");
@@ -151,7 +151,7 @@ public abstract class UCDTest extends HazelcastTestSupport {
             // } catch (ReflectiveOperationException e) {
             // throw ExceptionUtil.sneakyThrow(e);
             // }
-        }), NONE((instance) -> assumeTrue("Skipping as configuration not supported", instance.isNoClassRegistrationAllowed()));
+        }), NONE(instance -> assumeTrue("Skipping as configuration not supported", instance.isNoClassRegistrationAllowed()));
 
         private final Consumer<UCDTest> action;
 
@@ -473,7 +473,7 @@ public abstract class UCDTest extends HazelcastTestSupport {
      */
     protected void assertListenerFired(String key) throws ReflectiveOperationException {
         Collection<String> result = instance.getSet(getClassObject().getSimpleName());
-        
+
         // TODO NS replace polling with entrylistener, to catch as values are added
         assertTrueEventually(() -> {
             if (LOGGER.isFinestEnabled()) {

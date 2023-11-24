@@ -36,7 +36,6 @@ public abstract class DurableExecutorUCDTest extends UCDTest {
         executor = instance.getDurableExecutorService(objectName);
     }
 
-
     @Override
     protected void registerConfig(Config config) {
         config.addDurableExecutorConfig(durableExecutorConfig);
