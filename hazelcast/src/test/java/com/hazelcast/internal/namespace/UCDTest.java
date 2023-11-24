@@ -190,9 +190,9 @@ public abstract class UCDTest extends HazelcastTestSupport {
         // But HazelcastInstanceAware is only available on listeners registered via config, NOT on those registered on the data
         // structure directly
         // E.G. AbstractCollectionProxyImpl.initialize() iterates through the configs
-        style != ClassRegistrationStyle.INSTANCE_IN_DATA_STRUCTURE &&
-        // TODO Just wasn't working, was like the listener wasn't firing - to be investigated properly
-                style != ClassRegistrationStyle.NAME_IN_CONFIG).toArray(ClassRegistrationStyle[]::new);
+        style != ClassRegistrationStyle.INSTANCE_IN_DATA_STRUCTURE
+        // TODO NS Just wasn't working, was like the listener wasn't firing - to be investigated properly
+                && style != ClassRegistrationStyle.NAME_IN_CONFIG).toArray(ClassRegistrationStyle[]::new);
 
         return Lists
                 .cartesianProduct(List.of(ConnectionStyle.values()), List.of(ConfigStyle.values()),
