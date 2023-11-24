@@ -37,7 +37,7 @@ public class TopicMessageListenerUCDTest extends TopicUCDTest {
     @Override
     protected void addClassNameToConfig() {
         ListenerConfig listenerConfig = new ListenerConfig();
-        listenerConfig.setClassName(getUserDefinedClassNames()[0]);
+        listenerConfig.setClassName(getUserDefinedClassName());
 
         reliableTopicConfig.addMessageListenerConfig(listenerConfig);
     }
@@ -53,7 +53,7 @@ public class TopicMessageListenerUCDTest extends TopicUCDTest {
     }
 
     @Override
-    protected String[] getUserDefinedClassNames() {
-        return new String[] {"usercodedeployment.MyMessageListener", "usercodedeployment.ObservableListener"};
+    protected String getUserDefinedClassName() {
+        return "usercodedeployment.MyMessageListener";
     }
 }

@@ -27,7 +27,7 @@ public class IMapEntryProcessorUCDTest extends IMapUCDTest {
     }
 
     @Override
-    protected String[] getUserDefinedClassNames() {
-        return new String[] {"usercodedeployment.IncrementingExternalEntryProcessor"};
+    protected String getUserDefinedClassName() {
+        return "usercodedeployment.IncrementingExternalEntryProcessor";
     }
 }

@@ -41,13 +41,13 @@ public class IMapValueExtractorUCDTest extends IMapUCDTest {
     }
 
     @Override
-    protected String[] getUserDefinedClassNames() {
-        return new String[] {"usercodedeployment.IncrementingValueExtractor"};
+    protected String getUserDefinedClassName() {
+        return "usercodedeployment.IncrementingValueExtractor";
     }
 
     @Override
     protected void addClassNameToConfig() {
-        mapConfig.addAttributeConfig(new AttributeConfig(attributeName, getUserDefinedClassNames()[0]));
+        mapConfig.addAttributeConfig(new AttributeConfig(attributeName, getUserDefinedClassName()));
     }
 
     @Override

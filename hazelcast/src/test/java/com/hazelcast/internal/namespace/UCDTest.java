@@ -28,7 +28,6 @@ import com.hazelcast.config.NamespaceConfig;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.instance.impl.NamespaceAwareClassLoaderIntegrationTest;
 import com.hazelcast.internal.util.ExceptionUtil;
-import com.hazelcast.jet.impl.deployment.MapResourceClassLoader;
 import com.hazelcast.logging.ILogger;
 import com.hazelcast.logging.Logger;
 import com.hazelcast.map.IMap;
@@ -72,7 +71,7 @@ import static org.junit.Assume.assumeTrue;
 @Category(SlowTest.class)
 public abstract class UCDTest extends HazelcastTestSupport {
     private static final ILogger LOGGER = Logger.getLogger(UCDTest.class);
-    private static MapResourceClassLoader mapResourceClassLoader;
+    private static Path sourceJar;
 
     @Parameter(0)
     public ConnectionStyle connectionStyle;
@@ -195,9 +194,8 @@ public abstract class UCDTest extends HazelcastTestSupport {
     }
 
     @BeforeClass
-    public static void setUpClass() throws IOException {
-        Path classRoot = Paths.get("src/test/class");
-        mapResourceClassLoader = NamespaceAwareClassLoaderIntegrationTest.generateMapResourceClassLoaderForDirectory(classRoot);
+    public static void setUpClass() {
+        sourceJar = Paths.get("src/test/class", "usercodedeployment", "UCDTest.jar");
     }
 
     @Before
@@ -211,7 +209,7 @@ public abstract class UCDTest extends HazelcastTestSupport {
     }
 
     /** Don't annotate children with {@code @Before}, framework controls test execution */
-    private void setUpInstance() throws ReflectiveOperationException {
+    private void setUpInstance() throws IOException {
         initialiseConfig();
 
         Config config = smallInstanceConfigWithoutJetAndMetrics();
@@ -256,7 +254,7 @@ public abstract class UCDTest extends HazelcastTestSupport {
         }
     }
 
-    private void setupConfigs(Config config) throws ReflectiveOperationException {
+    private void setupConfigs(Config config) throws IOException {
         registerClass(config);
 
         try {
@@ -344,7 +342,7 @@ public abstract class UCDTest extends HazelcastTestSupport {
      * <p>
      * Typically main class under test is first
      */
-    protected abstract String[] getUserDefinedClassNames();
+    protected abstract String getUserDefinedClassName();
 
     /** Allows registration of a config (e.g. a {@link MapConfig} with the {@link HazelcastInstance#getConfig()} */
     protected abstract void registerConfig(Config config);
@@ -416,17 +414,8 @@ public abstract class UCDTest extends HazelcastTestSupport {
         return true;
     }
 
-    private void registerClass(Config config) throws ClassNotFoundException {
-        for (String className : getUserDefinedClassNames()) {
-            Class<?> clazz = mapResourceClassLoader.loadClass(className);
-
-            Class<?> unwanted = IdentifiedDataSerializable.class;
-            assertFalse(String.format(
-                    "%s should not implement %s, as unless done with care, when deserialized the parent might be deserialized instead",
-                    className, unwanted.getSimpleName()), unwanted.isAssignableFrom(clazz));
-
-            namespaceConfig.addClass(clazz);
-        }
+    private void registerClass(Config config) throws IOException {
+        namespaceConfig.addJar(sourceJar.toUri().toURL(), null);
 
         config.getNamespacesConfig().addNamespaceConfig(namespaceConfig);
     }
@@ -438,7 +427,15 @@ public abstract class UCDTest extends HazelcastTestSupport {
 
     /** @return the {@link Class} object generated from the first element of {@link #getUserDefinedClassNames()} */
     private Class<?> getClassObject() throws ReflectiveOperationException {
-        return NamespaceAwareClassLoaderIntegrationTest.tryLoadClass(member, getNamespaceName(), getUserDefinedClassNames()[0]);
+        Class<?> clazz =
+                NamespaceAwareClassLoaderIntegrationTest.tryLoadClass(member, getNamespaceName(), getUserDefinedClassName());
+
+        Class<?> unwanted = IdentifiedDataSerializable.class;
+        assertFalse(String.format(
+                "%s should not implement %s, as unless done with care, when deserialized the parent might be deserialized instead",
+                getUserDefinedClassName(), unwanted.getSimpleName()), unwanted.isAssignableFrom(clazz));
+
+        return clazz;
     }
 
     protected String getNamespaceName() {

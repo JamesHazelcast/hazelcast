@@ -27,8 +27,8 @@ public class IQueueQueueStoreUCDTest extends IQueueUCDTest {
     }
 
     @Override
-    protected String[] getUserDefinedClassNames() {
-        return new String[] {"usercodedeployment.KeyBecomesValueQueueStore"};
+    protected String getUserDefinedClassName() {
+        return "usercodedeployment.KeyBecomesValueQueueStore";
     }
 
     @Override
@@ -38,7 +38,7 @@ public class IQueueQueueStoreUCDTest extends IQueueUCDTest {
 
     @Override
     protected void addClassNameToConfig() {
-        queueConfig.setQueueStoreConfig(new QueueStoreConfig().setEnabled(true).setClassName(getUserDefinedClassNames()[0]));
+        queueConfig.setQueueStoreConfig(new QueueStoreConfig().setEnabled(true).setClassName(getUserDefinedClassName()));
     }
 
     @Override

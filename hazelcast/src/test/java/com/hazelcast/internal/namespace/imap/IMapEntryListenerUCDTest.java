@@ -29,7 +29,7 @@ public abstract class IMapEntryListenerUCDTest extends IMapUCDTest {
     @Override
     protected void addClassNameToConfig() {
         EntryListenerConfig entryListenerConfig = new EntryListenerConfig();
-        entryListenerConfig.setClassName(getUserDefinedClassNames()[0]);
+        entryListenerConfig.setClassName(getUserDefinedClassName());
         mapConfig.addEntryListenerConfig(entryListenerConfig);
     }
 
@@ -44,7 +44,7 @@ public abstract class IMapEntryListenerUCDTest extends IMapUCDTest {
     }
 
     @Override
-    protected String[] getUserDefinedClassNames() {
-        return new String[] {"usercodedeployment.MyEntryListener", "usercodedeployment.ObservableListener"};
+    protected String getUserDefinedClassName() {
+        return "usercodedeployment.MyEntryListener";
     }
 }

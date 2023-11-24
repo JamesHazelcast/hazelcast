@@ -28,7 +28,7 @@ public class RingbufferIFunctionUCDTest extends RingbufferUCDTest {
     }
 
     @Override
-    protected String[] getUserDefinedClassNames() {
-        return new String[] {"usercodedeployment.AcceptAllIFunction"};
+    protected String getUserDefinedClassName() {
+        return "usercodedeployment.AcceptAllIFunction";
     }
 }

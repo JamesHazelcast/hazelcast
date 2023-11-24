@@ -30,7 +30,7 @@ public abstract class QueueListenerUCDTest extends IQueueUCDTest {
     @Override
     protected void addClassNameToConfig() {
         ItemListenerConfig listenerConfig = new ItemListenerConfig();
-        listenerConfig.setClassName(getUserDefinedClassNames()[0]);
+        listenerConfig.setClassName(getUserDefinedClassName());
 
         queueConfig.addItemListenerConfig(listenerConfig);
     }
@@ -46,7 +46,7 @@ public abstract class QueueListenerUCDTest extends IQueueUCDTest {
     }
 
     @Override
-    protected String[] getUserDefinedClassNames() {
-        return new String[] {"usercodedeployment.MyItemListener", "usercodedeployment.ObservableListener"};
+    protected String getUserDefinedClassName() {
+        return "usercodedeployment.MyItemListener";
     }
 }

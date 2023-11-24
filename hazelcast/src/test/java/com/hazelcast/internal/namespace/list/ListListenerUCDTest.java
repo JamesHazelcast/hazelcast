@@ -29,7 +29,7 @@ public abstract class ListListenerUCDTest extends ListUCDTest {
     @Override
     protected void addClassNameToConfig() {
         ItemListenerConfig itemListenerConfig = new ItemListenerConfig();
-        itemListenerConfig.setClassName(getUserDefinedClassNames()[0]);
+        itemListenerConfig.setClassName(getUserDefinedClassName());
         listConfig.addItemListenerConfig(itemListenerConfig);
     }
 
@@ -44,7 +44,7 @@ public abstract class ListListenerUCDTest extends ListUCDTest {
     }
 
     @Override
-    protected String[] getUserDefinedClassNames() {
-        return new String[] {"usercodedeployment.MyItemListener", "usercodedeployment.ObservableListener"};
+    protected String getUserDefinedClassName() {
+        return "usercodedeployment.MyItemListener";
     }
 }

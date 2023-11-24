@@ -18,7 +18,7 @@ package com.hazelcast.internal.namespace.replicatedmap;
 
 public class ReplicatedMapPagingPredicateUCDTest extends ReplicatedMapPredicateUCDTest {
     @Override
-    protected String[] getUserDefinedClassNames() {
-        return new String[] {"usercodedeployment.TruePagingPredicate"};
+    protected String getUserDefinedClassName() {
+        return "usercodedeployment.TruePagingPredicate";
     }
 }

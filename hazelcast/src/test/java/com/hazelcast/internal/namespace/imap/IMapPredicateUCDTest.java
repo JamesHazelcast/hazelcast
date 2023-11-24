@@ -27,7 +27,7 @@ public class IMapPredicateUCDTest extends IMapUCDTest {
     }
 
     @Override
-    protected String[] getUserDefinedClassNames() {
-        return new String[] {"usercodedeployment.TruePredicate"};
+    protected String getUserDefinedClassName() {
+        return "usercodedeployment.TruePredicate";
     }
 }

@@ -29,7 +29,7 @@ public abstract class MultiMapMapListenerUCDTest extends MultiMapUCDTest {
     @Override
     protected void addClassNameToConfig() {
         EntryListenerConfig listenerConfig = new EntryListenerConfig();
-        listenerConfig.setClassName(getUserDefinedClassNames()[0]);
+        listenerConfig.setClassName(getUserDefinedClassName());
         mapConfig.addEntryListenerConfig(listenerConfig);
     }
 
@@ -44,7 +44,7 @@ public abstract class MultiMapMapListenerUCDTest extends MultiMapUCDTest {
     }
 
     @Override
-    protected String[] getUserDefinedClassNames() {
-        return new String[] {"usercodedeployment.MyEntryListener", "usercodedeployment.ObservableListener"};
+    protected String getUserDefinedClassName() {
+        return "usercodedeployment.MyEntryListener";
     }
 }

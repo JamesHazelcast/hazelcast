@@ -29,7 +29,7 @@ public class ICacheEntryProcessorUCDTest extends ICacheUCDTest {
     }
 
     @Override
-    protected String[] getUserDefinedClassNames() {
-        return new String[] {"usercodedeployment.IncrementingJavaxEntryProcessor"};
+    protected String getUserDefinedClassName() {
+        return "usercodedeployment.IncrementingJavaxEntryProcessor";
     }
 }

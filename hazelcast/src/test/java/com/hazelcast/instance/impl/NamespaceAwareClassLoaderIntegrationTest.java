@@ -516,9 +516,8 @@ public class NamespaceAwareClassLoaderIntegrationTest extends HazelcastTestSuppo
         }
     }
 
-    // TODO NS Put somewhere more sensible
     /** Find & load all {@code .class} files in the scope of this test */
-    public static MapResourceClassLoader generateMapResourceClassLoaderForDirectory(Path root) throws IOException {
+    protected static MapResourceClassLoader generateMapResourceClassLoaderForDirectory(Path root) throws IOException {
         try (Stream<Path> stream = Files.walk(root.resolve("usercodedeployment"))) {
             final Map<String, byte[]> classNameToContent = stream
                     .filter(path -> FilenameUtils.isExtension(path.getFileName().toString(), "class"))

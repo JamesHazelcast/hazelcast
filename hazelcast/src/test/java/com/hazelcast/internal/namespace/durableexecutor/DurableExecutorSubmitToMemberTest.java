@@ -28,7 +28,7 @@ public class DurableExecutorSubmitToMemberTest extends DurableExecutorUCDTest {
     }
 
     @Override
-    protected String[] getUserDefinedClassNames() {
-        return new String[] {"usercodedeployment.MyCallable"};
+    protected String getUserDefinedClassName() {
+        return "usercodedeployment.MyCallable";
     }
 }

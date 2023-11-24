@@ -33,7 +33,7 @@ public class IMapMapStoreUCDTest extends IMapUCDTest {
 
     @Override
     protected void addClassNameToConfig() {
-        mapConfig.setMapStoreConfig(new MapStoreConfig().setClassName(getUserDefinedClassNames()[0]));
+        mapConfig.setMapStoreConfig(new MapStoreConfig().setClassName(getUserDefinedClassName()));
     }
 
     @Override
@@ -42,7 +42,7 @@ public class IMapMapStoreUCDTest extends IMapUCDTest {
     }
 
     @Override
-    protected String[] getUserDefinedClassNames() {
-        return new String[] {"usercodedeployment.KeyBecomesValueMapStore"};
+    protected String getUserDefinedClassName() {
+        return "usercodedeployment.KeyBecomesValueMapStore";
     }
 }

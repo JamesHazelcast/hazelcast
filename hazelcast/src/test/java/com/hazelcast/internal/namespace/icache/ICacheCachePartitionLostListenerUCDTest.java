@@ -25,7 +25,7 @@ public class ICacheCachePartitionLostListenerUCDTest extends ICacheUCDTest {
     }
 
     @Override
-    protected String[] getUserDefinedClassNames() {
-        return new String[] {"usercodedeployment.NoOpCachePartitionLostListener"};
+    protected String getUserDefinedClassName() {
+        return "usercodedeployment.NoOpCachePartitionLostListener";
     }
 }

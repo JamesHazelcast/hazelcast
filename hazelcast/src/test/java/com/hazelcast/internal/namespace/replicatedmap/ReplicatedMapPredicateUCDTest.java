@@ -42,7 +42,7 @@ public class ReplicatedMapPredicateUCDTest extends ReplicatedMapUCDTest {
     }
 
     @Override
-    protected String[] getUserDefinedClassNames() {
-        return new String[] {"usercodedeployment.TruePredicate"};
+    protected String getUserDefinedClassName() {
+        return "usercodedeployment.TruePredicate";
     }
 }

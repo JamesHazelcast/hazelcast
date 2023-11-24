@@ -18,7 +18,7 @@ package com.hazelcast.internal.namespace.imap;
 
 public class IMapEntryLoaderUCDTest extends IMapMapLoaderUCDTest {
     @Override
-    protected String[] getUserDefinedClassNames() {
-        return new String[] {"usercodedeployment.KeyBecomesValueEntryLoader"};
+    protected String getUserDefinedClassName() {
+        return "usercodedeployment.KeyBecomesValueEntryLoader";
     }
 }

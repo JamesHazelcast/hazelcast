@@ -25,8 +25,8 @@ public class IMapMapLoaderUCDTest extends IMapUCDTest {
     }
 
     @Override
-    protected String[] getUserDefinedClassNames() {
-        return new String[] {"usercodedeployment.KeyBecomesValueMapLoader"};
+    protected String getUserDefinedClassName() {
+        return "usercodedeployment.KeyBecomesValueMapLoader";
     }
 
     @Override
@@ -36,7 +36,7 @@ public class IMapMapLoaderUCDTest extends IMapUCDTest {
 
     @Override
     protected void addClassNameToConfig() {
-        mapConfig.getMapStoreConfig().setEnabled(true).setClassName(getUserDefinedClassNames()[0]);
+        mapConfig.getMapStoreConfig().setEnabled(true).setClassName(getUserDefinedClassName());
     }
 
     @Override

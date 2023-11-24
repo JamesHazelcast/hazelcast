@@ -27,7 +27,7 @@ public class IMapProjectionUCDTest extends IMapUCDTest {
     }
 
     @Override
-    protected String[] getUserDefinedClassNames() {
-        return new String[] {"usercodedeployment.IdentityProjection"};
+    protected String getUserDefinedClassName() {
+        return "usercodedeployment.IdentityProjection";
     }
 }

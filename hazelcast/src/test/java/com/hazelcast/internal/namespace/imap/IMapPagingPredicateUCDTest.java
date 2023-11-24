@@ -24,7 +24,7 @@ import org.junit.Ignore;
 @Ignore
 public class IMapPagingPredicateUCDTest extends IMapPredicateUCDTest {
     @Override
-    protected String[] getUserDefinedClassNames() {
-        return new String[] {"usercodedeployment.TruePagingPredicate"};
+    protected String getUserDefinedClassName() {
+        return "usercodedeployment.TruePagingPredicate";
     }
 }

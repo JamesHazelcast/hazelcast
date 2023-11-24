@@ -31,7 +31,7 @@ public class IScheduledExecutorScheduleOnMemberTest extends IScheduledExecutorUC
     }
 
     @Override
-    protected String[] getUserDefinedClassNames() {
-        return new String[] {"usercodedeployment.MyCallable"};
+    protected String getUserDefinedClassName() {
+        return "usercodedeployment.MyCallable";
     }
 }

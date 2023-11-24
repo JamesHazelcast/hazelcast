@@ -27,7 +27,7 @@ public class IExecutorSubmitToMemberTest extends IExecutorUCDTest {
     }
 
     @Override
-    protected String[] getUserDefinedClassNames() {
-        return new String[] {"usercodedeployment.MyCallable"};
+    protected String getUserDefinedClassName() {
+        return "usercodedeployment.MyCallable";
     }
 }

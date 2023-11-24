@@ -22,10 +22,37 @@ Note: unless package is explicitly specified, all classes described above reside
 To generate a new `.class` from from an existing `.java` file, run something like:
 
 ```shell
-GROUP_ID=com.hazelcast
-ARTIFACT_ID=hazelcast
-VERSION=5.3.2
+mvn dependency:get -DgroupId=com.hazelcast -DartifactId=hazelcast -Dversion=5.3.2 --quiet;
+mvn dependency:get -DgroupId=javax.cache -DartifactId=cache-api -Dversion=1.1.1 --quiet;
 
-mvn dependency:get -DgroupId=$GROUP_ID -DartifactId=$ARTIFACT_ID -Dversion=$VERSION --quiet;
-javac --release 11 *.java -cp "$HOME/.m2/repository/${GROUP_ID//.//}/$ARTIFACT_ID/$VERSION/$ARTIFACT_ID-$VERSION.jar";
+javac --release 11 *.java -cp "$HOME/.m2/repository/com/hazelcast/hazelcast/5.3.2/*:$HOME/.m2/repository/javax/cache/cache-api/1.1.1/*";
+```
+
+And to  compile those `.class`' into a `.jar`:
+
+```shell
+jar -cf usercodedeployment/UCDTest.jar \
+usercodedeployment/AcceptAllIFunction.class \
+usercodedeployment/IdentityProjection.class \
+usercodedeployment/IncrementingExternalEntryProcessor.class \
+usercodedeployment/IncrementingJavaxEntryProcessor.class \
+usercodedeployment/IncrementingMapInterceptor.class \
+usercodedeployment/IncrementingOffloadableEntryProcessor.class \
+usercodedeployment/IncrementingValueExtractor.class \
+usercodedeployment/KeyBecomesValueEntryLoader.class \
+usercodedeployment/KeyBecomesValueEntryStore.class \
+usercodedeployment/KeyBecomesValueMapLoader.class \
+usercodedeployment/KeyBecomesValueMapStore.class \
+usercodedeployment/KeyBecomesValueQueueStore.class \
+usercodedeployment/LargeSequenceRingBufferStore.class \
+usercodedeployment/LargeSequenceRingBufferStoreFactory.class \
+usercodedeployment/MyCallable.class \
+usercodedeployment/MyEntryListener.class \
+usercodedeployment/MyItemListener.class \
+usercodedeployment/MyMessageListener.class \
+usercodedeployment/NoOpCachePartitionLostListener.class \
+usercodedeployment/ObservableListener.class \
+usercodedeployment/TruePagingPredicate.class \
+usercodedeployment/TruePartition1PartitionPredicate.class \
+usercodedeployment/TruePredicate.class
 ```

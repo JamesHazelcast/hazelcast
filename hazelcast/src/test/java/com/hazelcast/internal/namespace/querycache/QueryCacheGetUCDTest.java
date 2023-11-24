@@ -27,8 +27,8 @@ public class QueryCacheGetUCDTest extends QueryCacheUCDTest {
     }
 
     @Override
-    protected String[] getUserDefinedClassNames() {
-        return new String[] {"usercodedeployment.TruePredicate"};
+    protected String getUserDefinedClassName() {
+        return "usercodedeployment.TruePredicate";
     }
 
     @Override
@@ -38,7 +38,7 @@ public class QueryCacheGetUCDTest extends QueryCacheUCDTest {
 
     @Override
     protected void addClassNameToConfig() {
-        queryCacheConfig.getPredicateConfig().setClassName(getUserDefinedClassNames()[0]);
+        queryCacheConfig.getPredicateConfig().setClassName(getUserDefinedClassName());
     }
 
     @Override

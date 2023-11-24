@@ -29,7 +29,7 @@ public class IMapMapInterceptorUCDTest extends IMapUCDTest {
     }
 
     @Override
-    protected String[] getUserDefinedClassNames() {
-        return new String[] {"usercodedeployment.IncrementingMapInterceptor"};
+    protected String getUserDefinedClassName() {
+        return "usercodedeployment.IncrementingMapInterceptor";
     }
 }

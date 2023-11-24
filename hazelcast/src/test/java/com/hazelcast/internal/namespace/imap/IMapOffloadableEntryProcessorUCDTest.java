@@ -18,7 +18,7 @@ package com.hazelcast.internal.namespace.imap;
 
 public class IMapOffloadableEntryProcessorUCDTest extends IMapEntryProcessorUCDTest {
     @Override
-    protected String[] getUserDefinedClassNames() {
-        return new String[] {"usercodedeployment.IncrementingOffloadableEntryProcessor"};
+    protected String getUserDefinedClassName() {
+        return "usercodedeployment.IncrementingOffloadableEntryProcessor";
     }
 }
