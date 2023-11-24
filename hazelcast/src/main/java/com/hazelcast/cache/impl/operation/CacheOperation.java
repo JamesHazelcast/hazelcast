@@ -247,8 +247,4 @@ public abstract class CacheOperation extends AbstractNamedOperation
         return getNodeEngine().getTenantControlService()
                               .getTenantControl(ICacheService.SERVICE_NAME, name);
     }
-
-    public String getUcdNamespace() {
-        return ICacheService.getUcdNamespace(name);
-    }
 }

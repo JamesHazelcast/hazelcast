@@ -35,7 +35,6 @@ public abstract class AbstractListMessageTask<T> extends AbstractPartitionMessag
 
     @Override
     protected String getNamespace() {
-        ListService service = getService(ListService.SERVICE_NAME);
-        return service.lookupNamespace(getDistributedObjectName());
+        return ListService.lookupNamespace(nodeEngine, getDistributedObjectName());
     }
 }
