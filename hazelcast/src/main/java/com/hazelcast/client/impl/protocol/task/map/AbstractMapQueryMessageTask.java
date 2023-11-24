@@ -76,7 +76,7 @@ public abstract class AbstractMapQueryMessageTask<P, QueryResult extends Result,
     }
 
     protected String getNamespace() {
-        return MapServiceContext.lookupMapNamespace(nodeEngine, getDistributedObjectName());
+        return MapService.lookupNamespace(nodeEngine, getDistributedObjectName());
     }
 
     protected abstract Predicate getPredicate();

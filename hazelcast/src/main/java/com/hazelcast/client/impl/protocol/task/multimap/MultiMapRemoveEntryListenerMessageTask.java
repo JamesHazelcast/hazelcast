@@ -75,8 +75,7 @@ public class MultiMapRemoveEntryListenerMessageTask
 
     @Override
     public Permission getNamespacePermission() {
-        MultiMapService service = getService(getServiceName());
-        String namespace = service.getNamespace(getDistributedObjectName());
+        String namespace = MultiMapService.lookupNamespace(nodeEngine, getDistributedObjectName());
         return namespace != null ? new NamespacePermission(namespace, ActionConstants.ACTION_USE) : null;
     }
 

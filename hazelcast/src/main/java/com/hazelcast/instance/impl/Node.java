@@ -359,7 +359,6 @@ public class Node {
             });
         } else {
             classLoader = config.getClassLoader();
-            // TODO NS: Fix new UCD not being considered here (can define Resources etc without UCD enabled currently)
             if (classLoader == null) {
                 classLoader = Node.class.getClassLoader();
             }

@@ -130,7 +130,6 @@ public class ListAddListenerMessageTask
 
     @Override
     protected String getNamespace() {
-        ListService service = getService(ListService.SERVICE_NAME);
-        return service.getNamespace(parameters.name);
+        return ListService.lookupNamespace(nodeEngine, parameters.name);
     }
 }

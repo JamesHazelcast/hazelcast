@@ -116,7 +116,6 @@ public class CacheAddPartitionLostListenerMessageTask
 
     @Override
     protected String getNamespace() {
-        final CacheService service = getService(CacheService.SERVICE_NAME);
-        return service.getNamespace(parameters.name);
+        return CacheService.lookupNamespace(nodeEngine, parameters.name);
     }
 }

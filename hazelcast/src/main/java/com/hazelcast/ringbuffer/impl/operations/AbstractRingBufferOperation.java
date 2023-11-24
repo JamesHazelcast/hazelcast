@@ -143,20 +143,7 @@ public abstract class AbstractRingBufferOperation extends Operation implements N
         // Obtain NodeEngine reference and set for use later in operations
         NodeEngine engine = NodeEngineThreadLocalContext.getNamespaceThreadLocalContext();
         setNodeEngine(engine);
-
-        // Check for container linked config first
-        RingbufferService service = engine.getService(SERVICE_NAME);
-        final ObjectNamespace ns = RingbufferService.getRingbufferNamespace(name);
-        final RingbufferContainer container = service.getContainerOrNull(getPartitionId(), ns);
-        if (container != null) {
-            return container.getConfig().getNamespace();
-        }
-        // Manual config lookup fallback
-        RingbufferConfig config = service.getRingbufferConfig(name);
-        if (config != null) {
-            return config.getNamespace();
-        }
-        return null;
+        return RingbufferService.lookupUcdNamespace(engine, name, getPartitionId());
     }
 
     @Override

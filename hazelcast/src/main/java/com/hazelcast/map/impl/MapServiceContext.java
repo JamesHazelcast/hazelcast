@@ -23,7 +23,6 @@ import com.hazelcast.config.MapStoreConfig;
 import com.hazelcast.config.PartitioningAttributeConfig;
 import com.hazelcast.config.PartitioningStrategyConfig;
 import com.hazelcast.internal.eviction.ExpirationManager;
-import com.hazelcast.internal.namespace.impl.NodeEngineThreadLocalContext;
 import com.hazelcast.internal.serialization.Data;
 import com.hazelcast.internal.util.collection.PartitionIdSet;
 import com.hazelcast.internal.util.comparators.ValueComparator;
@@ -47,7 +46,6 @@ import com.hazelcast.spi.impl.NodeEngine;
 import com.hazelcast.spi.impl.eventservice.EventFilter;
 import com.hazelcast.spi.properties.HazelcastProperty;
 
-import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -276,47 +274,5 @@ public interface MapServiceContext extends MapServiceContextInterceptorSupport,
      */
     default boolean shouldEnableMerkleTree(MapConfig mapConfig, boolean log) {
         return false;
-    }
-
-    /**
-     * Attempts to retrieve a {@code ThreadLocal} {@link NodeEngine} implementation
-     * for the current member, and uses it to find a Namespace ID for the provided mapName.
-     * <p>
-     * This method <b>does not</b> check for Namespace enablement, and returns a result
-     * as defined by {@link #lookupMapNamespace(NodeEngine, String)}.
-     *
-     * @param mapName The name of the {@link com.hazelcast.map.IMap} to lookup for
-     * @return the Namespace ID if found, or {@code null} otherwise.
-     */
-    // TODO NS move this somewhere proper?
-    static String getNamespace(@Nonnull String mapName) {
-        // TODO NS: We lookup NodeEngine again later in the NS-awareness stack; can we optimize?
-        NodeEngine engine = NodeEngineThreadLocalContext.getNamespaceThreadLocalContext();
-        // We're skipping enablement checks here as they're handled at NS-awareness start logic
-        return lookupMapNamespace(engine, mapName);
-    }
-
-    /**
-     * Looks up the Namespace ID associated with the specified map name. This starts
-     * by looking for an existing {@link MapContainer} and checking its defined
-     * {@link MapConfig}. If the {@link MapContainer} does not exist (containers are
-     * created lazily), then fallback to checking the Node's config tree directly.
-     *
-     * @param engine  {@link NodeEngine} implementation of this member for service and config lookups
-     * @param mapName The name of the {@link com.hazelcast.map.IMap} to lookup for
-     * @return the Namespace ID if found, or {@code null} otherwise.
-     */
-    static String lookupMapNamespace(@Nonnull NodeEngine engine, @Nonnull String mapName) {
-        MapService mapService = engine.getService(MapService.SERVICE_NAME);
-        MapContainer container = mapService.getMapServiceContext().getExistingMapContainer(mapName);
-        if (container != null) {
-            return container.getMapConfig().getNamespace();
-        }
-        // Fallback to config lookup
-        MapConfig mapConfig = engine.getConfig().getMapConfigOrNull(mapName);
-        if (mapConfig != null) {
-            return mapConfig.getNamespace();
-        }
-        return null;
     }
 }

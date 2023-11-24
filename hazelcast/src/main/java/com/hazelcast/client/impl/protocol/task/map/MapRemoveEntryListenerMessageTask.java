@@ -22,7 +22,6 @@ import com.hazelcast.client.impl.protocol.task.AbstractRemoveListenerMessageTask
 import com.hazelcast.instance.impl.Node;
 import com.hazelcast.internal.nio.Connection;
 import com.hazelcast.map.impl.MapService;
-import com.hazelcast.map.impl.MapServiceContext;
 import com.hazelcast.security.SecurityInterceptorConstants;
 import com.hazelcast.security.permission.ActionConstants;
 import com.hazelcast.security.permission.MapPermission;
@@ -77,7 +76,7 @@ public class MapRemoveEntryListenerMessageTask
 
     @Override
     public Permission getNamespacePermission() {
-        String namespace = MapServiceContext.lookupMapNamespace(nodeEngine, getDistributedObjectName());
+        String namespace = MapService.lookupNamespace(nodeEngine, getDistributedObjectName());
         return namespace != null ? new NamespacePermission(namespace, ActionConstants.ACTION_USE) : null;
     }
 

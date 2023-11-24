@@ -149,7 +149,7 @@ public class TopicService implements ManagedService, RemoteService, EventPublish
                 , nodeEngine.getSerializationService());
         incrementReceivedMessages(topicEvent.name);
         MessageListener messageListener = (MessageListener) listener;
-        NamespaceUtil.runWithNamespace(nodeEngine, getNamespace(nodeEngine, topicEvent.name),
+        NamespaceUtil.runWithNamespace(nodeEngine, lookupNamespace(nodeEngine, topicEvent.name),
                 () -> messageListener.onMessage(message));
     }
 
@@ -232,12 +232,13 @@ public class TopicService implements ManagedService, RemoteService, EventPublish
         provide(descriptor, context, TOPIC_PREFIX, getStats());
     }
 
-    // TODO NS move this somewhere proper?
-    public static String getNamespace(NodeEngine nodeEngine, String topicName) {
-        // No regular containers available, fallback to config
-        TopicConfig topicConfig = nodeEngine.getConfig().findTopicConfig(topicName);
-        if (topicConfig != null) {
-            return topicConfig.getNamespace();
+    public static String lookupNamespace(NodeEngine nodeEngine, String topicName) {
+        if (nodeEngine.getNamespaceService().isEnabled()) {
+            // No regular containers available, fallback to config
+            TopicConfig topicConfig = nodeEngine.getConfig().findTopicConfig(topicName);
+            if (topicConfig != null) {
+                return topicConfig.getNamespace();
+            }
         }
         return null;
     }

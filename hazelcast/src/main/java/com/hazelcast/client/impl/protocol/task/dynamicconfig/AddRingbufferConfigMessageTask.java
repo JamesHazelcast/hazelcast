@@ -59,7 +59,7 @@ public class AddRingbufferConfigMessageTask
         config.setInMemoryFormat(InMemoryFormat.valueOf(parameters.inMemoryFormat));
         config.setTimeToLiveSeconds(parameters.timeToLiveSeconds);
         if (parameters.ringbufferStoreConfig != null) {
-            RingbufferStoreConfig storeConfig = NamespaceUtil.callWithNamespace(parameters.namespace,
+            RingbufferStoreConfig storeConfig = NamespaceUtil.callWithNamespace(nodeEngine, parameters.namespace,
                     () -> parameters.ringbufferStoreConfig.asRingbufferStoreConfig(serializationService));
             config.setRingbufferStoreConfig(storeConfig);
         }

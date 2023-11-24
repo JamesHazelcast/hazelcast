@@ -139,7 +139,7 @@ public class ReplicatedMapEventPublishingService
     }
 
     private void runWithNamespaceAwareness(String mapName, Runnable runnable) {
-        NamespaceUtil.runWithNamespace(nodeEngine, replicatedMapService.getNamespace(mapName), runnable);
+        NamespaceUtil.runWithNamespace(nodeEngine, ReplicatedMapService.lookupNamespace(nodeEngine, mapName), runnable);
     }
 
     public @Nonnull

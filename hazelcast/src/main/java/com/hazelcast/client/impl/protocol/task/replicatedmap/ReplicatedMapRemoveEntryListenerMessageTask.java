@@ -83,8 +83,7 @@ public class ReplicatedMapRemoveEntryListenerMessageTask
 
     @Override
     public Permission getNamespacePermission() {
-        ReplicatedMapService service = getService(getServiceName());
-        String namespace = service.getNamespace(getDistributedObjectName());
+        String namespace = ReplicatedMapService.lookupNamespace(nodeEngine, getDistributedObjectName());
         return namespace != null ? new NamespacePermission(namespace, ActionConstants.ACTION_USE) : null;
     }
 }

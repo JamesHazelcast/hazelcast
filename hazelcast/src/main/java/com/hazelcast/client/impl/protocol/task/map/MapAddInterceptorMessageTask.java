@@ -52,7 +52,7 @@ public class MapAddInterceptorMessageTask
         final MapService mapService = getService(MapService.SERVICE_NAME);
         final MapServiceContext mapServiceContext = mapService.getMapServiceContext();
         final MapInterceptor mapInterceptor =
-                NamespaceUtil.callWithNamespace(nodeEngine, MapServiceContext.lookupMapNamespace(nodeEngine, parameters.name),
+                NamespaceUtil.callWithNamespace(nodeEngine, MapService.lookupNamespace(nodeEngine, parameters.name),
                         () -> serializationService.toObject(parameters.interceptor));
         id = mapServiceContext.generateInterceptorId(parameters.name, mapInterceptor);
         return new AddInterceptorOperationSupplier(parameters.name, id, mapInterceptor);
@@ -96,7 +96,7 @@ public class MapAddInterceptorMessageTask
 
     @Override
     public Permission getNamespacePermission() {
-        String namespace = MapServiceContext.lookupMapNamespace(nodeEngine, getDistributedObjectName());
+        String namespace = MapService.lookupNamespace(nodeEngine, getDistributedObjectName());
         return namespace != null ? new NamespacePermission(namespace, ActionConstants.ACTION_USE) : null;
     }
 

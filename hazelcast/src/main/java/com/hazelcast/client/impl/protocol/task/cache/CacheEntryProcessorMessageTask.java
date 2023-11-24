@@ -50,7 +50,7 @@ public class CacheEntryProcessorMessageTask
     protected Operation prepareOperation() {
         CacheService service = getService(getServiceName());
         CacheOperationProvider operationProvider = getOperationProvider(parameters.name);
-        String namespace = service.getNamespace(parameters.name);
+        String namespace = CacheService.lookupNamespace(nodeEngine, parameters.name);
         EntryProcessor entryProcessor = (EntryProcessor) service.toObject(parameters.entryProcessor, namespace);
         ArrayList argumentsList = new ArrayList(parameters.arguments.size());
         for (Data data : parameters.arguments) {

@@ -83,8 +83,7 @@ public abstract class AbstractReplicatedMapAddEntryListenerMessageTask<Parameter
 
     @Override
     public Permission getNamespacePermission() {
-        ReplicatedMapService service = getService(getServiceName());
-        String namespace = service.getNamespace(getDistributedObjectName());
+        String namespace = ReplicatedMapService.lookupNamespace(nodeEngine, getDistributedObjectName());
         return namespace != null ? new NamespacePermission(namespace, ActionConstants.ACTION_USE) : null;
     }
 
@@ -178,7 +177,6 @@ public abstract class AbstractReplicatedMapAddEntryListenerMessageTask<Parameter
 
     @Override
     protected String getNamespace() {
-        ReplicatedMapService service = getService(ReplicatedMapService.SERVICE_NAME);
-        return service.getNamespace(getDistributedObjectName());
+        return ReplicatedMapService.lookupNamespace(nodeEngine, getDistributedObjectName());
     }
 }

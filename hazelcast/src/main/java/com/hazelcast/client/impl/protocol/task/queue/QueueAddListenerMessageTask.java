@@ -123,7 +123,6 @@ public class QueueAddListenerMessageTask
 
     @Override
     protected String getNamespace() {
-        QueueService service = nodeEngine.getService(QueueService.SERVICE_NAME);
-        return service.getNamespace(getDistributedObjectName());
+        return QueueService.lookupNamespace(nodeEngine, getDistributedObjectName());
     }
 }

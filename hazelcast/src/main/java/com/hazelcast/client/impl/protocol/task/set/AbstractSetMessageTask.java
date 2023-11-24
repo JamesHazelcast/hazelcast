@@ -35,7 +35,6 @@ public abstract class AbstractSetMessageTask<T> extends AbstractPartitionMessage
 
     @Override
     protected String getNamespace() {
-        SetService service = getService(SetService.SERVICE_NAME);
-        return service.getNamespace(getDistributedObjectName());
+        return SetService.lookupNamespace(nodeEngine, getDistributedObjectName());
     }
 }

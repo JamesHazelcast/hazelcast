@@ -18,10 +18,12 @@ package com.hazelcast.scheduledexecutor.impl;
 
 import com.hazelcast.internal.cluster.Versions;
 import com.hazelcast.internal.namespace.NamespaceUtil;
+import com.hazelcast.internal.namespace.impl.NodeEngineThreadLocalContext;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
 import com.hazelcast.nio.serialization.impl.Versioned;
+import com.hazelcast.spi.impl.NodeEngine;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -144,7 +146,9 @@ public class TaskDefinition<V>
             throws IOException {
         type = Type.valueOf(in.readString());
         name = in.readString();
-        command = NamespaceUtil.callWithNamespace(DistributedScheduledExecutorService.getNamespace(name), in::readObject);
+        NodeEngine engine = NodeEngineThreadLocalContext.getNamespaceThreadLocalContext();
+        String namespace = DistributedScheduledExecutorService.lookupNamespace(engine, name);
+        command = NamespaceUtil.callWithNamespace(engine, namespace, in::readObject);
         initialDelay = in.readLong();
         period = in.readLong();
         unit = TimeUnit.valueOf(in.readString());

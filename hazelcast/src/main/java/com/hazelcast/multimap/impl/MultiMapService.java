@@ -561,11 +561,21 @@ public class MultiMapService implements ManagedService, RemoteService, ChunkedMi
         provide(descriptor, context, MULTIMAP_PREFIX, getStats());
     }
 
-    public String getNamespace(String mapName) {
-        // No regular containers available, fallback to config
-        MultiMapConfig config = nodeEngine.getConfig().getMultiMapConfig(mapName);
-        if (config != null) {
-            return config.getNamespace();
+    /**
+     * Looks up the UCD Namespace ID associated with the specified multimap name. This is done
+     * by checking the Node's config tree directly.
+     *
+     * @param engine  {@link NodeEngine} implementation of this member for service and config lookups
+     * @param mapName The name of the {@link com.hazelcast.multimap.MultiMap} to lookup for
+     * @return the Namespace ID if found, or {@code null} otherwise.
+     */
+    public static String lookupNamespace(NodeEngine engine, String mapName) {
+        if (engine.getNamespaceService().isEnabled()) {
+            // No regular containers available, fallback to config
+            MultiMapConfig config = engine.getConfig().getMultiMapConfig(mapName);
+            if (config != null) {
+                return config.getNamespace();
+            }
         }
         return null;
     }

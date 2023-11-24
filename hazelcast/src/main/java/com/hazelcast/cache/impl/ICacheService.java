@@ -23,7 +23,6 @@ import com.hazelcast.config.InMemoryFormat;
 import com.hazelcast.internal.eviction.ExpirationManager;
 import com.hazelcast.internal.metrics.DynamicMetricsProvider;
 import com.hazelcast.internal.monitor.LocalCacheStats;
-import com.hazelcast.internal.namespace.impl.NodeEngineThreadLocalContext;
 import com.hazelcast.internal.partition.ChunkedMigrationAwareService;
 import com.hazelcast.internal.serialization.Data;
 import com.hazelcast.internal.services.ManagedService;
@@ -171,11 +170,4 @@ public interface ICacheService
      * @since 3.10
      */
     <K, V> void createCacheConfigOnAllMembers(PreJoinCacheConfig<K, V> cacheConfig);
-
-    static String getUcdNamespace(String prefixedCacheName) {
-        NodeEngine engine = NodeEngineThreadLocalContext.getNamespaceThreadLocalContext();
-        CacheService service = engine.getService(CacheService.SERVICE_NAME);
-        CacheConfig config = service.getCacheConfig(prefixedCacheName);
-        return config == null ? null : config.getNamespace();
-    }
 }

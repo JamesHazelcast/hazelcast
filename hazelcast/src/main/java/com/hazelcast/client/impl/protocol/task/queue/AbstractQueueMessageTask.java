@@ -35,7 +35,6 @@ public abstract class AbstractQueueMessageTask<T> extends AbstractPartitionMessa
 
     @Override
     protected String getNamespace() {
-        QueueService service = nodeEngine.getService(QueueService.SERVICE_NAME);
-        return service.getNamespace(getDistributedObjectName());
+        return QueueService.lookupNamespace(nodeEngine, getDistributedObjectName());
     }
 }

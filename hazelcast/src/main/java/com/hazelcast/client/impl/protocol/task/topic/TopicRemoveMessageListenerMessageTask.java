@@ -72,7 +72,7 @@ public class TopicRemoveMessageListenerMessageTask
 
     @Override
     public Permission getNamespacePermission() {
-        String namespace = TopicService.getNamespace(nodeEngine, getDistributedObjectName());
+        String namespace = TopicService.lookupNamespace(nodeEngine, getDistributedObjectName());
         return namespace != null ? new NamespacePermission(namespace, ActionConstants.ACTION_USE) : null;
     }
 

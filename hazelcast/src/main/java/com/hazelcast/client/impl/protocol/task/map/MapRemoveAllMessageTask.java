@@ -21,7 +21,7 @@ import com.hazelcast.client.impl.protocol.codec.MapRemoveAllCodec;
 import com.hazelcast.instance.impl.Node;
 import com.hazelcast.internal.namespace.NamespaceUtil;
 import com.hazelcast.internal.nio.Connection;
-import com.hazelcast.map.impl.MapServiceContext;
+import com.hazelcast.map.impl.MapService;
 import com.hazelcast.map.impl.operation.MapOperationProvider;
 import com.hazelcast.query.PartitionPredicate;
 import com.hazelcast.query.Predicate;
@@ -50,7 +50,7 @@ public class MapRemoveAllMessageTask extends AbstractMapAllPartitionsMessageTask
 
     @Override
     protected void processMessage() {
-        predicate = NamespaceUtil.callWithNamespace(nodeEngine, MapServiceContext.lookupMapNamespace(nodeEngine, parameters.name),
+        predicate = NamespaceUtil.callWithNamespace(nodeEngine, MapService.lookupNamespace(nodeEngine, parameters.name),
                 () -> serializationService.toObject(parameters.predicate));
         if (!(predicate instanceof PartitionPredicate)) {
             super.processMessage();

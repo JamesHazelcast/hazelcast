@@ -24,7 +24,6 @@ import com.hazelcast.internal.metrics.DynamicMetricsProvider;
 import com.hazelcast.internal.metrics.MetricDescriptor;
 import com.hazelcast.internal.metrics.MetricsCollectionContext;
 import com.hazelcast.internal.monitor.impl.LocalExecutorStatsImpl;
-import com.hazelcast.internal.namespace.impl.NodeEngineThreadLocalContext;
 import com.hazelcast.internal.partition.MigrationAwareService;
 import com.hazelcast.internal.partition.MigrationEndpoint;
 import com.hazelcast.internal.partition.PartitionMigrationEvent;
@@ -402,9 +401,21 @@ public class DistributedScheduledExecutorService
         }
     }
 
-    public static String getNamespace(String executorName) {
-        NodeEngine engine = NodeEngineThreadLocalContext.getNamespaceThreadLocalContext();
-        ScheduledExecutorConfig config = engine.getConfig().findScheduledExecutorConfig(executorName);
-        return config != null ? config.getNamespace() : null;
+    /**
+     * Looks up the UCD Namespace ID associated with the specified executor name. This is done
+     * by checking the Node's config tree directly.
+     *
+     * @param engine       {@link NodeEngine} implementation of this member for service and config lookups
+     * @param executorName The name of the {@link com.hazelcast.core.IExecutorService} to lookup for
+     * @return the Namespace ID if found, or {@code null} otherwise.
+     */
+    public static String lookupNamespace(NodeEngine engine, String executorName) {
+        if (engine.getNamespaceService().isEnabled()) {
+            ScheduledExecutorConfig config = engine.getConfig().findScheduledExecutorConfig(executorName);
+            if (config != null) {
+                return config.getNamespace();
+            }
+        }
+        return null;
     }
 }

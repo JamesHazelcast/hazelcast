@@ -48,7 +48,7 @@ public class ScheduledExecutorSubmitToTargetMessageTask
     @Override
     protected Operation prepareOperation() {
         Callable callable = NamespaceUtil.callWithNamespace(nodeEngine,
-                DistributedScheduledExecutorService.getNamespace(parameters.schedulerName),
+                DistributedScheduledExecutorService.lookupNamespace(nodeEngine, parameters.schedulerName),
                 () -> serializationService.toObject(parameters.task));
         SecurityContext securityContext = clientEngine.getSecurityContext();
         if (securityContext != null) {

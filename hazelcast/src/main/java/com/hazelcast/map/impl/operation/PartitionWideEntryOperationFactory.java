@@ -16,7 +16,6 @@
 
 package com.hazelcast.map.impl.operation;
 
-import com.hazelcast.internal.namespace.NamespaceUtil;
 import com.hazelcast.map.EntryProcessor;
 import com.hazelcast.map.impl.MapDataSerializerHook;
 import com.hazelcast.nio.ObjectDataInput;
@@ -51,7 +50,7 @@ public class PartitionWideEntryOperationFactory extends AbstractMapOperationFact
     @Override
     public void readData(ObjectDataInput in) throws IOException {
         name = in.readString();
-        entryProcessor = NamespaceUtil.callWithNamespace(getNamespace(), in::readObject);
+        entryProcessor = callWithNamespaceAwareness(in::readObject);
     }
 
     @Override

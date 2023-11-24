@@ -42,6 +42,6 @@ abstract class AbstractMapPartitionMessageTask<P> extends AbstractPartitionMessa
 
     @Override
     protected final String getNamespace() {
-        return MapServiceContext.lookupMapNamespace(nodeEngine, getDistributedObjectName());
+        return MapService.lookupNamespace(nodeEngine, getDistributedObjectName());
     }
 }
