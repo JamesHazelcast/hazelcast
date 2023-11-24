@@ -472,13 +472,15 @@ public abstract class UCDTest extends HazelcastTestSupport {
      * @param key the name of the method in the listener that should've fired
      */
     protected void assertListenerFired(String key) throws ReflectiveOperationException {
-        Collection<String> map = instance.getSet(getClassObject().getSimpleName());
+        Collection<String> result = instance.getSet(getClassObject().getSimpleName());
+        
+        // TODO NS replace polling with entrylistener, to catch as values are added
         assertTrueEventually(() -> {
             if (LOGGER.isFinestEnabled()) {
-                LOGGER.finest("Checking map for values, currently contains %s", map);
+                LOGGER.finest("Checking map for values, currently contains %s", result);
             }
 
-            assertTrue(map.contains(key));
+            assertTrue(result.contains(key));
         });
     }
 }
