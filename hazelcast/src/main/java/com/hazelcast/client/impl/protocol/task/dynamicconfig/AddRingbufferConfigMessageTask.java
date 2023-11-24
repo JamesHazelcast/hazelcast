@@ -24,6 +24,7 @@ import com.hazelcast.config.RingbufferConfig;
 import com.hazelcast.config.RingbufferStoreConfig;
 import com.hazelcast.instance.impl.Node;
 import com.hazelcast.internal.dynamicconfig.DynamicConfigurationAwareConfig;
+import com.hazelcast.internal.namespace.NamespaceUtil;
 import com.hazelcast.internal.nio.Connection;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
 import com.hazelcast.security.SecurityInterceptorConstants;
@@ -58,7 +59,8 @@ public class AddRingbufferConfigMessageTask
         config.setInMemoryFormat(InMemoryFormat.valueOf(parameters.inMemoryFormat));
         config.setTimeToLiveSeconds(parameters.timeToLiveSeconds);
         if (parameters.ringbufferStoreConfig != null) {
-            RingbufferStoreConfig storeConfig = parameters.ringbufferStoreConfig.asRingbufferStoreConfig(serializationService);
+            RingbufferStoreConfig storeConfig = NamespaceUtil.callWithNamespace(parameters.namespace,
+                    () -> parameters.ringbufferStoreConfig.asRingbufferStoreConfig(serializationService));
             config.setRingbufferStoreConfig(storeConfig);
         }
         MergePolicyConfig mergePolicyConfig = mergePolicyConfig(parameters.mergePolicy, parameters.mergeBatchSize);
