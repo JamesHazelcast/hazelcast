@@ -22,6 +22,7 @@ import com.hazelcast.config.ReliableTopicConfig;
 import com.hazelcast.core.HazelcastException;
 import com.hazelcast.core.HazelcastInstanceAware;
 import com.hazelcast.internal.monitor.impl.LocalTopicStatsImpl;
+import com.hazelcast.internal.namespace.NamespaceUtil;
 import com.hazelcast.internal.nio.ClassLoaderUtil;
 import com.hazelcast.internal.serialization.Data;
 import com.hazelcast.internal.util.ExceptionUtil;
@@ -140,7 +141,7 @@ public class ReliableTopicProxy<E> extends AbstractDistributedObject<ReliableTop
 
             if (listenerConfig.getClassName() != null) {
                 String namespace = ReliableTopicService.lookupNamespace(nodeEngine, name);
-                ClassLoader loader = nodeEngine.getNamespaceService().getClassLoaderForNamespace(namespace);
+                ClassLoader loader = NamespaceUtil.getClassLoaderForNamespace(nodeEngine, namespace);
                 Object object = ClassLoaderUtil.newInstance(loader, listenerConfig.getClassName());
 
                 if (!(object instanceof MessageListener)) {

@@ -20,6 +20,11 @@ import com.hazelcast.config.Config;
 import com.hazelcast.config.ReplicatedMapConfig;
 import com.hazelcast.internal.namespace.UCDTest;
 import com.hazelcast.replicatedmap.ReplicatedMap;
+import org.apache.commons.lang3.stream.Streams;
+import org.junit.runners.Parameterized;
+
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 public abstract class ReplicatedMapUCDTest extends UCDTest {
     protected ReplicatedMapConfig replicatedMapConfig;
@@ -33,7 +38,7 @@ public abstract class ReplicatedMapUCDTest extends UCDTest {
 
     @Override
     protected void initialiseDataStructure() {
-        map = member.getReplicatedMap(objectName);
+        map = instance.getReplicatedMap(objectName);
     }
 
     protected void populate() {
@@ -43,5 +48,13 @@ public abstract class ReplicatedMapUCDTest extends UCDTest {
     @Override
     protected void registerConfig(Config config) {
         config.addReplicatedMapConfig(replicatedMapConfig);
+    }
+
+    @Parameterized.Parameters(name = "Connection: {0}, Config: {1}, Class Registration: {2}, Assertion: {3}")
+    public static Iterable<Object[]> parameters() {
+        // Skip MEMBER_TO_MEMBER ConnectionTypes because ReplicatedMaps cannot be created on Lite members
+        return Streams.of(UCDTest.parameters())
+                .filter(obj -> obj[0] != ConnectionStyle.MEMBER_TO_MEMBER)
+                .collect(Collectors.toList());
     }
 }

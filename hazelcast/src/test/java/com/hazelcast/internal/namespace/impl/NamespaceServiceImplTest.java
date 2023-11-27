@@ -49,6 +49,7 @@ import java.util.stream.Stream;
 
 import static com.hazelcast.test.Accessors.getNodeEngineImpl;
 import static com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig;
+import static com.hazelcast.test.HazelcastTestSupport.smallInstanceConfigWithoutJetAndMetrics;
 import static com.hazelcast.test.UserCodeUtil.fileRelativeToBinariesFolder;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -264,7 +265,7 @@ public class NamespaceServiceImplTest {
     @Test
     void testNoOpImplementation() {
         // Do not enable Namespaces in any form, results in No-Op implementation being used
-        HazelcastInstance instance = Hazelcast.newHazelcastInstance(smallInstanceConfig());
+        HazelcastInstance instance = Hazelcast.newHazelcastInstance(smallInstanceConfigWithoutJetAndMetrics());
         try {
             NodeEngineImpl nodeEngine = getNodeEngineImpl(instance);
             NamespaceService service = nodeEngine.getNamespaceService();

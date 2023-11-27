@@ -25,46 +25,34 @@ import com.hazelcast.config.ListenerConfig;
 import com.hazelcast.config.MapConfig;
 import com.hazelcast.config.NamespaceConfig;
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.internal.nio.ClassLoaderUtil;
-import com.hazelcast.internal.nio.IOUtil;
 import com.hazelcast.internal.util.ExceptionUtil;
-import com.hazelcast.jet.impl.JobRepository;
-import com.hazelcast.jet.impl.deployment.MapResourceClassLoader;
 import com.hazelcast.logging.ILogger;
 import com.hazelcast.logging.Logger;
 import com.hazelcast.map.IMap;
 import com.hazelcast.map.listener.MapListener;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
+import com.hazelcast.spi.impl.NodeEngine;
 import com.hazelcast.test.AssertTask;
 import com.hazelcast.test.HazelcastParametrizedRunner;
 import com.hazelcast.test.HazelcastTestSupport;
 import com.hazelcast.test.annotation.NamespaceTest;
 import com.hazelcast.test.annotation.SlowTest;
-import io.netty.util.internal.StringUtil;
-import org.apache.commons.text.WordUtils;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
-import java.util.jar.JarEntry;
-import java.util.jar.JarInputStream;
 import java.util.stream.Collectors;
 
 import static com.hazelcast.internal.namespace.UCDTest.AssertionStyle.NEGATIVE;
@@ -79,7 +67,7 @@ import static com.hazelcast.internal.namespace.UCDTest.ConfigStyle.STATIC_YAML;
 import static com.hazelcast.internal.namespace.UCDTest.ConnectionStyle.CLIENT_TO_MEMBER;
 import static com.hazelcast.internal.namespace.UCDTest.ConnectionStyle.EMBEDDED;
 import static com.hazelcast.internal.namespace.UCDTest.ConnectionStyle.MEMBER_TO_MEMBER;
-import static com.hazelcast.jet.impl.util.ReflectionUtils.toClassResourceId;
+import static com.hazelcast.test.Accessors.getNodeEngineImpl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -93,7 +81,7 @@ import static org.junit.Assert.assertTrue;
 public abstract class UCDTest extends HazelcastTestSupport {
     private static final ILogger LOGGER = Logger.getLogger(UCDTest.class);
     private static final Path sourceJar = Paths.get("src/test/class", "usercodedeployment", "UCDTest.jar");
-    private static MapResourceClassLoader resourceClassLoader;
+    private ClassLoader resourceClassLoader;
 
     @Parameter(0)
     public ConnectionStyle connectionStyle;
@@ -112,32 +100,6 @@ public abstract class UCDTest extends HazelcastTestSupport {
     private NamespaceConfig namespaceConfig;
 
     protected String objectName = randomName();
-
-    @BeforeClass
-    public static void setUpClass() {
-        // Load our jar into an external resource class loader
-        Map<String, byte[]> resourceMap = new ConcurrentHashMap<>();
-        try {
-            InputStream inputStream = new FileInputStream(sourceJar.toFile());
-            JarInputStream jarInputStream = new JarInputStream(inputStream);
-            JarEntry entry;
-            do {
-                entry = jarInputStream.getNextJarEntry();
-                if (entry == null) {
-                    break;
-                }
-                String className = ClassLoaderUtil.extractClassName(entry.getName());
-                byte[] payload = IOUtil.compress(jarInputStream.readAllBytes());
-                jarInputStream.closeEntry();
-                resourceMap.put(className == null ? JobRepository.fileKeyName(entry.getName())
-                        : JobRepository.classKeyName(toClassResourceId(className)), payload);
-            } while (true);
-        } catch (IOException e) {
-            throw new IllegalArgumentException("Failed to load testing JAR resources", e);
-        }
-        resourceClassLoader = new MapResourceClassLoader("external",
-                null, () -> resourceMap, true);
-    }
 
     @Before
     public void setUp() {
@@ -257,7 +219,8 @@ public abstract class UCDTest extends HazelcastTestSupport {
         } catch (Throwable t) {
             switch (assertionStyle) {
                 case NEGATIVE:
-                    // Do nothing - this is ok
+                    // Print the exception for tracing (useful to have), but it's expected, so return
+                    t.printStackTrace();
                     return;
                 case POSITIVE:
                     throw t;
@@ -339,8 +302,32 @@ public abstract class UCDTest extends HazelcastTestSupport {
         return (T) getClassObject().getDeclaredConstructor().newInstance();
     }
 
+    private void initResourceClassLoader() {
+        if (resourceClassLoader != null) {
+            return;
+        }
+        // We want to use a MapResourceClassLoader that's relevant for the cluster, as using an
+        //  externally created instance from our test JAR can result in our `instance` using that
+        //  externally loaded resource and passing all NEGATIVE assertions because the instance
+        //  never actually goes through serde (client listeners, for example)
+        NodeEngine engine;
+        switch (connectionStyle) {
+            case CLIENT_TO_MEMBER:
+                engine = getNodeEngineImpl(member);
+                break;
+            case MEMBER_TO_MEMBER:
+            case EMBEDDED:
+                engine = getNodeEngineImpl(instance);
+                break;
+            default: throw new IllegalArgumentException();
+        }
+        resourceClassLoader = NamespaceUtil.getClassLoaderForNamespace(engine, getNamespaceName());
+    }
+
     /** @return the {@link Class} object generated from {@link #getUserDefinedClassName()} */
     private Class<?> getClassObject() throws ReflectiveOperationException {
+        // Init our ClassLoader at call time to ensure our backing instance is ready
+        initResourceClassLoader();
         Class<?> clazz = resourceClassLoader.loadClass(getUserDefinedClassName());
         Class<?> unwanted = IdentifiedDataSerializable.class;
         assertFalse(String.format(

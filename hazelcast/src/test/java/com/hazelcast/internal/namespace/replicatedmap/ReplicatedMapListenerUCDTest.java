@@ -19,6 +19,8 @@ package com.hazelcast.internal.namespace.replicatedmap;
 import com.hazelcast.config.EntryListenerConfig;
 import org.junit.runners.Parameterized;
 
+import java.util.stream.Collectors;
+
 public abstract class ReplicatedMapListenerUCDTest extends ReplicatedMapUCDTest {
     @Override
     protected void addClassInstanceToConfig() throws ReflectiveOperationException {
@@ -41,7 +43,11 @@ public abstract class ReplicatedMapListenerUCDTest extends ReplicatedMapUCDTest 
 
     @Parameterized.Parameters(name = "Connection: {0}, Config: {1}, Class Registration: {2}, Assertion: {3}")
     public static Iterable<Object[]> parameters() {
-        return listenerParameters();
+        // Skip MEMBER_TO_MEMBER ConnectionTypes because ReplicatedMaps cannot be created on Lite members
+        return listenerParameters()
+                .stream()
+                .filter(obj -> obj[0] != ConnectionStyle.MEMBER_TO_MEMBER)
+                .collect(Collectors.toList());
     }
 
     @Override
