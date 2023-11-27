@@ -17,6 +17,7 @@
 package com.hazelcast.internal.namespace.ringbuffer;
 
 import com.hazelcast.config.RingbufferStoreConfig;
+import org.junit.runners.Parameterized;
 
 import static org.junit.Assert.assertEquals;
 
@@ -41,8 +42,8 @@ public class RingbufferRingbufferStoreUCDTest extends RingbufferUCDTest {
         ringBufferConfig.setRingbufferStoreConfig(new RingbufferStoreConfig().setClassName(getUserDefinedClassName()));
     }
 
-    @Override
-    protected boolean isNoClassRegistrationAllowed() {
-        return false;
+    @Parameterized.Parameters(name = "Connection: {0}, Config: {1}, Class Registration: {2}, Assertion: {3}")
+    public static Iterable<Object[]> parameters() {
+        return listenerParameters();
     }
 }

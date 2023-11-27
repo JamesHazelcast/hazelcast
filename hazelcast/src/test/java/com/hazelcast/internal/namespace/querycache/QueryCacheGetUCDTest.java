@@ -16,6 +16,10 @@
 
 package com.hazelcast.internal.namespace.querycache;
 
+import org.junit.runners.Parameterized;
+
+import java.util.stream.Collectors;
+
 import static org.junit.Assert.assertNotNull;
 
 public class QueryCacheGetUCDTest extends QueryCacheUCDTest {
@@ -41,8 +45,11 @@ public class QueryCacheGetUCDTest extends QueryCacheUCDTest {
         queryCacheConfig.getPredicateConfig().setClassName(getUserDefinedClassName());
     }
 
-    @Override
-    protected boolean isNoClassRegistrationAllowed() {
-        return false;
+    @Parameterized.Parameters(name = "Connection: {0}, Config: {1}, Class Registration: {2}, Assertion: {3}")
+    public static Iterable<Object[]> parameters() {
+        // This test does not support INSTANCE_IN_DATA_STRUCTURE
+        return listenerParameters().stream()
+                .filter(obj -> obj[2] != ClassRegistrationStyle.INSTANCE_IN_DATA_STRUCTURE)
+                .collect(Collectors.toList());
     }
 }

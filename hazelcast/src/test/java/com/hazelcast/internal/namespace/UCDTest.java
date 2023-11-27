@@ -16,7 +16,6 @@
 
 package com.hazelcast.internal.namespace;
 
-import com.google.common.collect.Lists;
 import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.client.test.TestHazelcastFactory;
 import com.hazelcast.config.Config;
@@ -26,8 +25,11 @@ import com.hazelcast.config.ListenerConfig;
 import com.hazelcast.config.MapConfig;
 import com.hazelcast.config.NamespaceConfig;
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.instance.impl.NamespaceAwareClassLoaderIntegrationTest;
+import com.hazelcast.internal.nio.ClassLoaderUtil;
+import com.hazelcast.internal.nio.IOUtil;
 import com.hazelcast.internal.util.ExceptionUtil;
+import com.hazelcast.jet.impl.JobRepository;
+import com.hazelcast.jet.impl.deployment.MapResourceClassLoader;
 import com.hazelcast.logging.ILogger;
 import com.hazelcast.logging.Logger;
 import com.hazelcast.map.IMap;
@@ -36,6 +38,7 @@ import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
 import com.hazelcast.test.AssertTask;
 import com.hazelcast.test.HazelcastParametrizedRunner;
 import com.hazelcast.test.HazelcastTestSupport;
+import com.hazelcast.test.annotation.NamespaceTest;
 import com.hazelcast.test.annotation.SlowTest;
 import io.netty.util.internal.StringUtil;
 import org.apache.commons.text.WordUtils;
@@ -48,30 +51,48 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
+import java.util.jar.JarEntry;
+import java.util.jar.JarInputStream;
 
-import static org.hamcrest.CoreMatchers.is;
+import static com.hazelcast.internal.namespace.UCDTest.AssertionStyle.NEGATIVE;
+import static com.hazelcast.internal.namespace.UCDTest.AssertionStyle.POSITIVE;
+import static com.hazelcast.internal.namespace.UCDTest.ClassRegistrationStyle.INSTANCE_IN_CONFIG;
+import static com.hazelcast.internal.namespace.UCDTest.ClassRegistrationStyle.INSTANCE_IN_DATA_STRUCTURE;
+import static com.hazelcast.internal.namespace.UCDTest.ClassRegistrationStyle.NONE;
+import static com.hazelcast.internal.namespace.UCDTest.ConfigStyle.DYNAMIC;
+import static com.hazelcast.internal.namespace.UCDTest.ConfigStyle.STATIC_PROGRAMMATIC;
+import static com.hazelcast.internal.namespace.UCDTest.ConfigStyle.STATIC_XML;
+import static com.hazelcast.internal.namespace.UCDTest.ConfigStyle.STATIC_YAML;
+import static com.hazelcast.internal.namespace.UCDTest.ConnectionStyle.CLIENT_TO_MEMBER;
+import static com.hazelcast.internal.namespace.UCDTest.ConnectionStyle.EMBEDDED;
+import static com.hazelcast.internal.namespace.UCDTest.ConnectionStyle.MEMBER_TO_MEMBER;
+import static com.hazelcast.jet.impl.util.ReflectionUtils.toClassResourceId;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assume.assumeNoException;
-import static org.junit.Assume.assumeThat;
-import static org.junit.Assume.assumeTrue;
 
 /**
  * @see <a href="https://hazelcast.atlassian.net/browse/HZ-3597">HZ-3597 - Add unit tests for all @NamespacesSupported UDF
  *      interfaces, across all supported data structures</a>
  */
 @RunWith(HazelcastParametrizedRunner.class)
-@Category(SlowTest.class)
+@Category({SlowTest.class, NamespaceTest.class})
 public abstract class UCDTest extends HazelcastTestSupport {
     private static final ILogger LOGGER = Logger.getLogger(UCDTest.class);
-    private static Path sourceJar;
+    private static final Path sourceJar = Paths.get("src/test/class", "usercodedeployment", "UCDTest.jar");
+    private static MapResourceClassLoader resourceClassLoader;
 
     @Parameter(0)
     public ConnectionStyle connectionStyle;
@@ -107,7 +128,7 @@ public abstract class UCDTest extends HazelcastTestSupport {
     }
 
     // TODO NS Should these be moved into their own classes?
-    private enum ConfigStyle {
+    protected enum ConfigStyle {
         /** All configuration is set programmatically <strong>before</strong> the instance is started */
         STATIC_PROGRAMMATIC,
         /** Where possible, configuration is changed <strong>after</strong> the instance has started */
@@ -130,27 +151,23 @@ public abstract class UCDTest extends HazelcastTestSupport {
      * <p>
      * called methods are expected to be inherited and extended so must call a method in the enclosing class.
      */
-    private enum ClassRegistrationStyle {
+    protected enum ClassRegistrationStyle {
         INSTANCE_IN_CONFIG(instance -> {
-            assumeThat("Can only create instances with a dynamic configuration, i.e. where the cluster is already up & running",
-                    instance.configStyle, is(ConfigStyle.DYNAMIC));
-
             try {
                 instance.addClassInstanceToConfig();
             } catch (ReflectiveOperationException e) {
                 throw ExceptionUtil.sneakyThrow(e);
             }
-        }), NAME_IN_CONFIG(UCDTest::addClassNameToConfig), INSTANCE_IN_DATA_STRUCTURE(instance -> {
-            // TODO NS if time, we should try to fix this bug to get more test coverage
-            throw new UnsupportedOperationException(
-                    "Typically used for listener registration, but due to a bug this doesn't work - https://github.com/hazelcast/hazelcast/issues/26062");
-
-            // try {
-            // instance.addClassInstanceToDataStructure();
-            // } catch (ReflectiveOperationException e) {
-            // throw ExceptionUtil.sneakyThrow(e);
-            // }
-        }), NONE(instance -> assumeTrue("Skipping as configuration not supported", instance.isNoClassRegistrationAllowed()));
+        }),
+        NAME_IN_CONFIG(UCDTest::addClassNameToConfig),
+        INSTANCE_IN_DATA_STRUCTURE(instance -> {
+             try {
+                 instance.addClassInstanceToDataStructure();
+             } catch (ReflectiveOperationException e) {
+                 throw ExceptionUtil.sneakyThrow(e);
+             }
+        }),
+        NONE(instance -> {});
 
         private final Consumer<UCDTest> action;
 
@@ -182,20 +199,94 @@ public abstract class UCDTest extends HazelcastTestSupport {
 
     @Parameters(name = "Connection: {0}, Config: {1}, Class Registration: {2}, Assertion: {3}")
     public static Iterable<Object[]> parameters() {
-        // TODO NS We likely don't need this much overlap - we should manually define test parameters if possible
-        return Lists
-                .cartesianProduct(List.of(ConnectionStyle.values()), List.of(ConfigStyle.values()),
-                        List.of(ClassRegistrationStyle.values()), List.of(AssertionStyle.values()))
-                .stream().map(Collection::toArray)::iterator;
+        // We don't need a `NEGATIVE` assertion for all tests; we can validate this by handling
+        //   `NEGATIVE` assertions for a handful of tests
+        // We don't need all ClassRegistrationStyle values, most tests will use `NONE` and those
+        //   that use the other values can override parameters to provide all but `NONE`
+        // We *probably* don't need all config styles for all 3 connection styles, but to avoid
+        //   accidentally missing use cases, they will be kept
+        return Arrays.asList(
+                // Client to member
+                new Object[]{CLIENT_TO_MEMBER, STATIC_PROGRAMMATIC, NONE, POSITIVE},
+                new Object[]{CLIENT_TO_MEMBER, STATIC_XML, NONE, POSITIVE},
+                new Object[]{CLIENT_TO_MEMBER, STATIC_YAML, NONE, POSITIVE},
+                new Object[]{CLIENT_TO_MEMBER, DYNAMIC, NONE, POSITIVE},
+                new Object[]{CLIENT_TO_MEMBER, STATIC_PROGRAMMATIC, NONE, NEGATIVE},
+                new Object[]{CLIENT_TO_MEMBER, DYNAMIC, NONE, NEGATIVE},
 
-        // Hardcode paramaters for debugging purposes
-        // return List.<Object[]>of(new Object[] {ConnectionStyle.EMBEDDED, ConfigStyle.DYNAMIC,
-        // ClassRegistrationStyle.NAME_IN_CONFIG, AssertionStyle.POSITIVE});
+                // Member to member
+                new Object[]{MEMBER_TO_MEMBER, STATIC_PROGRAMMATIC, NONE, POSITIVE},
+                new Object[]{MEMBER_TO_MEMBER, STATIC_XML, NONE, POSITIVE},
+                new Object[]{MEMBER_TO_MEMBER, STATIC_YAML, NONE, POSITIVE},
+                new Object[]{MEMBER_TO_MEMBER, DYNAMIC, NONE, POSITIVE},
+                new Object[]{MEMBER_TO_MEMBER, STATIC_PROGRAMMATIC, NONE, NEGATIVE},
+                new Object[]{MEMBER_TO_MEMBER, DYNAMIC, NONE, NEGATIVE},
+
+                // Embedded
+                new Object[]{EMBEDDED, STATIC_PROGRAMMATIC, NONE, POSITIVE},
+                new Object[]{EMBEDDED, STATIC_XML, NONE, POSITIVE},
+                new Object[]{EMBEDDED, STATIC_YAML, NONE, POSITIVE},
+                new Object[]{EMBEDDED, DYNAMIC, NONE, POSITIVE},
+                new Object[]{EMBEDDED, STATIC_XML, NONE, NEGATIVE},
+                new Object[]{EMBEDDED, DYNAMIC, NONE, NEGATIVE}
+        );
+    }
+
+    // Used for tests where we need different ClassRegistrationStyle approaches (and not used in
+    //   all other tests to reduce complexity of parameterized testing)
+    protected static List<Object[]> listenerParameters() {
+        List<Object[]> newParams = new ArrayList<>(45);
+        for (Object[] parameter : parameters()) {
+            // Create variants for all "not NONE" ClassRegistrationStyles
+            for (ClassRegistrationStyle style : ClassRegistrationStyle.values()) {
+                if (style != NONE) {
+                    // Only run INSTANCE_IN_DATA_STRUCTURE tests on embedded/member-to-member (clients invoke
+                    //  listeners locally), and avoid negative assertions due to classpath implications
+                    if (style == INSTANCE_IN_DATA_STRUCTURE &&
+                            (parameter[0] == CLIENT_TO_MEMBER || parameter[1] != DYNAMIC || parameter[3] == NEGATIVE)) {
+                        continue;
+                    }
+                    // Do not include NEGATIVE assertions for INSTANCE_IN_CONFIG tests on embedded/member-to-member
+                    //  since there is nothing to validate due to classpath implications
+                    if (style == INSTANCE_IN_CONFIG
+                            && (parameter[1] != DYNAMIC || (parameter[0] != CLIENT_TO_MEMBER && parameter[3] == NEGATIVE))) {
+                        // Only applicable to DYNAMIC ConfigStyles on CLIENT_TO_MEMBER ConnectionStyles because
+                        //   when running member to member or embedded, we need the class to be loaded for us
+                        //   to obtain an instance to actually add anyway - so there's nothing to validate
+                        continue;
+                    }
+                    newParams.add(new Object[]{parameter[0], parameter[1], style, parameter[3]});
+                }
+            }
+            // We don't want `NONE` variants as tests using these parameters require class registration
+        }
+        return newParams;
     }
 
     @BeforeClass
     public static void setUpClass() {
-        sourceJar = Paths.get("src/test/class", "usercodedeployment", "UCDTest.jar");
+        // Load our jar into an external resource class loader
+        Map<String, byte[]> resourceMap = new ConcurrentHashMap<>();
+        try {
+            InputStream inputStream = new FileInputStream(sourceJar.toFile());
+            JarInputStream jarInputStream = new JarInputStream(inputStream);
+            JarEntry entry;
+            do {
+                entry = jarInputStream.getNextJarEntry();
+                if (entry == null) {
+                    break;
+                }
+                String className = ClassLoaderUtil.extractClassName(entry.getName());
+                byte[] payload = IOUtil.compress(jarInputStream.readAllBytes());
+                jarInputStream.closeEntry();
+                resourceMap.put(className == null ? JobRepository.fileKeyName(entry.getName())
+                        : JobRepository.classKeyName(toClassResourceId(className)), payload);
+            } while (true);
+        } catch (IOException e) {
+            throw new IllegalArgumentException("Failed to load testing JAR resources", e);
+        }
+        resourceClassLoader = new MapResourceClassLoader("external",
+                null, () -> resourceMap, true);
     }
 
     @Before
@@ -215,8 +306,9 @@ public abstract class UCDTest extends HazelcastTestSupport {
         Config config = smallInstanceConfigWithoutJetAndMetrics();
 
         namespaceConfig = new NamespaceConfig(getNamespaceName());
+        namespaceConfig.addJar(sourceJar.toUri().toURL(), "ucd_test_jar");
 
-        config.getNamespacesConfig().setEnabled(assertionStyle == AssertionStyle.POSITIVE);
+        config.getNamespacesConfig().setEnabled(assertionStyle == POSITIVE);
 
         if (configStyle != ConfigStyle.DYNAMIC) {
             setupConfigs(config);
@@ -255,14 +347,8 @@ public abstract class UCDTest extends HazelcastTestSupport {
     }
 
     private void setupConfigs(Config config) throws IOException {
-        registerClass(config);
-
-        try {
-            classRegistrationStyle.action.accept(this);
-        } catch (UnsupportedOperationException e) {
-            assumeNoException("Skipping as configuration not supported", e);
-        }
-
+        registerNamespacesConfig(config);
+        classRegistrationStyle.action.accept(this);
         registerConfig(config);
     }
 
@@ -331,7 +417,7 @@ public abstract class UCDTest extends HazelcastTestSupport {
         }
 
         assertEquals("Test passed even though namespace was not configured, suggests scope of test is incorrect",
-                AssertionStyle.POSITIVE, assertionStyle);
+                POSITIVE, assertionStyle);
     }
 
     /** Don't annotate children with {@code @Test}, framework controls test execution */
@@ -352,8 +438,6 @@ public abstract class UCDTest extends HazelcastTestSupport {
      * <p>
      * E.G. {@link EntryListenerConfig#setImplementation(MapListener)}
      * <p>
-     * It's likely this behavior is mutually exclusive with {@link #isNoClassRegistrationAllowed()}
-     * <p>
      * Implementers should *consider* overriding this behavior.
      *
      * @throws ReflectiveOperationException because implementers will be constructing a class, likely using reflection
@@ -370,8 +454,6 @@ public abstract class UCDTest extends HazelcastTestSupport {
      * <p>
      * E.G. {@link ListenerConfig#setClassName(String)}
      * <p>
-     * It's likely this behavior is mutually exclusive with {@link #isNoClassRegistrationAllowed()}
-     * <p>
      * Implementers should *consider* overriding this behavior.
      *
      * @throws UnsupportedOperationException if the test does not support this kind of configuration
@@ -387,8 +469,6 @@ public abstract class UCDTest extends HazelcastTestSupport {
      * <p>
      * E.G. {@link IMap#addEntryListener(MapListener, boolean)}
      * <p>
-     * It's likely this behavior is mutually exclusive with {@link #isNoClassRegistrationAllowed()}
-     * <p>
      * Implementers should *consider* overriding this behavior.
      *
      * @throws ReflectiveOperationException because implementers will be constructing a class, likely using reflection
@@ -400,23 +480,7 @@ public abstract class UCDTest extends HazelcastTestSupport {
         throw new UnsupportedOperationException();
     }
 
-    /**
-     * Describes whether the test can be run without a class being registered with anything else - e.g.
-     * {@link IExecutorService#submitToMember(Callable<T>, Member)}
-     * <p>
-     * It's likely this behavior is mutually exclusive with other {@link ClassRegistrationStyle}s
-     * <p>
-     * Implementers should *consider* overriding this behavior.
-     *
-     * @see ClassRegistrationStyle#NONE
-     */
-    protected boolean isNoClassRegistrationAllowed() {
-        return true;
-    }
-
-    private void registerClass(Config config) throws IOException {
-        namespaceConfig.addJar(sourceJar.toUri().toURL(), null);
-
+    private void registerNamespacesConfig(Config config) throws IOException {
         config.getNamespacesConfig().addNamespaceConfig(namespaceConfig);
     }
 
@@ -425,16 +489,13 @@ public abstract class UCDTest extends HazelcastTestSupport {
         return (T) getClassObject().getDeclaredConstructor().newInstance();
     }
 
-    /** @return the {@link Class} object generated from the first element of {@link #getUserDefinedClassNames()} */
+    /** @return the {@link Class} object generated from {@link #getUserDefinedClassName()} */
     private Class<?> getClassObject() throws ReflectiveOperationException {
-        Class<?> clazz =
-                NamespaceAwareClassLoaderIntegrationTest.tryLoadClass(member, getNamespaceName(), getUserDefinedClassName());
-
+        Class<?> clazz = resourceClassLoader.loadClass(getUserDefinedClassName());
         Class<?> unwanted = IdentifiedDataSerializable.class;
         assertFalse(String.format(
                 "%s should not implement %s, as unless done with care, when deserialized the parent might be deserialized instead",
                 getUserDefinedClassName(), unwanted.getSimpleName()), unwanted.isAssignableFrom(clazz));
-
         return clazz;
     }
 
@@ -478,6 +539,6 @@ public abstract class UCDTest extends HazelcastTestSupport {
             }
 
             assertTrue(result.contains(key));
-        });
+        }, 5);
     }
 }

@@ -17,6 +17,7 @@
 package com.hazelcast.internal.namespace.imap;
 
 import com.hazelcast.config.EntryListenerConfig;
+import org.junit.runners.Parameterized;
 
 public abstract class IMapEntryListenerUCDTest extends IMapUCDTest {
     @Override
@@ -38,9 +39,9 @@ public abstract class IMapEntryListenerUCDTest extends IMapUCDTest {
         map.addEntryListener(getClassInstance(), false);
     }
 
-    @Override
-    protected boolean isNoClassRegistrationAllowed() {
-        return false;
+    @Parameterized.Parameters(name = "Connection: {0}, Config: {1}, Class Registration: {2}, Assertion: {3}")
+    public static Iterable<Object[]> parameters() {
+        return listenerParameters();
     }
 
     @Override

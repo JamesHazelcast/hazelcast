@@ -17,6 +17,7 @@
 package com.hazelcast.internal.namespace.topic;
 
 import com.hazelcast.config.ListenerConfig;
+import org.junit.runners.Parameterized;
 
 public class TopicMessageListenerUCDTest extends TopicUCDTest {
     @Override
@@ -47,9 +48,9 @@ public class TopicMessageListenerUCDTest extends TopicUCDTest {
         topic.addMessageListener(getClassInstance());
     }
 
-    @Override
-    protected boolean isNoClassRegistrationAllowed() {
-        return false;
+    @Parameterized.Parameters(name = "Connection: {0}, Config: {1}, Class Registration: {2}, Assertion: {3}")
+    public static Iterable<Object[]> parameters() {
+        return listenerParameters();
     }
 
     @Override

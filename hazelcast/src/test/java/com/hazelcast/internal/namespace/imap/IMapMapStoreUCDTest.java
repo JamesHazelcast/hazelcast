@@ -17,6 +17,7 @@
 package com.hazelcast.internal.namespace.imap;
 
 import com.hazelcast.config.MapStoreConfig;
+import org.junit.runners.Parameterized;
 
 import static org.junit.Assert.assertNotNull;
 
@@ -36,9 +37,9 @@ public class IMapMapStoreUCDTest extends IMapUCDTest {
         mapConfig.setMapStoreConfig(new MapStoreConfig().setClassName(getUserDefinedClassName()));
     }
 
-    @Override
-    protected boolean isNoClassRegistrationAllowed() {
-        return false;
+    @Parameterized.Parameters(name = "Connection: {0}, Config: {1}, Class Registration: {2}, Assertion: {3}")
+    public static Iterable<Object[]> parameters() {
+        return listenerParameters();
     }
 
     @Override

@@ -17,6 +17,7 @@
 package com.hazelcast.internal.namespace.iqueue;
 
 import com.hazelcast.config.QueueStoreConfig;
+import org.junit.runners.Parameterized;
 
 import static org.junit.Assert.assertFalse;
 
@@ -41,8 +42,8 @@ public class IQueueQueueStoreUCDTest extends IQueueUCDTest {
         queueConfig.setQueueStoreConfig(new QueueStoreConfig().setEnabled(true).setClassName(getUserDefinedClassName()));
     }
 
-    @Override
-    protected boolean isNoClassRegistrationAllowed() {
-        return false;
+    @Parameterized.Parameters(name = "Connection: {0}, Config: {1}, Class Registration: {2}, Assertion: {3}")
+    public static Iterable<Object[]> parameters() {
+        return listenerParameters();
     }
 }
