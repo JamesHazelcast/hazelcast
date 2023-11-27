@@ -343,14 +343,11 @@ public class JobRepository {
         }
     }
 
-    private void readStreamAndPutCompressedToMap(
+    private static void readStreamAndPutCompressedToMap(
             String resourceName, Map<String, byte[]> map, InputStream in
     ) throws IOException {
         // ignore duplicates: the first resource in first jar takes precedence
-        if (map.containsKey(resourceName)) {
-            return;
-        }
-        map.put(classKeyName(resourceName), IOUtil.compress(in.readAllBytes()));
+        map.putIfAbsent(classKeyName(resourceName), IOUtil.compress(in.readAllBytes()));
     }
 
     /**
