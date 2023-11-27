@@ -419,7 +419,7 @@ public abstract class UCDTest extends HazelcastTestSupport {
                  throw ExceptionUtil.sneakyThrow(e);
              }
         }),
-        NONE(instance -> {});
+        NONE(instance -> { });
 
         private final Consumer<UCDTest> action;
 
@@ -484,8 +484,8 @@ public abstract class UCDTest extends HazelcastTestSupport {
                 if (style != NONE) {
                     // Only run INSTANCE_IN_DATA_STRUCTURE tests on embedded/member-to-member (clients invoke
                     //  listeners locally), and avoid negative assertions due to classpath implications
-                    if (style == INSTANCE_IN_DATA_STRUCTURE &&
-                            (parameter[0] == CLIENT_TO_MEMBER || parameter[1] != DYNAMIC || parameter[3] == NEGATIVE)) {
+                    if (style == INSTANCE_IN_DATA_STRUCTURE
+                            && (parameter[0] == CLIENT_TO_MEMBER || parameter[1] != DYNAMIC || parameter[3] == NEGATIVE)) {
                         continue;
                     }
                     // Do not include NEGATIVE assertions for INSTANCE_IN_CONFIG tests on embedded/member-to-member

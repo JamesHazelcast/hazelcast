@@ -18,7 +18,6 @@ package com.hazelcast.internal.namespace.reliabletopic;
 
 import com.hazelcast.config.Config;
 import com.hazelcast.config.ReliableTopicConfig;
-import com.hazelcast.config.TopicConfig;
 import com.hazelcast.internal.namespace.UCDTest;
 import com.hazelcast.topic.ITopic;
 

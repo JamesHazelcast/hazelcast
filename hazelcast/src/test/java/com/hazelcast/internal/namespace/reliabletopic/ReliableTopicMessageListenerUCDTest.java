@@ -17,7 +17,6 @@
 package com.hazelcast.internal.namespace.reliabletopic;
 
 import com.hazelcast.config.ListenerConfig;
-import com.hazelcast.internal.namespace.topic.TopicUCDTest;
 import org.junit.runners.Parameterized;
 
 public class ReliableTopicMessageListenerUCDTest extends ReliableTopicUCDTest {

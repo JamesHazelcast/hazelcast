@@ -16,7 +16,6 @@
 
 package com.hazelcast.topic.impl;
 
-import com.hazelcast.core.HazelcastInstanceAware;
 import com.hazelcast.internal.serialization.Data;
 import com.hazelcast.spi.impl.InternalCompletableFuture;
 import com.hazelcast.spi.impl.NodeEngine;

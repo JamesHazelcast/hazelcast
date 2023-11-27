@@ -48,7 +48,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.hazelcast.test.Accessors.getNodeEngineImpl;
-import static com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig;
 import static com.hazelcast.test.HazelcastTestSupport.smallInstanceConfigWithoutJetAndMetrics;
 import static com.hazelcast.test.UserCodeUtil.fileRelativeToBinariesFolder;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;

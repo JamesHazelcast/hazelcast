@@ -23,7 +23,6 @@ import com.hazelcast.replicatedmap.ReplicatedMap;
 import org.apache.commons.lang3.stream.Streams;
 import org.junit.runners.Parameterized;
 
-import java.util.Arrays;
 import java.util.stream.Collectors;
 
 public abstract class ReplicatedMapUCDTest extends UCDTest {
