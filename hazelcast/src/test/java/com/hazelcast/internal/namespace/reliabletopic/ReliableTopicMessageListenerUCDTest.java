@@ -14,36 +14,48 @@
  * limitations under the License.
  */
 
-package com.hazelcast.internal.namespace.iqueue;
+package com.hazelcast.internal.namespace.reliabletopic;
 
-import com.hazelcast.config.QueueStoreConfig;
+import com.hazelcast.config.ListenerConfig;
+import com.hazelcast.internal.namespace.topic.TopicUCDTest;
 import org.junit.runners.Parameterized;
 
-import static org.junit.Assert.assertFalse;
-
-public class IQueueQueueStoreUCDTest extends IQueueUCDTest {
+public class ReliableTopicMessageListenerUCDTest extends ReliableTopicUCDTest {
     @Override
     public void test() throws Exception {
-        assertFalse(queue.isEmpty());
-    }
+        topic.publish(Byte.MIN_VALUE);
 
-    @Override
-    protected String getUserDefinedClassName() {
-        return "usercodedeployment.KeyBecomesValueQueueStore";
+        assertListenerFired("onMessage");
     }
 
     @Override
     protected void addClassInstanceToConfig() throws ReflectiveOperationException {
-        queueConfig.setQueueStoreConfig(new QueueStoreConfig().setEnabled(true).setStoreImplementation(getClassInstance()));
+        ListenerConfig listenerConfig = new ListenerConfig();
+        listenerConfig.setImplementation(getClassInstance());
+
+        reliableTopicConfig.addMessageListenerConfig(listenerConfig);
     }
 
     @Override
     protected void addClassNameToConfig() {
-        queueConfig.setQueueStoreConfig(new QueueStoreConfig().setEnabled(true).setClassName(getUserDefinedClassName()));
+        ListenerConfig listenerConfig = new ListenerConfig();
+        listenerConfig.setClassName(getUserDefinedClassName());
+
+        reliableTopicConfig.addMessageListenerConfig(listenerConfig);
+    }
+
+    @Override
+    protected void addClassInstanceToDataStructure() throws ReflectiveOperationException {
+        topic.addMessageListener(getClassInstance());
     }
 
     @Parameterized.Parameters(name = "Connection: {0}, Config: {1}, Class Registration: {2}, Assertion: {3}")
     public static Iterable<Object[]> parameters() {
-        return listenerParametersWithoutInstanceInDataStructure();
+        return listenerParameters();
+    }
+
+    @Override
+    protected String getUserDefinedClassName() {
+        return "usercodedeployment.MyMessageListener";
     }
 }

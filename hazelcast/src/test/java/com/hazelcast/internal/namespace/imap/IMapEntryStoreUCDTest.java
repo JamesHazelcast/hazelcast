@@ -16,9 +16,16 @@
 
 package com.hazelcast.internal.namespace.imap;
 
+import org.junit.runners.Parameterized;
+
 public class IMapEntryStoreUCDTest extends IMapMapLoaderUCDTest {
     @Override
     protected String getUserDefinedClassName() {
         return "usercodedeployment.KeyBecomesValueEntryStore";
+    }
+
+    @Parameterized.Parameters(name = "Connection: {0}, Config: {1}, Class Registration: {2}, Assertion: {3}")
+    public static Iterable<Object[]> parameters() {
+        return listenerParametersWithoutInstanceInDataStructure();
     }
 }

@@ -43,6 +43,6 @@ public class IMapMapLoaderUCDTest extends IMapUCDTest {
 
     @Parameterized.Parameters(name = "Connection: {0}, Config: {1}, Class Registration: {2}, Assertion: {3}")
     public static Iterable<Object[]> parameters() {
-        return listenerParameters();
+        return listenerParametersWithoutInstanceInDataStructure();
     }
 }

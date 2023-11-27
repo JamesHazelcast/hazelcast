@@ -18,6 +18,7 @@ package com.hazelcast.internal.dynamicconfig;
 
 import com.hazelcast.internal.cluster.ClusterService;
 import com.hazelcast.internal.cluster.impl.ClusterTopologyChangedException;
+import com.hazelcast.internal.namespace.NamespaceUtil;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
@@ -67,9 +68,10 @@ public abstract class UpdateDynamicConfigOperation extends AbstractDynamicConfig
 
     @Override
     protected void readInternal(ObjectDataInput in) throws IOException {
+        // TODO NS: Validate backwards compatibility, since we're reading `namespace` first now
         // We need namespace first for config deser
         namespace = in.readString();
-        config = in.readObject();
+        config = NamespaceUtil.callWithNamespace(namespace, in::readObject);
         memberListVersion = in.readInt();
     }
 

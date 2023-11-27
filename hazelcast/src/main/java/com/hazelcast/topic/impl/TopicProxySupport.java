@@ -64,18 +64,11 @@ public abstract class TopicProxySupport extends AbstractDistributedObject<TopicS
     }
 
     private void initialize(ListenerConfig listenerConfig) {
-        NodeEngine nodeEngine = getNodeEngine();
-
         MessageListener listener = loadListener(listenerConfig);
-
         if (listener == null) {
             return;
         }
 
-        if (listener instanceof HazelcastInstanceAware) {
-            HazelcastInstanceAware hazelcastInstanceAware = (HazelcastInstanceAware) listener;
-            hazelcastInstanceAware.setHazelcastInstance(nodeEngine.getHazelcastInstance());
-        }
         addMessageListenerInternal(listener);
     }
 
@@ -108,6 +101,9 @@ public abstract class TopicProxySupport extends AbstractDistributedObject<TopicS
 
     public @Nonnull
     UUID addMessageListenerInternal(@Nonnull MessageListener listener) {
+        if (listener instanceof HazelcastInstanceAware) {
+            ((HazelcastInstanceAware) listener).setHazelcastInstance(getNodeEngine().getHazelcastInstance());
+        }
         return topicService.addMessageListener(name, listener);
     }
 

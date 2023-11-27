@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.hazelcast.internal.namespace.topic;
+package com.hazelcast.internal.namespace.reliabletopic;
 
 import com.hazelcast.config.Config;
 import com.hazelcast.config.ReliableTopicConfig;
@@ -22,23 +22,23 @@ import com.hazelcast.config.TopicConfig;
 import com.hazelcast.internal.namespace.UCDTest;
 import com.hazelcast.topic.ITopic;
 
-public abstract class TopicUCDTest extends UCDTest {
-    protected TopicConfig topicConfig;
+public abstract class ReliableTopicUCDTest extends UCDTest {
+    protected ReliableTopicConfig reliableTopicConfig;
     protected ITopic<Object> topic;
 
     @Override
     protected void initialiseConfig() {
-        topicConfig = new TopicConfig(objectName);
-        topicConfig.setNamespace(getNamespaceName());
+        reliableTopicConfig = new ReliableTopicConfig(objectName);
+        reliableTopicConfig.setNamespace(getNamespaceName());
     }
 
     @Override
     protected void initialiseDataStructure() {
-        topic = instance.getTopic(objectName);
+        topic = instance.getReliableTopic(objectName);
     }
 
     @Override
     protected void registerConfig(Config config) {
-        config.addTopicConfig(topicConfig);
+        config.addReliableTopicConfig(reliableTopicConfig);
     }
 }

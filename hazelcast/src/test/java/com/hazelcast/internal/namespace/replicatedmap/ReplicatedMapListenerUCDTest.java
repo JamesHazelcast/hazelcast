@@ -36,7 +36,7 @@ public abstract class ReplicatedMapListenerUCDTest extends ReplicatedMapUCDTest 
 
     @Override
     protected void addClassInstanceToDataStructure() throws ReflectiveOperationException {
-        map.addEntryListener(getClassInstance(), false);
+        map.addEntryListener(getClassInstance());
     }
 
     @Parameterized.Parameters(name = "Connection: {0}, Config: {1}, Class Registration: {2}, Assertion: {3}")

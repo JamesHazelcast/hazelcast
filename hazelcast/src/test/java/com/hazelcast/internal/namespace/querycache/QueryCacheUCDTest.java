@@ -35,6 +35,7 @@ public abstract class QueryCacheUCDTest extends IMapUCDTest {
     @Override
     protected void initialiseDataStructure() {
         super.initialiseDataStructure();
+        // TODO NS: Should this be `instance` instead of `member`?
         cache = member.getMap(objectName).getQueryCache(queryCacheConfig.getName());
     }
 

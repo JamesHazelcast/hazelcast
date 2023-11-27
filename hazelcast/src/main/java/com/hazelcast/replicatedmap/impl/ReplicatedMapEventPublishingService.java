@@ -23,6 +23,7 @@ import com.hazelcast.config.ReplicatedMapConfig;
 import com.hazelcast.core.EntryEvent;
 import com.hazelcast.core.EntryEventType;
 import com.hazelcast.core.EntryListener;
+import com.hazelcast.core.HazelcastInstanceAware;
 import com.hazelcast.internal.namespace.NamespaceUtil;
 import com.hazelcast.internal.serialization.InternalSerializationService;
 import com.hazelcast.map.MapEvent;
@@ -146,6 +147,9 @@ public class ReplicatedMapEventPublishingService
     UUID addLocalEventListener(EventListener entryListener, EventFilter eventFilter, String mapName) {
         if (nodeEngine.getLocalMember().isLiteMember()) {
             throw new ReplicatedMapCantBeCreatedOnLiteMemberException(nodeEngine.getThisAddress());
+        }
+        if (entryListener instanceof HazelcastInstanceAware) {
+            ((HazelcastInstanceAware) entryListener).setHazelcastInstance(nodeEngine.getHazelcastInstance());
         }
         EventRegistration registration = eventService.registerLocalListener(SERVICE_NAME, mapName, eventFilter,
                 entryListener);

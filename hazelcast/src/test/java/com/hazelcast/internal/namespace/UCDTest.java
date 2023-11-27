@@ -65,6 +65,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
+import java.util.stream.Collectors;
 
 import static com.hazelcast.internal.namespace.UCDTest.AssertionStyle.NEGATIVE;
 import static com.hazelcast.internal.namespace.UCDTest.AssertionStyle.POSITIVE;
@@ -111,157 +112,6 @@ public abstract class UCDTest extends HazelcastTestSupport {
     private NamespaceConfig namespaceConfig;
 
     protected String objectName = randomName();
-
-    // TODO NS Should these be moved into their own classes?
-    protected enum ConnectionStyle {
-        /** Work directly with the underlying {@link HazelcastInstance} */
-        EMBEDDED,
-        /** Test communication between {@link HazelcastClient} & member */
-        CLIENT_TO_MEMBER,
-        /** Test communication between members - using a lite member as the entry point */
-        MEMBER_TO_MEMBER;
-
-        @Override
-        public String toString() {
-            return prettyPrintEnumName(name());
-        }
-    }
-
-    // TODO NS Should these be moved into their own classes?
-    protected enum ConfigStyle {
-        /** All configuration is set programmatically <strong>before</strong> the instance is started */
-        STATIC_PROGRAMMATIC,
-        /** Where possible, configuration is changed <strong>after</strong> the instance has started */
-        DYNAMIC,
-        /** All configuration is defined by a YAML configuration, derived from our programmatic config */
-        STATIC_YAML,
-        /** All configuration is defined by an XML configuration, derived from our programmatic config */
-        STATIC_XML;
-
-        @Override
-        public String toString() {
-            return prettyPrintEnumName(name());
-        }
-    }
-
-    // TODO NS Should these be moved into their own classes?
-    /**
-     * Classes can be registered in multiple ways, parameterized to allow tests to define what they support and then each to be
-     * tested the same way
-     * <p>
-     * called methods are expected to be inherited and extended so must call a method in the enclosing class.
-     */
-    protected enum ClassRegistrationStyle {
-        INSTANCE_IN_CONFIG(instance -> {
-            try {
-                instance.addClassInstanceToConfig();
-            } catch (ReflectiveOperationException e) {
-                throw ExceptionUtil.sneakyThrow(e);
-            }
-        }),
-        NAME_IN_CONFIG(UCDTest::addClassNameToConfig),
-        INSTANCE_IN_DATA_STRUCTURE(instance -> {
-             try {
-                 instance.addClassInstanceToDataStructure();
-             } catch (ReflectiveOperationException e) {
-                 throw ExceptionUtil.sneakyThrow(e);
-             }
-        }),
-        NONE(instance -> {});
-
-        private final Consumer<UCDTest> action;
-
-        ClassRegistrationStyle(Consumer<UCDTest> action) {
-            this.action = action;
-        }
-
-        @Override
-        public String toString() {
-            return prettyPrintEnumName(name());
-        }
-    }
-
-    // TODO NS Should these be moved into their own classes?
-    public enum AssertionStyle {
-        /** Happy path - assert the functionality works when configured correctly */
-        POSITIVE,
-        /**
-         * Negative path - assert that the functionality doesn't work normally when namespace not configured to ensure scope of
-         * test is correct
-         */
-        NEGATIVE;
-
-        @Override
-        public String toString() {
-            return prettyPrintEnumName(name());
-        }
-    }
-
-    @Parameters(name = "Connection: {0}, Config: {1}, Class Registration: {2}, Assertion: {3}")
-    public static Iterable<Object[]> parameters() {
-        // We don't need a `NEGATIVE` assertion for all tests; we can validate this by handling
-        //   `NEGATIVE` assertions for a handful of tests
-        // We don't need all ClassRegistrationStyle values, most tests will use `NONE` and those
-        //   that use the other values can override parameters to provide all but `NONE`
-        // We *probably* don't need all config styles for all 3 connection styles, but to avoid
-        //   accidentally missing use cases, they will be kept
-        return Arrays.asList(
-                // Client to member
-                new Object[]{CLIENT_TO_MEMBER, STATIC_PROGRAMMATIC, NONE, POSITIVE},
-                new Object[]{CLIENT_TO_MEMBER, STATIC_XML, NONE, POSITIVE},
-                new Object[]{CLIENT_TO_MEMBER, STATIC_YAML, NONE, POSITIVE},
-                new Object[]{CLIENT_TO_MEMBER, DYNAMIC, NONE, POSITIVE},
-                new Object[]{CLIENT_TO_MEMBER, STATIC_PROGRAMMATIC, NONE, NEGATIVE},
-                new Object[]{CLIENT_TO_MEMBER, DYNAMIC, NONE, NEGATIVE},
-
-                // Member to member
-                new Object[]{MEMBER_TO_MEMBER, STATIC_PROGRAMMATIC, NONE, POSITIVE},
-                new Object[]{MEMBER_TO_MEMBER, STATIC_XML, NONE, POSITIVE},
-                new Object[]{MEMBER_TO_MEMBER, STATIC_YAML, NONE, POSITIVE},
-                new Object[]{MEMBER_TO_MEMBER, DYNAMIC, NONE, POSITIVE},
-                new Object[]{MEMBER_TO_MEMBER, STATIC_PROGRAMMATIC, NONE, NEGATIVE},
-                new Object[]{MEMBER_TO_MEMBER, DYNAMIC, NONE, NEGATIVE},
-
-                // Embedded
-                new Object[]{EMBEDDED, STATIC_PROGRAMMATIC, NONE, POSITIVE},
-                new Object[]{EMBEDDED, STATIC_XML, NONE, POSITIVE},
-                new Object[]{EMBEDDED, STATIC_YAML, NONE, POSITIVE},
-                new Object[]{EMBEDDED, DYNAMIC, NONE, POSITIVE},
-                new Object[]{EMBEDDED, STATIC_XML, NONE, NEGATIVE},
-                new Object[]{EMBEDDED, DYNAMIC, NONE, NEGATIVE}
-        );
-    }
-
-    // Used for tests where we need different ClassRegistrationStyle approaches (and not used in
-    //   all other tests to reduce complexity of parameterized testing)
-    protected static List<Object[]> listenerParameters() {
-        List<Object[]> newParams = new ArrayList<>(45);
-        for (Object[] parameter : parameters()) {
-            // Create variants for all "not NONE" ClassRegistrationStyles
-            for (ClassRegistrationStyle style : ClassRegistrationStyle.values()) {
-                if (style != NONE) {
-                    // Only run INSTANCE_IN_DATA_STRUCTURE tests on embedded/member-to-member (clients invoke
-                    //  listeners locally), and avoid negative assertions due to classpath implications
-                    if (style == INSTANCE_IN_DATA_STRUCTURE &&
-                            (parameter[0] == CLIENT_TO_MEMBER || parameter[1] != DYNAMIC || parameter[3] == NEGATIVE)) {
-                        continue;
-                    }
-                    // Do not include NEGATIVE assertions for INSTANCE_IN_CONFIG tests on embedded/member-to-member
-                    //  since there is nothing to validate due to classpath implications
-                    if (style == INSTANCE_IN_CONFIG
-                            && (parameter[1] != DYNAMIC || (parameter[0] != CLIENT_TO_MEMBER && parameter[3] == NEGATIVE))) {
-                        // Only applicable to DYNAMIC ConfigStyles on CLIENT_TO_MEMBER ConnectionStyles because
-                        //   when running member to member or embedded, we need the class to be loaded for us
-                        //   to obtain an instance to actually add anyway - so there's nothing to validate
-                        continue;
-                    }
-                    newParams.add(new Object[]{parameter[0], parameter[1], style, parameter[3]});
-                }
-            }
-            // We don't want `NONE` variants as tests using these parameters require class registration
-        }
-        return newParams;
-    }
 
     @BeforeClass
     public static void setUpClass() {
@@ -503,11 +353,6 @@ public abstract class UCDTest extends HazelcastTestSupport {
         return "ns1";
     }
 
-    // TODO NS Should this be moved into some test-scoped "EnumUtils" class?
-    private static String prettyPrintEnumName(String name) {
-        return WordUtils.capitalizeFully(name.replace('_', StringUtil.SPACE));
-    }
-
     /**
      * We expect that listeners implement {@code usercodedeployment.ObservableListener}
      * <p>
@@ -540,5 +385,143 @@ public abstract class UCDTest extends HazelcastTestSupport {
 
             assertTrue(result.contains(key));
         }, 5);
+    }
+
+    // TODO NS Should these be moved into their own classes?
+    protected enum ConnectionStyle {
+        /** Work directly with the underlying {@link HazelcastInstance} */
+        EMBEDDED,
+        /** Test communication between {@link HazelcastClient} & member */
+        CLIENT_TO_MEMBER,
+        /** Test communication between members - using a lite member as the entry point */
+        MEMBER_TO_MEMBER;
+    }
+
+    // TODO NS Should these be moved into their own classes?
+    protected enum ConfigStyle {
+        /** All configuration is set programmatically <strong>before</strong> the instance is started */
+        STATIC_PROGRAMMATIC,
+        /** Where possible, configuration is changed <strong>after</strong> the instance has started */
+        DYNAMIC,
+        /** All configuration is defined by a YAML configuration, derived from our programmatic config */
+        STATIC_YAML,
+        /** All configuration is defined by an XML configuration, derived from our programmatic config */
+        STATIC_XML;
+    }
+
+    // TODO NS Should these be moved into their own classes?
+    /**
+     * Classes can be registered in multiple ways, parameterized to allow tests to define what they support and then each to be
+     * tested the same way
+     * <p>
+     * called methods are expected to be inherited and extended so must call a method in the enclosing class.
+     */
+    protected enum ClassRegistrationStyle {
+        INSTANCE_IN_CONFIG(instance -> {
+            try {
+                instance.addClassInstanceToConfig();
+            } catch (ReflectiveOperationException e) {
+                throw ExceptionUtil.sneakyThrow(e);
+            }
+        }),
+        NAME_IN_CONFIG(UCDTest::addClassNameToConfig),
+        INSTANCE_IN_DATA_STRUCTURE(instance -> {
+             try {
+                 instance.addClassInstanceToDataStructure();
+             } catch (ReflectiveOperationException e) {
+                 throw ExceptionUtil.sneakyThrow(e);
+             }
+        }),
+        NONE(instance -> {});
+
+        private final Consumer<UCDTest> action;
+
+        ClassRegistrationStyle(Consumer<UCDTest> action) {
+            this.action = action;
+        }
+    }
+
+    // TODO NS Should these be moved into their own classes?
+    public enum AssertionStyle {
+        /** Happy path - assert the functionality works when configured correctly */
+        POSITIVE,
+        /**
+         * Negative path - assert that the functionality doesn't work normally when namespace not configured to ensure scope of
+         * test is correct
+         */
+        NEGATIVE;
+    }
+
+    @Parameters(name = "Connection: {0}, Config: {1}, Class Registration: {2}, Assertion: {3}")
+    public static Iterable<Object[]> parameters() {
+        // We don't need a `NEGATIVE` assertion for all tests; we can validate this by handling
+        //   `NEGATIVE` assertions for a handful of tests
+        // We don't need all ClassRegistrationStyle values, most tests will use `NONE` and those
+        //   that use the other values can override parameters to provide all but `NONE`
+        // We *probably* don't need all config styles for all 3 connection styles, but to avoid
+        //   accidentally missing use cases, they will be kept
+        return Arrays.asList(
+                // Client to member
+                new Object[]{CLIENT_TO_MEMBER, STATIC_PROGRAMMATIC, NONE, POSITIVE},
+                new Object[]{CLIENT_TO_MEMBER, STATIC_XML, NONE, POSITIVE},
+                new Object[]{CLIENT_TO_MEMBER, STATIC_YAML, NONE, POSITIVE},
+                new Object[]{CLIENT_TO_MEMBER, DYNAMIC, NONE, POSITIVE},
+                new Object[]{CLIENT_TO_MEMBER, STATIC_PROGRAMMATIC, NONE, NEGATIVE},
+                new Object[]{CLIENT_TO_MEMBER, DYNAMIC, NONE, NEGATIVE},
+
+                // Member to member
+                new Object[]{MEMBER_TO_MEMBER, STATIC_PROGRAMMATIC, NONE, POSITIVE},
+                new Object[]{MEMBER_TO_MEMBER, STATIC_XML, NONE, POSITIVE},
+                new Object[]{MEMBER_TO_MEMBER, STATIC_YAML, NONE, POSITIVE},
+                new Object[]{MEMBER_TO_MEMBER, DYNAMIC, NONE, POSITIVE},
+                new Object[]{MEMBER_TO_MEMBER, STATIC_PROGRAMMATIC, NONE, NEGATIVE},
+                new Object[]{MEMBER_TO_MEMBER, DYNAMIC, NONE, NEGATIVE},
+
+                // Embedded
+                new Object[]{EMBEDDED, STATIC_PROGRAMMATIC, NONE, POSITIVE},
+                new Object[]{EMBEDDED, STATIC_XML, NONE, POSITIVE},
+                new Object[]{EMBEDDED, STATIC_YAML, NONE, POSITIVE},
+                new Object[]{EMBEDDED, DYNAMIC, NONE, POSITIVE},
+                new Object[]{EMBEDDED, STATIC_XML, NONE, NEGATIVE},
+                new Object[]{EMBEDDED, DYNAMIC, NONE, NEGATIVE}
+        );
+    }
+
+    // Used for tests where we need different ClassRegistrationStyle approaches (and not used in
+    //   all other tests to reduce complexity of parameterized testing)
+    protected static List<Object[]> listenerParameters() {
+        List<Object[]> newParams = new ArrayList<>(45);
+        for (Object[] parameter : parameters()) {
+            // Create variants for all "not NONE" ClassRegistrationStyles
+            for (ClassRegistrationStyle style : ClassRegistrationStyle.values()) {
+                if (style != NONE) {
+                    // Only run INSTANCE_IN_DATA_STRUCTURE tests on embedded/member-to-member (clients invoke
+                    //  listeners locally), and avoid negative assertions due to classpath implications
+                    if (style == INSTANCE_IN_DATA_STRUCTURE &&
+                            (parameter[0] == CLIENT_TO_MEMBER || parameter[1] != DYNAMIC || parameter[3] == NEGATIVE)) {
+                        continue;
+                    }
+                    // Do not include NEGATIVE assertions for INSTANCE_IN_CONFIG tests on embedded/member-to-member
+                    //  since there is nothing to validate due to classpath implications
+                    if (style == INSTANCE_IN_CONFIG
+                            && (parameter[1] != DYNAMIC || (parameter[0] != CLIENT_TO_MEMBER && parameter[3] == NEGATIVE))) {
+                        // Only applicable to DYNAMIC ConfigStyles on CLIENT_TO_MEMBER ConnectionStyles because
+                        //   when running member to member or embedded, we need the class to be loaded for us
+                        //   to obtain an instance to actually add anyway - so there's nothing to validate
+                        continue;
+                    }
+                    newParams.add(new Object[]{parameter[0], parameter[1], style, parameter[3]});
+                }
+            }
+            // We don't want `NONE` variants as tests using these parameters require class registration
+        }
+        return newParams;
+    }
+
+    // For fast access in tests that do not support INSTANCE_IN_DATA_STRUCTURE
+    protected static List<Object[]> listenerParametersWithoutInstanceInDataStructure() {
+        return listenerParameters().stream()
+                                   .filter(obj -> obj[2] != ClassRegistrationStyle.INSTANCE_IN_DATA_STRUCTURE)
+                                   .collect(Collectors.toList());
     }
 }

@@ -91,9 +91,6 @@ public abstract class AbstractCollectionProxyImpl<S extends RemoteService, E> ex
                 }
             }
             if (listener != null) {
-                if (listener instanceof HazelcastInstanceAware) {
-                    ((HazelcastInstanceAware) listener).setHazelcastInstance(nodeEngine.getHazelcastInstance());
-                }
                 addItemListener(listener, itemListenerConfig.isIncludeValue());
             }
         }
@@ -230,6 +227,9 @@ public abstract class AbstractCollectionProxyImpl<S extends RemoteService, E> ex
         checkNotNull(listener, "Null listener is not allowed!");
         final EventService eventService = getNodeEngine().getEventService();
         final CollectionEventFilter filter = new CollectionEventFilter(includeValue);
+        if (listener instanceof HazelcastInstanceAware) {
+            ((HazelcastInstanceAware) listener).setHazelcastInstance(getNodeEngine().getHazelcastInstance());
+        }
         final EventRegistration registration = eventService.registerListener(getServiceName(), name, filter, listener);
         return registration.getId();
     }

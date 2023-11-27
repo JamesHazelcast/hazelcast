@@ -21,6 +21,8 @@ import com.hazelcast.query.Predicates;
 import org.junit.Before;
 import org.junit.runners.Parameterized;
 
+import java.util.stream.Collectors;
+
 import static org.junit.Assert.assertFalse;
 
 public class IMapValueExtractorUCDTest extends IMapUCDTest {
@@ -53,6 +55,10 @@ public class IMapValueExtractorUCDTest extends IMapUCDTest {
 
     @Parameterized.Parameters(name = "Connection: {0}, Config: {1}, Class Registration: {2}, Assertion: {3}")
     public static Iterable<Object[]> parameters() {
-        return listenerParameters();
+        // This test does not support INSTANCE_IN_DATA_STRUCTURE or INSTANCE_IN_CONFIG
+        return listenerParameters().stream()
+                                   .filter(obj -> obj[2] != ClassRegistrationStyle.INSTANCE_IN_DATA_STRUCTURE
+                                           && obj[2] != ClassRegistrationStyle.INSTANCE_IN_CONFIG)
+                                   .collect(Collectors.toList());
     }
 }

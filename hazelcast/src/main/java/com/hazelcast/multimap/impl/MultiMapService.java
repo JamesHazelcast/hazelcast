@@ -21,6 +21,7 @@ import com.hazelcast.config.MultiMapConfig;
 import com.hazelcast.core.DistributedObject;
 import com.hazelcast.core.EntryEventType;
 import com.hazelcast.core.EntryListener;
+import com.hazelcast.core.HazelcastInstanceAware;
 import com.hazelcast.internal.cluster.ClusterService;
 import com.hazelcast.internal.locksupport.LockStoreInfo;
 import com.hazelcast.internal.locksupport.LockSupportService;
@@ -264,6 +265,9 @@ public class MultiMapService implements ManagedService, RemoteService, ChunkedMi
                             boolean includeValue) {
         EventService eventService = nodeEngine.getEventService();
         MultiMapEventFilter filter = new MultiMapEventFilter(includeValue, key);
+        if (listener instanceof HazelcastInstanceAware) {
+            ((HazelcastInstanceAware) listener).setHazelcastInstance(nodeEngine.getHazelcastInstance());
+        }
         return eventService.registerListener(SERVICE_NAME, name, filter, listener).getId();
     }
 
@@ -273,6 +277,9 @@ public class MultiMapService implements ManagedService, RemoteService, ChunkedMi
                                                     boolean includeValue) {
         EventService eventService = nodeEngine.getEventService();
         MultiMapEventFilter filter = new MultiMapEventFilter(includeValue, key);
+        if (listener instanceof HazelcastInstanceAware) {
+            ((HazelcastInstanceAware) listener).setHazelcastInstance(nodeEngine.getHazelcastInstance());
+        }
         return eventService.registerListenerAsync(SERVICE_NAME, name, filter, listener)
                 .thenApplyAsync(EventRegistration::getId, CALLER_RUNS);
     }
@@ -283,6 +290,9 @@ public class MultiMapService implements ManagedService, RemoteService, ChunkedMi
                                  boolean includeValue) {
         EventService eventService = nodeEngine.getEventService();
         MultiMapEventFilter filter = new MultiMapEventFilter(includeValue, key);
+        if (listener instanceof HazelcastInstanceAware) {
+            ((HazelcastInstanceAware) listener).setHazelcastInstance(nodeEngine.getHazelcastInstance());
+        }
         return eventService.registerLocalListener(SERVICE_NAME, name, filter, listener).getId();
     }
 

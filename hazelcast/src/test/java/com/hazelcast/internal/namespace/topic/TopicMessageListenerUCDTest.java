@@ -32,7 +32,7 @@ public class TopicMessageListenerUCDTest extends TopicUCDTest {
         ListenerConfig listenerConfig = new ListenerConfig();
         listenerConfig.setImplementation(getClassInstance());
 
-        reliableTopicConfig.addMessageListenerConfig(listenerConfig);
+        topicConfig.addMessageListenerConfig(listenerConfig);
     }
 
     @Override
@@ -40,7 +40,7 @@ public class TopicMessageListenerUCDTest extends TopicUCDTest {
         ListenerConfig listenerConfig = new ListenerConfig();
         listenerConfig.setClassName(getUserDefinedClassName());
 
-        reliableTopicConfig.addMessageListenerConfig(listenerConfig);
+        topicConfig.addMessageListenerConfig(listenerConfig);
     }
 
     @Override

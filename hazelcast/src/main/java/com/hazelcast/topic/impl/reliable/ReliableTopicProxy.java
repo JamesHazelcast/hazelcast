@@ -234,6 +234,10 @@ public class ReliableTopicProxy<E> extends AbstractDistributedObject<ReliableTop
 
         UUID id = UuidUtil.newUnsecureUUID();
         ReliableMessageListener<E> reliableMessageListener;
+        if (listener instanceof HazelcastInstanceAware) {
+            ((HazelcastInstanceAware) listener).setHazelcastInstance(nodeEngine.getHazelcastInstance());
+        }
+
         if (listener instanceof ReliableMessageListener) {
             reliableMessageListener = (ReliableMessageListener) listener;
         } else {

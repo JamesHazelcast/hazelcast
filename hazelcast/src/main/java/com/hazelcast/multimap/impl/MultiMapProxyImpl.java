@@ -87,9 +87,6 @@ public class MultiMapProxyImpl<K, V>
             }
 
             if (listener != null) {
-                if (listener instanceof HazelcastInstanceAware) {
-                    ((HazelcastInstanceAware) listener).setHazelcastInstance(nodeEngine.getHazelcastInstance());
-                }
                 if (listenerConfig.isLocal()) {
                     addLocalEntryListener(listener);
                 } else {
