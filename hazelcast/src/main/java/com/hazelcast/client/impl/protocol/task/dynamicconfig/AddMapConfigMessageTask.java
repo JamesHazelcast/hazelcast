@@ -85,7 +85,8 @@ public class AddMapConfigMessageTask
         config.setPerEntryStatsEnabled(parameters.perEntryStatsEnabled);
         config.setIndexConfigs(parameters.indexConfigs);
         if (parameters.mapStoreConfig != null) {
-            NamespaceUtil.callWithNamespace(nodeEngine, parameters.namespace, () -> config.setMapStoreConfig(parameters.mapStoreConfig.asMapStoreConfig(serializationService)));
+            NamespaceUtil.callWithNamespace(nodeEngine, parameters.namespace,
+                    () -> config.setMapStoreConfig(parameters.mapStoreConfig.asMapStoreConfig(serializationService)));
         }
         config.setTimeToLiveSeconds(parameters.timeToLiveSeconds);
         config.setMaxIdleSeconds(parameters.maxIdleSeconds);
