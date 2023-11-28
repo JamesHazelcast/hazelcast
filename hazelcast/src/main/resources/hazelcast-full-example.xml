@@ -4088,10 +4088,46 @@
     </tpc>
 
     <!--
-    ===== HAZELCAST USER CODE DEPLOYMENT V2 (NAMESPACES) CONFIGURATION =====
+    ===== NAMESPACES CONFIGURATION =====
 
-    Hazelcast UCD Namespaces are the next generation of User Code Deployment.
-    TODO NS: Expand documentation
+        Configuration element's name is <namespaces>.
+
+        It has the following attributes:
+        - enabled:
+            The master-switch for the namespaces to be enabled. If this is set
+            to false hazelcast operations will not be namespace aware and such User Code will
+            not be executed.
+            In addition, there will be no attempt to load individual namespace resources (Jar/JarsInZip)
+            on member startup.
+            It will not be possible to add or remove namespaces at runtime.
+            Its default value is false.
+
+        It has the following sub-elements:
+        * <java-serialization-filter>:
+            Allows to configure blacklisting and whitelisting for deserialized classes when Java serialization is used.
+        * <namespace>:
+            Defines a namespace.
+            It has the following attributes:
+            * "name":
+                Name of the namespace, must be unique.
+            * "jar":
+                Defines a Jar resource to be loaded for the namespace.
+                It has the following attributes:
+                * "id":
+                    Id of the Jar resource. This is an optional property.
+                    If not provided, the id will be the URL path.
+                It has the following sub-elements:
+                * <url>:
+                    Defines the URL of the Jar resource.
+            * <jars-in-zip>:
+                Defines a zip of jar resources to be loaded for the namespace.
+                It has the following attributes:
+                * "id":
+                    Id of the JarsInZip resource. This is an optional property.
+                    If not provided, the id will be the URL path.
+                It has the following sub-elements:
+                * <url>:
+                    Defines the URL of the zip resource.
     -->
     <namespaces enabled="false">
         <java-serialization-filter defaults-disabled="true">
