@@ -16,12 +16,6 @@
 
 package com.hazelcast.internal.namespace.imap;
 
-import org.junit.Ignore;
-
-// TODO NS this is failing because of https://github.com/hazelcast/hazelcast/pull/26040
-// Once fixed, UDF will need to be updated with new interface
-// OR it can just extend com.hazelcast.map.impl.query.AlwaysTruePagingPredicate
-@Ignore
 public class IMapPagingPredicateUCDTest extends IMapPredicateUCDTest {
     @Override
     protected String getUserDefinedClassName() {
