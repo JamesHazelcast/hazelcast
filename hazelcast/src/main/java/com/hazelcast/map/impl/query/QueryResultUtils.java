@@ -40,12 +40,12 @@ public final class QueryResultUtils {
 
         if (unwrappedPredicate instanceof PagingPredicate) {
             // We need an instance of PagingPredicateImpl for later use, so prepare it now
-            PagingPredicate pagingPredicate = (PagingPredicate) predicate;
+            PagingPredicate pagingPredicate = (PagingPredicate) unwrappedPredicate;
             PagingPredicateImpl pagingPredicateImpl;
             if (unwrappedPredicate instanceof PagingPredicateImpl) {
                 pagingPredicateImpl = (PagingPredicateImpl) unwrappedPredicate;
             } else {
-                Predicate simplePredicate = mapEntry -> predicate.apply(mapEntry);
+                Predicate simplePredicate = mapEntry -> unwrappedPredicate.apply(mapEntry);
                 // We provide Namespace wrapping to parent calls, we don't need to know it within the PagingPredicateImpl
                 pagingPredicateImpl = new PagingPredicateImpl(simplePredicate, pagingPredicate.getComparator(),
                         pagingPredicate.getPageSize(), null);
