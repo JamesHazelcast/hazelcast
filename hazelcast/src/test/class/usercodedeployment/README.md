@@ -16,6 +16,7 @@ Contents:
 - `DerbyUpperCaseStringMapLoader`: connects to an embedded Derby database instance and returns the result of an upper-casing SQL query.
 - `H2WitHDataSourceBuilderVerionMapLoader`, `H2WithDriverManagerBuildVersionMapLoader`: connects to an embedded H2 database and returns the results of an SQL query for the databases' version.
 - `IdentityProjection`: a `Projection` that returns the input.
+- `CustomCachePartitionLostListener`: a simple CachePartitionLostListener implementation that pushes notifications to an ISet
 
 Note: unless package is explicitly specified, all classes described above reside in package `usercodedeployment`.
 
@@ -54,5 +55,6 @@ usercodedeployment/NoOpCachePartitionLostListener.class \
 usercodedeployment/ObservableListener.class \
 usercodedeployment/TruePagingPredicate.class \
 usercodedeployment/TruePartition1PartitionPredicate.class \
-usercodedeployment/TruePredicate.class
+usercodedeployment/TruePredicate.class \
+usercodedeployment/CustomCachePartitionLostListener.class
 ```
