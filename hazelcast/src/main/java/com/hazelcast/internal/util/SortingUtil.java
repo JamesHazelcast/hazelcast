@@ -151,7 +151,7 @@ public final class SortingUtil {
 
     @SuppressWarnings("unchecked")
     public static ResultSet getSortedQueryResultSet(List<Map.Entry> list,
-                                                    PagingPredicate pagingPredicate, IterationType iterationType) {
+                                                    PagingPredicateImpl pagingPredicate, IterationType iterationType) {
         List<? extends Map.Entry> subList = getSortedSubListAndUpdateAnchor(list, pagingPredicate, iterationType);
         return new ResultSet(subList, iterationType);
     }
@@ -209,7 +209,7 @@ public final class SortingUtil {
     }
 
     private static List<? extends Map.Entry> getSortedSubListAndUpdateAnchor(List<? extends Map.Entry> list,
-                                                                             PagingPredicate pagingPredicate,
+                                                                             PagingPredicateImpl pagingPredicate,
                                                                              IterationType iterationType) {
         Map.Entry<Integer, Integer> pageIndex = getPageIndexesAndUpdateAnchor(list, pagingPredicate, iterationType);
         int begin = pageIndex.getKey();
@@ -222,14 +222,13 @@ public final class SortingUtil {
     }
 
     private static Map.Entry<Integer, Integer> getPageIndexesAndUpdateAnchor(List<? extends Map.Entry> list,
-                                                                             PagingPredicate pagingPredicate,
+                                                                             PagingPredicateImpl pagingPredicateImpl,
                                                                              IterationType iterationType) {
         if (list.isEmpty()) {
             return new AbstractMap.SimpleImmutableEntry<Integer, Integer>(-1, -1);
         }
-        PagingPredicateImpl pagingPredicateImpl = (PagingPredicateImpl) pagingPredicate;
         Comparator<Map.Entry> comparator = SortingUtil.newComparator(pagingPredicateImpl.getComparator(), iterationType);
-        NamespaceUtil.runWithNamespace(pagingPredicateImpl.getNamespace(), () -> Collections.sort(list, comparator));
+        Collections.sort(list, comparator);
 
         Map.Entry<Integer, Map.Entry> nearestAnchorEntry = pagingPredicateImpl.getNearestAnchorEntry();
         int nearestPage = nearestAnchorEntry.getKey();
