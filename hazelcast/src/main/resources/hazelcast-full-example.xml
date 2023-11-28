@@ -4104,30 +4104,59 @@
 
         It has the following sub-elements:
         * <java-serialization-filter>:
-            Allows to configure blacklisting and whitelisting for deserialized classes when Java serialization is used.
+            Allows to configure blacklisting and whitelisting by class, package or prefix.
+            If a filtered class has been blacklisted, a SecurityException will be thrown.
+            If whitelisting is enabled, either by explicit declaration under <whitelist>
+            or setting defaults-disabled="false", a SecurityException will be thrown if a filtered
+            class has not been whitelisted.
+            It has the following attributes:
+            * defaults-disabled:
+                If set to true, the default whitelist will not be used.
+                If set to false, the default whitelist will be used. In such cases that a class name
+                does not match any of the whitelisted classes, packages or prefixes, a SecurityException
+                will be thrown.
+           It has the following elements:
+              * <blacklist>:
+                 Defines a blacklist of classes, packages or prefixes.
+                 It has the following sub-elements:
+                 * <class>:
+                      Defines a class to be blacklisted.
+                 * <package>:
+                      Defines a package to be blacklisted.
+                 * <prefix>:
+                      Defines a prefix to be blacklisted.
+              * <whitelist>:
+                    Defines a whitelist of classes, packages or prefixes.
+                    It has the following sub-elements:
+                    * <class>:
+                        Defines a class to be whitelisted.
+                    * <package>:
+                        Defines a package to be whitelisted.
+                    * <prefix>:
+                        Defines a prefix to be whitelisted.
         * <namespace>:
             Defines a namespace.
             It has the following attributes:
-            * "name":
+            * <name>:
                 Name of the namespace, must be unique.
-            * "jar":
-                Defines a Jar resource to be loaded for the namespace.
-                It has the following attributes:
-                * "id":
-                    Id of the Jar resource. This is an optional property.
-                    If not provided, the id will be the URL path.
-                It has the following sub-elements:
-                * <url>:
-                    Defines the URL of the Jar resource.
-            * <jars-in-zip>:
-                Defines a zip of jar resources to be loaded for the namespace.
-                It has the following attributes:
-                * "id":
-                    Id of the JarsInZip resource. This is an optional property.
-                    If not provided, the id will be the URL path.
-                It has the following sub-elements:
-                * <url>:
-                    Defines the URL of the zip resource.
+                * <jar>:
+                    Defines a Jar resource to be loaded for the namespace.
+                    It has the following attributes:
+                    * <id>:
+                        Id of the Jar resource. This is an optional property.
+                        If not provided, the id will be the URL path.
+                    It has the following sub-elements:
+                    * <url>:
+                        Defines the URL of the Jar resource.
+                * <jars-in-zip>:
+                    Defines a zip of jar resources to be loaded for the namespace.
+                    It has the following attributes:
+                    * <id>:
+                        Id of the JarsInZip resource. This is an optional property.
+                        If not provided, the id will be the URL path.
+                    It has the following sub-elements:
+                    * <url>:
+                        Defines the URL of the zip resource.
     -->
     <namespaces enabled="false">
         <java-serialization-filter defaults-disabled="true">
