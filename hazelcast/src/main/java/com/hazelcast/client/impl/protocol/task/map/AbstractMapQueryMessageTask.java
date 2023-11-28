@@ -112,12 +112,12 @@ public abstract class AbstractMapQueryMessageTask<P, QueryResult extends Result,
 
             PartitionIdSet finishedPartitions = invokeOnMembers(result, predicate, partitionCount);
             invokeOnMissingPartitions(result, predicate, finishedPartitions);
+            return reduce(result);
         } catch (Throwable t) {
             throw rethrow(t);
         } finally {
             NamespaceUtil.cleanupNamespace(nodeEngine, getNamespace());
         }
-        return reduce(result);
     }
 
     private QueryResult invokeOnPartitions(PartitionPredicate predicate) {

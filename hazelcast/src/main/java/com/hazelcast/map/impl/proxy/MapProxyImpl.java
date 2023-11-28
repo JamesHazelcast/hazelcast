@@ -818,7 +818,13 @@ public class MapProxyImpl<K, V> extends MapProxySupport<K, V> implements EventJo
         checkNotNull(predicate, NULL_PREDICATE_IS_NOT_ALLOWED);
         QueryResult result = executeQueryInternal(predicate, iterationType, target);
         incrementOtherOperationsStat();
-        return transformToSet(serializationService, result, predicate, iterationType, uniqueResult, false);
+        return transformToSetWithNamespace(result, predicate, iterationType, uniqueResult, false);
+    }
+
+    private <T> Set<T>  transformToSetWithNamespace(QueryResult result, Predicate predicate,
+                                            IterationType iterationType, boolean unique, boolean binary) {
+        return NamespaceUtil.callWithNamespace(getNodeEngine(), mapConfig.getNamespace(),
+                () -> transformToSet(serializationService, result, predicate, iterationType, unique, binary));
     }
 
     @Override
@@ -832,7 +838,7 @@ public class MapProxyImpl<K, V> extends MapProxySupport<K, V> implements EventJo
         checkNotNull(predicate, NULL_PREDICATE_IS_NOT_ALLOWED);
         QueryResult result = executeQueryInternal(predicate, IterationType.KEY, Target.LOCAL_NODE);
         incrementOtherOperationsStat();
-        return transformToSet(serializationService, result, predicate, IterationType.KEY, false, false);
+        return transformToSetWithNamespace(result, predicate, IterationType.KEY, false, false);
     }
 
     @Override
@@ -965,11 +971,11 @@ public class MapProxyImpl<K, V> extends MapProxySupport<K, V> implements EventJo
 
         // HazelcastInstanceAware handled by cloning
         Projection<? super Map.Entry<K, V>, R> clonedProjection =
-                NamespaceUtil.callWithNamespace(getNodeEngine(), MapService.lookupNamespace(getNodeEngine(), name),
+                NamespaceUtil.callWithNamespace(getNodeEngine(), mapConfig.getNamespace(),
                         () -> serializationService.toObject(serializationService.toData(projection)));
 
         QueryResult result = executeQueryInternal(predicate, null, clonedProjection, IterationType.VALUE, target);
-        return transformToSet(serializationService, result, predicate, IterationType.VALUE, false, false);
+        return transformToSetWithNamespace(result, predicate, IterationType.VALUE, false, false);
     }
 
     protected Object invoke(Operation operation, int partitionId) throws Throwable {
