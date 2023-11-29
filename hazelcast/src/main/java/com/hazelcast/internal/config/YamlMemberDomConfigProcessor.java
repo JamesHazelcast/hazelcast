@@ -94,6 +94,9 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
@@ -321,13 +324,31 @@ public class YamlMemberDomConfigProcessor extends MemberDomConfigProcessor {
                 NamespaceConfig ns = new NamespaceConfig(nodeName);
                 //get list of resources
                 for (Node subChild : childElements(n)) {
-                    Node jar = getNamedItemNode(subChild, "jar");
-                    if (jar != null) {
-                        handleJarNode(jar, ns);
+                    String resourceId = null;
+                    String resourceTypeName = null;
+                    String resourceUrl = null;
+                    for (Node resourceChild : childElements(subChild)) {
+                        if (resourceChild.getNodeName().equals("resource-type")) {
+                            resourceTypeName = resourceChild.getNodeValue();
+                        } else if (resourceChild.getNodeName().equals("url")) {
+                            resourceUrl = resourceChild.getNodeValue();
+                        } else if (resourceChild.getNodeName().equals("id")) {
+                            resourceId = resourceChild.getNodeValue();
+                        }
                     }
-                    Node jarsInZip = getNamedItemNode(subChild, "jars-in-zip");
-                    if (jarsInZip != null) {
-                        handleJarsInZipNode(jarsInZip, ns);
+                    if (resourceTypeName == null || resourceUrl == null || resourceId == null) {
+                        throw new IllegalArgumentException("For each namespace, resource elements \"id\","
+                                + " \"resource-type\" and \"url\" must be defined.");
+                    }
+                    try {
+                        if ("jar".equalsIgnoreCase(resourceTypeName)) {
+                            ns.addJar(new URI(resourceUrl).toURL(), resourceId);
+                        } else if ("jars_in_zip".equalsIgnoreCase(resourceTypeName)) {
+                            ns.addJarsInZip(new URI(resourceUrl).toURL(), resourceId);
+                        }
+                    } catch (MalformedURLException | URISyntaxException e) {
+                        throw new IllegalArgumentException("Namespace resource " + resourceId + " was configured with invalid URL "
+                                    + resourceUrl, e);
                     }
                 }
                 config.getNamespacesConfig().addNamespaceConfig(ns);

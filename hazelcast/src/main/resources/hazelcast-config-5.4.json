@@ -2533,7 +2533,7 @@
         "map-limit": {
           "type": "integer",
           "default": 10,
-          "description": "The maximum number of CP Maps that are permitted. The default of 10 is not necessarily applicable for a wide variety of usages. Please note when defining this limit: take into consideration the maps you are to create, their capacities and the number of members their host CP groups entail. The latter is important as you will currently need memory headroom per-map, then a multiple of that map's size required for publishing snapshots, e.g. (group size - 1) * map size, per-map.",
+          "description": "The maximum number of CP Maps that are permitted. The default of 10 is not necessarily applicable for a wide variety of usages. Please note when defining this limit: take into consideration the maps you are to create, their capacities and the number of members their host CP groups entail. The latter is important as you will currently need memory headroom per-map, then a multiple of that map's size required for publishing snapshots, e.g. (group size - 1) * map size, per-map."
         },
         "raft-algorithm": {
           "type": "object",
@@ -5185,11 +5185,12 @@
       "properties": {
         "enabled": {
           "type": "boolean",
-          "description": "Indicates whether the namespace configuration is enabled or not."
+          "description": "Indicates whether the namespaces configuration is enabled or not."
         },
         "java-serialization-filter": {
           "$ref": "#/definitions/JavaSerializationFilter",
-          "description": "Allows to configure blacklisting and whitelisting for deserialized classes from Resource definitions."
+          "description":
+          "Allows to configure blacklisting and whitelisting by class, package or prefix.\nIf a filtered class has been blacklisted, a SecurityException will be thrown.\nIf whitelisting is enabled, either by explicit declaration under whitelist or setting defaults-disabled=false, a SecurityException will be thrown if a filtered class has not been whitelisted.\nIf defaults-disabled is set to true, the default whitelist will not be used.\nIf set to false, the default whitelist will be used. In such cases that a class name does not match any of the whitelisted classes, packages or prefixes, a SecurityException will be thrown."
         }
       },
       "additionalProperties": {
@@ -5206,17 +5207,9 @@
     },
     "Namespace": {
       "type": "object",
-      "properties": {
-        "jar": {
-          "$ref": "#/definitions/Resource",
-          "description": "The JAR file configuration within a namespace."
-        },
-        "jars-in-zip": {
-          "$ref": "#/definitions/Resource",
-          "description": "The configuration for a ZIP archive that contains JAR files within a namespace."
-        }
+      "items": {
+        "$ref": "#/definitions/Resource"
       },
-      "additionalProperties": false,
       "description": "Defines a namespace which can contain configurations for JAR files and JARs in ZIP archives."
     },
     "Resource": {
@@ -5224,7 +5217,15 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "An optional unique identifier for the resource."
+          "description": "Defines an object that uniquely identifies a namespace resource. If a value is not set, the URL is used as the identifier."
+        },
+        "resource-type": {
+          "enum": [
+            "JAR",
+            "JARS_IN_ZIP"
+          ],
+          "default": "JAR",
+          "description": "The resource type. Valid values are JAR or JARS_IN_ZIP."
         },
         "url": {
           "type": "string",
@@ -5232,10 +5233,12 @@
           "description": "The URL must be a valid URI that points to the location of the resource. This is a required property."
         }
       },
+      "additionalProperties": false,
       "required": [
+        "id",
+        "resource-type",
         "url"
       ],
-      "additionalProperties": false,
       "description": "The base definition for a resource, which can either be a single JAR file or a ZIP archive of JAR files."
     }
   }

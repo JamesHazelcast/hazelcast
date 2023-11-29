@@ -3974,17 +3974,77 @@ hazelcast:
     # Configures the number of eventloops. It's equal to available processor count by default.
     eventloop-count: 12
 
-  #    ===== HAZELCAST USER CODE DEPLOYMENT V2 (NAMESPACES) CONFIGURATION =====
+  #    ===== HAZELCAST NAMESPACES CONFIGURATION =====
   #
-  #    Hazelcast UCD Namespaces are the next generation of User Code Deployment.
-  #    TODO NS: Expand documentation
+  #  Configuration element's name is "namespaces".
+  #
+  # It has the following attributes:
+  #  - "enabled":
+  #      The master-switch for the namespaces to be enabled. If this is set
+  #      to false hazelcast operations will not be namespace aware and such User Code will
+  #      not be executed.
+  #      In addition, there will be no attempt to load individual namespace resources (Jar/JarsInZip)
+  #      on member startup.
+  #      It will not be possible to add or remove namespaces at runtime.
+  #      Its default value is false.
+  # It has the following sub-elements:
+  #  * "java-serialization-filter":
+  #      Allows to configure blacklisting and whitelisting by class, package or prefix.
+  #      If a filtered class has been blacklisted, a SecurityException will be thrown.
+  #      If whitelisting is enabled, either by explicit declaration under <whitelist>
+  #      or setting defaults-disabled="false", a SecurityException will be thrown if a filtered
+  #      class has not been whitelisted.
+  #      It has the following attributes:
+  #      - "defaults-disabled":
+  #          If set to true, the default whitelist will not be used.
+  #          If set to false, the default whitelist will be used. In such cases that a class name
+  #          does not match any of the whitelisted classes, packages or prefixes, a SecurityException
+  #          will be thrown.
+  #          It has the following elements:
+  #          * "blacklist":
+  #              Defines a blacklist of classes, packages or prefixes.
+  #                It has the following sub-elements:
+  #              * "class":
+  #                  Defines a class to be blacklisted.
+  #              * "package":
+  #                  Defines a package to be blacklisted.
+  #              * "prefix":
+  #                  Defines a prefix to be blacklisted.
+  #          * "whitelist":
+  #              Defines a whitelist of classes, packages or prefixes.
+  #                It has the following sub-elements:
+  #              * "class":
+  #                  Defines a class to be whitelisted.
+  #              * "package":
+  #                  Defines a package to be whitelisted.
+  #              * "prefix":
+  #                  Defines a prefix to be whitelisted.
+  #  * "namespace":
+  #      Defines a namespace with a name.
+  #      It has the following attributes:
+  #      * "id":
+  #         Id of the namespace, must be unique.
+  #      * "resource-type":
+  #          Defines a resource type to be loaded for the namespace.
+  #          It has the following options:
+  #          * "JAR":
+  #              Defines a Jar resource to be loaded for the namespace.
+  #          * "JARS_IN_ZIP":
+  #              Defines Jars in a zip file to be loaded for the namespace.
+  #      * "url":
+  #          Defines the URL of the resource.
   namespaces:
-    enabled: false
+    # Sub attribute of namespaces, enables or disables namespaces.
+    enabled: true
+    # Sub attribute of namespaces, allows to configure blacklisting and whitelisting by class, package or prefix.
     java-serialization-filter:
-      defaults-disabled: false
+      # Sub-Attribute of java-serialization-filter, If set to true, the default whitelist will not be used.
+      defaults-disabled: true
+      # Sub-Attribute of java-serialization-filter, defines a blacklist of classes, packages or prefixes.
       blacklist:
         class:
           - com.acme.app.BeanComparator
+      # Sub-Attribute of java-serialization-filter, defines a whitelist of classes, packages or prefixes.
       whitelist:
         class:
           - java.lang.String
@@ -3995,13 +4055,23 @@ hazelcast:
         prefix:
           - com.hazelcast.
           - java
-    namespace1:
-      - jar:
-          id: "test"
-          url: "file://home/hazelcast/test.jar"
-      - jar:
-          id: "test2"
-          url: "file://home/hazelcast/test2.jar"
-      - jars-in-zip:
-          id: "test3"
-          url: "file://home/hazelcast/test3.zip"
+    # Sub-Attribute of namespaces, an object which defines a namespace.
+    ns1:
+      # Sub-Attribute of namespace Object, defines the id of the namespace, must be unique.
+      - id: jarId
+        # Sub-Attribute of a namespace object, Defines a Jar resource to be loaded for the namespace.
+        resource-type: JAR
+        # Sub-Attribute of a namespace object, Defines the URL of the Jar resource.
+        url: "file:./src/test/class/usercodedeployment/ShadedClasses.jar"
+      - id: jarsInZipId
+        # Sub-Attribute of a namespace object, Defines Jars in a zip file to be loaded for the namespace.
+        resource-type: JARS_IN_ZIP
+        # Sub-Attribute of a namespace object, Defines the URL of the zip resource.
+        url: "file:./src/test/class/usercodedeployment/ShadedClasses.jar"
+    ns2:
+      - id: jarId2
+        resource-type: JAR
+        url: "file:./src/test/class/usercodedeployment/ChildParent.jar"
+      - id: jarId3
+        resource-type: JAR
+        url: "file:./src/test/class/usercodedeployment/ShadedClasses.jar"

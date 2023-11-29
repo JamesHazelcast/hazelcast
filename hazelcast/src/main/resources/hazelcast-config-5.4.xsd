@@ -6242,14 +6242,14 @@
     <xs:complexType name="resource">
         <xs:annotation>
             <xs:documentation>
-                A generic type representing a resource with a URI and an optional identifier.
+                Defines an object that uniquely identifies a namespace resource.
             </xs:documentation>
         </xs:annotation>
         <xs:sequence>
             <xs:element name="url" type="xs:anyURI">
                 <xs:annotation>
                     <xs:documentation>
-                        The URL must be a valid URI that points to the location of the resource.
+                        The URL must be a valid URI that points to the location of the resource. This is a required property.
                     </xs:documentation>
                 </xs:annotation>
             </xs:element>
@@ -6257,7 +6257,7 @@
         <xs:attribute name="id" type="xs:string">
             <xs:annotation>
                 <xs:documentation>
-                    An optional identifier for the resource. It must be unique within the namespace.
+                    An optional identifier for the resource. It must be unique within the namespace. If a value is not set, the URL is used as the identifier.
                 </xs:documentation>
             </xs:annotation>
         </xs:attribute>
@@ -6268,7 +6268,7 @@
             <xs:extension base="resource">
                 <xs:annotation>
                     <xs:documentation>
-                        Configures a jar type resource specifically pointing to a JAR files.
+                        Configures a Jar type resource specifically pointing to a JAR files.
                     </xs:documentation>
                 </xs:annotation>
             </xs:extension>
@@ -6321,7 +6321,21 @@
             </xs:documentation>
         </xs:annotation>
         <xs:sequence>
-            <xs:element name="java-serialization-filter" type="java-serialization-filter" minOccurs="0"/>
+            <xs:element name="java-serialization-filter" type="java-serialization-filter" minOccurs="0">
+            <xs:annotation>
+                <xs:documentation>
+                    Allows to configure blacklisting and whitelisting by class, package or prefix.
+                    If a filtered class has been blacklisted, a SecurityException will be thrown.
+                    If whitelisting is enabled, either by explicit declaration under whitelist or setting defaults-disabled=false,
+                    a SecurityException will be thrown if a filtered class has not been whitelisted.
+
+                    If defaults-disabled is set to true, the default whitelist will not be used.
+                    If set to false, the default whitelist will be used. In such cases that a class name
+                    does not match any of the whitelisted classes, packages or prefixes, a SecurityException
+                    will be thrown.
+                </xs:documentation>
+            </xs:annotation>
+            </xs:element>
             <xs:element name="namespace" type="namespace-type" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
         <xs:attribute name="enabled" type="xs:boolean" use="required"/>

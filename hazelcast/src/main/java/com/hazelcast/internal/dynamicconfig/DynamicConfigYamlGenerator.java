@@ -23,9 +23,12 @@ import com.hazelcast.config.BTreeIndexConfig;
 import com.hazelcast.config.CacheSimpleConfig;
 import com.hazelcast.config.CacheSimpleEntryListenerConfig;
 import com.hazelcast.config.CardinalityEstimatorConfig;
+import com.hazelcast.config.ClassFilter;
 import com.hazelcast.config.CollectionConfig;
 import com.hazelcast.config.Config;
+import com.hazelcast.config.ConfigAccessor;
 import com.hazelcast.config.ConfigXmlGenerator;
+import com.hazelcast.config.DataConnectionConfig;
 import com.hazelcast.config.DataPersistenceConfig;
 import com.hazelcast.config.DiscoveryConfig;
 import com.hazelcast.config.DiscoveryStrategyConfig;
@@ -35,12 +38,12 @@ import com.hazelcast.config.EndpointConfig;
 import com.hazelcast.config.EventJournalConfig;
 import com.hazelcast.config.EvictionConfig;
 import com.hazelcast.config.ExecutorConfig;
-import com.hazelcast.config.DataConnectionConfig;
 import com.hazelcast.config.FlakeIdGeneratorConfig;
 import com.hazelcast.config.IcmpFailureDetectorConfig;
 import com.hazelcast.config.IndexConfig;
 import com.hazelcast.config.IndexType;
 import com.hazelcast.config.InterfacesConfig;
+import com.hazelcast.config.JavaSerializationFilterConfig;
 import com.hazelcast.config.JoinConfig;
 import com.hazelcast.config.ListConfig;
 import com.hazelcast.config.ListenerConfig;
@@ -53,6 +56,7 @@ import com.hazelcast.config.MergePolicyConfig;
 import com.hazelcast.config.MerkleTreeConfig;
 import com.hazelcast.config.MultiMapConfig;
 import com.hazelcast.config.MulticastConfig;
+import com.hazelcast.config.NamespacesConfig;
 import com.hazelcast.config.NearCacheConfig;
 import com.hazelcast.config.NetworkConfig;
 import com.hazelcast.config.PNCounterConfig;
@@ -85,6 +89,7 @@ import com.hazelcast.config.WanReplicationConfig;
 import com.hazelcast.config.WanReplicationRef;
 import com.hazelcast.instance.ProtocolType;
 import com.hazelcast.internal.config.AliasedDiscoveryConfigUtils;
+import com.hazelcast.internal.namespace.ResourceDefinition;
 import com.hazelcast.internal.util.CollectionUtil;
 import com.hazelcast.memory.Capacity;
 import org.snakeyaml.engine.v2.api.Dump;
@@ -93,6 +98,7 @@ import org.snakeyaml.engine.v2.common.FlowStyle;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -152,6 +158,7 @@ public class DynamicConfigYamlGenerator {
         networkConfigYamlGenerator(root, config);
         advancedNetworkConfigYamlGenerator(root, config);
         dataConnectionYamlGenerator(root, config);
+        namespacesConfigGenerator(root, config);
         DumpSettings dumpSettings = DumpSettings.builder()
                 .setDefaultFlowStyle(FlowStyle.BLOCK)
                 .setIndicatorIndent(INDENT - 2)
@@ -1050,6 +1057,65 @@ public class DynamicConfigYamlGenerator {
         } else {
             parent.put(endpointConfigElementName(endpointConfig), child);
         }
+    }
+
+    static Map<String, Object> javaSerializationFilterGenerator(JavaSerializationFilterConfig jsfConfig) {
+        Map<String, Object> javaSerializationFilterCfg = new LinkedHashMap<>();
+        addNonNullToMap(javaSerializationFilterCfg, "defaults-disabled", jsfConfig.isDefaultsDisabled());
+        Map<String, Object> whiteListAsMap = classFilterGenerator(jsfConfig.getWhitelist());
+        Map<String, Object> blackListAsMap = classFilterGenerator(jsfConfig.getBlacklist());
+        javaSerializationFilterCfg.put("blacklist", blackListAsMap);
+        javaSerializationFilterCfg.put("whitelist", whiteListAsMap);
+        return javaSerializationFilterCfg;
+    }
+
+    static Map<String, Object> classFilterGenerator(ClassFilter classFilter) {
+        if (classFilter == null || classFilter.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        Map<String, Object> classFilterMap = new LinkedHashMap<>();
+        List<String> packagesAsList = new ArrayList<>();
+        List<String> classesAsList = new ArrayList<>();
+        List<String> prefixesAsList = new ArrayList<>();
+        for (String p : classFilter.getPackages()) {
+            packagesAsList.add(p);
+        }
+        for (String c : classFilter.getClasses()) {
+            classesAsList.add(c);
+        }
+        for (String p : classFilter.getPrefixes()) {
+            prefixesAsList.add(p);
+        }
+        classFilterMap.put("package", packagesAsList);
+        classFilterMap.put("class", classesAsList);
+        classFilterMap.put("prefix", prefixesAsList);
+        return classFilterMap;
+    }
+
+    private void namespacesConfigGenerator(Map<String, Object> parent, Config config) {
+        Map<String, Object> child = new LinkedHashMap<>();
+        NamespacesConfig namespacesConfig = config.getNamespacesConfig();
+        addNonNullToMap(child, "enabled", namespacesConfig.isEnabled());
+        parent.put("namespaces", child);
+        if (!namespacesConfig.isEnabled()) {
+            return;
+        }
+        if (namespacesConfig.getJavaSerializationFilterConfig() != null) {
+            Map<String, Object> javaSerializationFilterCfg =
+                    javaSerializationFilterGenerator(namespacesConfig.getJavaSerializationFilterConfig());
+            addNonNullToMap(child, "java-serialization-filter", javaSerializationFilterCfg);
+        }
+        ConfigAccessor.getNamespaceConfigs(config).forEach((namespace, namespaceConfig) -> {
+            List<Map<String, Object>> resourcesList = new ArrayList<>();
+            for (ResourceDefinition resourceDefinition : ConfigAccessor.getResourceDefinitions(namespaceConfig)) {
+                Map<String, Object> resourceAsMap = new LinkedHashMap<>();
+                resourceAsMap.put("id", resourceDefinition.id());
+                resourceAsMap.put("resource-type", resourceDefinition.type().toString());
+                resourceAsMap.put("url", resourceDefinition.url());
+                resourcesList.add(resourceAsMap);
+            }
+            child.put(namespace, resourcesList);
+        });
     }
 
     private static Map<String, Object> getWanConsumerConfigsAsMap(WanConsumerConfig wanConsumerConfig) {

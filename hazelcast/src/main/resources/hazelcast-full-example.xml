@@ -4158,7 +4158,7 @@
                     * <url>:
                         Defines the URL of the zip resource.
     -->
-    <namespaces enabled="false">
+    <namespaces enabled="true">
         <java-serialization-filter defaults-disabled="true">
             <blacklist>
                 <class>com.acme.app.BeanComparator</class>
@@ -4174,18 +4174,18 @@
         </java-serialization-filter>
         <namespace name="ns1">
             <jar id="jarId">
-                <url>file:///path/to/jar</url>
+                <url>file:./src/test/class/usercodedeployment/ShadedClasses.jar</url>
             </jar>
             <jars-in-zip id="jarsInZipId">
-                <url>file:///path/to/jarsInZip/jars.zip</url>
+                <url>file:./src/test/class/usercodedeployment/ShadedClasses.jar</url>
             </jars-in-zip>
         </namespace>
         <namespace name="ns2">
             <jar id="jarId2">
-                <url>file:///path/to/jar2</url>
+                <url>file:./src/test/class/usercodedeployment/ChildParent.jar</url>
             </jar>
             <jar id="jarId3">
-                <url>file:///path/to/jar3</url>
+                <url>file:./src/test/class/usercodedeployment/ShadedClasses.jar</url>
             </jar>
         </namespace>
     </namespaces>

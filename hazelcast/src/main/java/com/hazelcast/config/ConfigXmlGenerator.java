@@ -1278,11 +1278,9 @@ public class ConfigXmlGenerator {
                 gen.node("url", resource.url());
                 gen.close();
             });
-        }
-
-        if (!namespaces.isEmpty()) {
             gen.close();
         }
+
         gen.close();
     }
 
