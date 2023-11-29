@@ -31,7 +31,6 @@ import javax.annotation.Nullable;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;

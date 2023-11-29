@@ -74,9 +74,9 @@ public class MapResourceClassLoader extends JetDelegatingClassLoader {
      */
     protected final boolean childFirst;
 
+    protected volatile boolean isShutdown;
     private final ILogger logger = Logger.getLogger(getClass());
     private final @Nullable String namespace;
-    protected volatile boolean isShutdown;
 
     static {
         ClassLoader.registerAsParallelCapable();

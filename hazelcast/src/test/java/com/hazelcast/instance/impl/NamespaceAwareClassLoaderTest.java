@@ -48,11 +48,9 @@ import java.util.ServiceLoader;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.hazelcast.test.Accessors.getNodeEngineImpl;
 import static com.hazelcast.test.UserCodeUtil.fileRelativeToBinariesFolder;
 import static com.hazelcast.test.UserCodeUtil.urlFromFile;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 
 /** Test static namespace configuration, resource resolution and classloading end-to-end */

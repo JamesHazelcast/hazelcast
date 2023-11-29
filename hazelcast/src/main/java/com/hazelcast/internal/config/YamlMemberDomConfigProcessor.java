@@ -347,8 +347,9 @@ public class YamlMemberDomConfigProcessor extends MemberDomConfigProcessor {
                             ns.addJarsInZip(new URI(resourceUrl).toURL(), resourceId);
                         }
                     } catch (MalformedURLException | URISyntaxException e) {
-                        throw new IllegalArgumentException("Namespace resource " + resourceId + " was configured with invalid URL "
-                                    + resourceUrl, e);
+                        throw new IllegalArgumentException(
+                                String.format("Namespace resource %s was configured with invalid URL %s",
+                                        resourceId, resourceUrl), e);
                     }
                 }
                 config.getNamespacesConfig().addNamespaceConfig(ns);
