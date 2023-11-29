@@ -35,7 +35,6 @@ public interface ResourceDefinition extends IdentifiedDataSerializable {
 
     /**
      * @return the contents of the resource.
-     * TODO NS byte[] or input stream? if the latter, what is its lifecycle?
      */
     byte[] payload();
 

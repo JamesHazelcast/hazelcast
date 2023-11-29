@@ -390,12 +390,12 @@ public class ReplicatedMapService implements ManagedService, RemoteService, Even
     }
 
     /**
-     * Looks up the UCD Namespace ID associated with the specified replicated map name. This is done
+     * Looks up the UCD Namespace Name associated with the specified replicated map name. This is done
      * by checking the Node's config tree directly.
      *
      * @param engine  {@link NodeEngine} implementation of this member for service and config lookups
      * @param mapName The name of the {@link com.hazelcast.replicatedmap.ReplicatedMap} to lookup for
-     * @return the Namespace ID if found, or {@code null} otherwise.
+     * @return the Namespace Name if found, or {@code null} otherwise.
      */
     public static String lookupNamespace(NodeEngine engine, String mapName) {
         if (engine.getNamespaceService().isEnabled()) {

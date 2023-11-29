@@ -32,7 +32,7 @@ import java.io.Serializable;
  * <p>
  * Serialized instances of this interface are used in client-member
  * communication, so changing an implementation's binary format will render it
- * incompatible with its previous versions. TODO NS: Update for new UCD
+ * incompatible with its previous versions.
  */
 @NamespacesSupported
 @BinaryInterface

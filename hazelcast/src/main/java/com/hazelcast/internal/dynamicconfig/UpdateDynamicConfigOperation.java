@@ -68,7 +68,7 @@ public abstract class UpdateDynamicConfigOperation extends AbstractDynamicConfig
 
     @Override
     protected void readInternal(ObjectDataInput in) throws IOException {
-        // TODO NS: Validate backwards compatibility, since we're reading `namespace` first now
+        // Backwards compatibility is handled in `Add` inheritor (`Remove` inheritor was introduced in 5.4)
         // We need namespace first for config deser
         namespace = in.readString();
         config = NamespaceUtil.callWithNamespace(namespace, in::readObject);

@@ -18,8 +18,15 @@ package com.hazelcast.internal.namespace.impl;
 
 import com.hazelcast.spi.impl.NodeEngine;
 
-// TODO NS should this be part of NamespaceThreadLocalContext if we keep it?
-//  Documentation
+/**
+ * A thread-local context that maintains a {@link NodeEngine} instance to be retrieved in
+ * areas of execution where Namespace awareness is required, which needs a {@link NodeEngine}
+ * instance to access the {@link NodeEngine#getNamespaceService()} method, but there is
+ * no local variable available.
+ * <p>
+ * The use of this thread-local context allows us to reduce code complexity that would otherwise
+ * be introduced by passing {@link NodeEngine} references through long function chains.
+ */
 public final class NodeEngineThreadLocalContext {
 
     private static final ThreadLocal<NodeEngineThreadLocalContext> NE_THREAD_LOCAL = new ThreadLocal<>();
@@ -36,16 +43,31 @@ public final class NodeEngineThreadLocalContext {
                 + '}';
     }
 
+    /**
+     * Sets the provided {@link NodeEngine} reference as this thread's {@link ThreadLocal}
+     * instance for use in Namespace awareness.
+     *
+     * @param nodeEngine the {@link NodeEngine} reference to use.
+     */
     public static void declareNodeEngineReference(NodeEngine nodeEngine) {
         if (nodeEngine != null) {
             NE_THREAD_LOCAL.set(new NodeEngineThreadLocalContext(nodeEngine));
         }
     }
 
+    /**
+     * Removes the currently set {@link NodeEngine} reference for this thread.
+     */
     public static void destroyNodeEngineReference() {
         NE_THREAD_LOCAL.remove();
     }
 
+    /**
+     * Retrieves the currently set {@link NodeEngine} reference for this thread,
+     * or throws an {@link IllegalStateException} if one could not be found.
+     *
+     * @return This thread's {@link NodeEngine} reference.
+     */
     public static NodeEngine getNamespaceThreadLocalContext() {
         NodeEngineThreadLocalContext tlContext = NE_THREAD_LOCAL.get();
         if (tlContext == null) {
@@ -56,6 +78,12 @@ public final class NodeEngineThreadLocalContext {
         }
     }
 
+    /**
+     * Retrieves the currently set {@link NodeEngine} reference for this thread,
+     * or {@code null} if one could not be found.
+     *
+     * @return This thread's {@link NodeEngine} reference if available, or {@code null}.
+     */
     public static NodeEngine getNamespaceThreadLocalContextOrNull() {
         NodeEngineThreadLocalContext tlContext = NE_THREAD_LOCAL.get();
         if (tlContext == null) {

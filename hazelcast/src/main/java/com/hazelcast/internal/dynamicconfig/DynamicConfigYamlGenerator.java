@@ -129,8 +129,8 @@ public class DynamicConfigYamlGenerator {
     private static final boolean DEFAULT_MASK_SENSITIVE_FIELDS = false;
     private static volatile boolean maskSensitiveFields = DEFAULT_MASK_SENSITIVE_FIELDS;
 
-    String generate(Config config, boolean isMask) {
-        maskSensitiveFields = isMask;
+    public String generate(Config config, boolean maskSensitiveFields) {
+        DynamicConfigYamlGenerator.maskSensitiveFields = maskSensitiveFields;
         Map<String, Object> document = new LinkedHashMap<>();
         Map<String, Object> root = new LinkedHashMap<>();
         document.put("hazelcast", root);
@@ -159,6 +159,10 @@ public class DynamicConfigYamlGenerator {
         advancedNetworkConfigYamlGenerator(root, config);
         dataConnectionYamlGenerator(root, config);
         namespacesConfigGenerator(root, config);
+
+        // Reset maskSensitiveFields to default
+        DynamicConfigYamlGenerator.maskSensitiveFields = DEFAULT_MASK_SENSITIVE_FIELDS;
+
         DumpSettings dumpSettings = DumpSettings.builder()
                 .setDefaultFlowStyle(FlowStyle.BLOCK)
                 .setIndicatorIndent(INDENT - 2)

@@ -380,7 +380,7 @@ public class RingbufferService implements ManagedService, RemoteService, Chunked
     }
 
     /**
-     * Looks up the UCD Namespace ID associated with the specified map name. This starts
+     * Looks up the UCD Namespace Name associated with the specified map name. This starts
      * by looking for an existing {@link RingbufferContainer} and checking its defined
      * {@link RingbufferConfig}. If the {@link RingbufferContainer} does not exist (containers
      * are created lazily), then fallback to checking the Node's config tree directly.
@@ -388,7 +388,7 @@ public class RingbufferService implements ManagedService, RemoteService, Chunked
      * @param engine         {@link NodeEngine} implementation of this member for service and config lookups
      * @param ringbufferName The name of the {@link com.hazelcast.ringbuffer.Ringbuffer} to lookup for
      * @param partitionId    The partition ID for the Ringbuffer defined by the {@code ringbufferName}
-     * @return the Namespace ID if found, or {@code null} otherwise.
+     * @return the Namespace Name if found, or {@code null} otherwise.
      */
     public static String lookupUcdNamespace(NodeEngine engine, String ringbufferName, int partitionId) {
         if (engine.getNamespaceService().isEnabled()) {

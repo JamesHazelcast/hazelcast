@@ -142,7 +142,6 @@ public class ListenerConfigHolder {
         validate();
         ListenerConfig listenerConfig = null;
         if (className != null) {
-            // TODO NS: Double-check NS awareness needs for all below
             switch (listenerType) {
                 case GENERIC:
                     listenerConfig = new ListenerConfig(className);

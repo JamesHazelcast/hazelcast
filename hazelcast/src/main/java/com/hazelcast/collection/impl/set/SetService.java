@@ -166,14 +166,14 @@ public class SetService extends CollectionService implements DynamicMetricsProvi
     }
 
     /**
-     * Looks up the UCD Namespace ID associated with the specified set name. This starts
+     * Looks up the UCD Namespace Name associated with the specified set name. This starts
      * by looking for an existing {@link SetContainer} and checking its defined
      * {@link SetConfig}. If the {@link SetContainer} does not exist (containers are
      * created lazily), then fallback to checking the Node's config tree directly.
      *
      * @param engine  {@link NodeEngine} implementation of this member for service and config lookups
      * @param setName The name of the {@link com.hazelcast.collection.ISet} to lookup for
-     * @return the Namespace ID if found, or {@code null} otherwise.
+     * @return the Namespace Name if found, or {@code null} otherwise.
      */
     public static String lookupNamespace(NodeEngine engine, String setName) {
         if (engine.getNamespaceService().isEnabled()) {

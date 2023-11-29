@@ -65,7 +65,7 @@ public class MultipleEntryOperation extends MapOperation
 
         final SerializationService serializationService = getNodeEngine().getSerializationService();
         final ManagedContext managedContext = serializationService.getManagedContext();
-        // TODO NS NS-aware?
+        // Namespace awareness already in place from MapOperation#beforeRun
         entryProcessor = (EntryProcessor) managedContext.initialize(entryProcessor);
     }
 

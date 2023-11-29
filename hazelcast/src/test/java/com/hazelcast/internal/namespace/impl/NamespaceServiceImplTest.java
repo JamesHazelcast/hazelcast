@@ -82,7 +82,7 @@ public class NamespaceServiceImplTest {
                 new NamespaceServiceImpl(NamespaceServiceImplTest.class.getClassLoader(), Collections.emptyMap(), null);
 
         namespaceService.addNamespace("ns1", resources);
-        ClassLoader classLoader = namespaceService.namespaceToClassLoader.get("ns1");
+        ClassLoader classLoader = namespaceService.getClassLoaderForExactNamespace("ns1");
 
         for (String expectedClass : expectedClasses) {
             Class<?> clazz = classLoader.loadClass(expectedClass);
@@ -118,47 +118,6 @@ public class NamespaceServiceImplTest {
         }
     }
 
-    // TODO NS This test is hacky and probably does not belong here - we should refactor/move it eventually
-    @Test
-    void testXmlConfigLoadingForNamespacesWithIMap() {
-        String stringPath =
-                getCorrectedPathString(Paths.get("src", "test", "class", "usercodedeployment", "ChildParent.jar"));
-
-        String xmlPayload = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-                + "<hazelcast xmlns=\"http://www.hazelcast.com/schema/config\"\n"
-                + "           xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n"
-                + "           xsi:schemaLocation=\"http://www.hazelcast.com/schema/config\n"
-                + "           http://www.hazelcast.com/schema/config/hazelcast-config-5.4.xsd\">\n" + "\n"
-                + "    <cluster-name>cluster</cluster-name>\n\n"
-                + "    <namespaces enabled=\"true\">\n"
-                + "      <namespace name=\"myNamespace\">\n"
-                + "          <jar>\n"
-                + "              <url>file:///" + stringPath + "</url>\n"
-                + "          </jar>\n"
-                + "      </namespace>\n"
-                + "    </namespaces>\n\n"
-                + "    <map name=\"myMap\">\n"
-                + "        <namespace>myNamespace</namespace>\n"
-                + "    </map>\n"
-                + "</hazelcast>\n" + "\n";
-
-        HazelcastInstance instance = Hazelcast.newHazelcastInstance(Config.loadFromString(xmlPayload));
-        try {
-            NodeEngineImpl nodeEngine = getNodeEngineImpl(instance);
-            NamespaceService service = nodeEngine.getNamespaceService();
-            assertTrue(service.isEnabled());
-            assertTrue(nodeEngine.getConfigClassLoader() instanceof NamespaceAwareClassLoader);
-            assertTrue(service.hasNamespace("myNamespace"));
-
-            MapConfig mapConfig = instance.getConfig().getMapConfig("myMap");
-            assertEquals("myNamespace", mapConfig.getNamespace());
-        } finally {
-            instance.shutdown();
-        }
-    }
-
-    // TODO NS These tests are hacky and probably does not belong here (should be programmatic even, since we have
-    //      coverage in XMLConfigBuilderTest & YamlConfigBuilderTest?) We should refactor/move it eventually
     @Test
     void testXmlConfigDefinedFiltering_ClassBlacklist() {
         assertThrows(SecurityException.class, () -> testXmlConfigDefinedFiltering(
@@ -214,6 +173,7 @@ public class NamespaceServiceImplTest {
                 null, null));
     }
 
+    // This could be programmatic in the future, but serves its purpose as-is
     private void testXmlConfigDefinedFiltering(String blacklistLine, String whitelistLine) {
         String stringPath =
                 getCorrectedPathString(Paths.get("src", "test", "class", "usercodedeployment", "ChildParent.jar"));
@@ -260,7 +220,6 @@ public class NamespaceServiceImplTest {
     }
 
     // "No-op" implementation test
-    // TODO NS Should this be in a separate test class? It would only be the 1 test...
     @Test
     void testNoOpImplementation() {
         // Do not enable Namespaces in any form, results in No-Op implementation being used

@@ -227,7 +227,7 @@ public class TopicConfig implements IdentifiedDataSerializable, NamedConfig, Ver
     }
 
     /**
-     * Associates the provided Namespace ID with this structure for {@link ClassLoader} awareness.
+     * Associates the provided Namespace Name with this structure for {@link ClassLoader} awareness.
      * <p>
      * The behaviour of setting this to {@code null} is outlined in the documentation for
      * {@link NamespaceAwareConfig#DEFAULT_NAMESPACE}.

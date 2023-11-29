@@ -19,13 +19,22 @@ package com.hazelcast.internal.namespace.impl;
 import com.hazelcast.internal.namespace.NamespaceService;
 import com.hazelcast.internal.namespace.ResourceDefinition;
 import com.hazelcast.internal.util.ExceptionUtil;
+import com.hazelcast.spi.impl.NodeEngine;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.concurrent.Callable;
 
+/**
+ * No-operations implementation for {@link NamespaceService} used when Namespaces are disabled.
+ * Replaced by {@link NamespaceServiceImpl} when Namespaces are enabled.
+ */
 public final class NoOpNamespaceService implements NamespaceService {
+    /**
+     * {@link NodeEngine#getConfigClassLoader()} defined {@link ClassLoader} to use in invocations
+     * where returning {@code null} would break functionality.
+     */
     private final ClassLoader configClassLoader;
 
     public NoOpNamespaceService(ClassLoader configClassLoader) {

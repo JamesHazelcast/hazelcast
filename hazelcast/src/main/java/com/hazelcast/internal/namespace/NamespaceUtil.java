@@ -28,46 +28,102 @@ import java.util.concurrent.Callable;
 import static com.hazelcast.internal.util.ExceptionUtil.sneakyThrow;
 
 /**
- * Utility to simplify accessing the NamespaceService and Namespace-aware wrapping
+ * Utility to simplify accessing the NamespaceService and Namespace-aware wrapping,
+ * as well as provide some useful additional functionality on top of the service
+ * implementation, such as providing a default {@link ClassLoader} where specified.
+ *
+ * @since 5.4
  */
 public class NamespaceUtil {
 
+    /** Private constructor to prevent instantiation **/
     private NamespaceUtil() {
     }
 
-    // TODO NS Docs for all methods
+    /**
+     * Obtains a {@link NodeEngine} reference from {@link NodeEngineThreadLocalContext}
+     * and uses it to call {@link NamespaceService#setupNamespace(String)} with the provided
+     * parameter.
+     *
+     * @see NamespaceService#setupNamespace(String)
+     */
     public static void setupNamespace(@Nullable String namespace) {
         NodeEngine engine = NodeEngineThreadLocalContext.getNamespaceThreadLocalContext();
         setupNamespace(engine, namespace);
     }
 
+    /**
+     * Obtains a {@link NodeEngine} reference from {@link NodeEngineThreadLocalContext}
+     * and uses it to call {@link NamespaceService#cleanupNamespace(String)} with the provided
+     * parameter.
+     *
+     * @see NamespaceService#cleanupNamespace(String)
+     */
     public static void cleanupNamespace(@Nullable String namespace) {
         NodeEngine engine = NodeEngineThreadLocalContext.getNamespaceThreadLocalContext();
         cleanupNamespace(engine, namespace);
     }
 
+    /**
+     * Convenience method for calling the same method name within the {@link NamespaceService},
+     * obtained from the provided {@link NodeEngine}.
+     *
+     * @see NamespaceService#setupNamespace(String)
+     */
     public static void setupNamespace(NodeEngine engine, @Nullable String namespace) {
         engine.getNamespaceService().setupNamespace(namespace);
     }
 
+    /**
+     * Convenience method for calling the same method name within the {@link NamespaceService},
+     * obtained from the provided {@link NodeEngine}.
+     *
+     * @see NamespaceService#cleanupNamespace(String)
+     */
     public static void cleanupNamespace(NodeEngine engine, @Nullable String namespace) {
         engine.getNamespaceService().cleanupNamespace(namespace);
     }
 
+    /**
+     * Obtains a {@link NodeEngine} reference from {@link NodeEngineThreadLocalContext}
+     * and uses it to call {@link NamespaceService#runWithNamespace(String, Runnable)} with
+     * the provided parameters.
+     *
+     * @see NamespaceService#runWithNamespace(String, Runnable)
+     */
     public static void runWithNamespace(@Nullable String namespace, Runnable runnable) {
         NodeEngine engine = NodeEngineThreadLocalContext.getNamespaceThreadLocalContext();
         runWithNamespace(engine, namespace, runnable);
     }
 
+    /**
+     * Convenience method for calling the same method name within the {@link NamespaceService},
+     * obtained from the provided {@link NodeEngine}.
+     *
+     * @see NamespaceService#runWithNamespace(String, Runnable)
+     */
     public static void runWithNamespace(NodeEngine engine, @Nullable String namespace, Runnable runnable) {
         engine.getNamespaceService().runWithNamespace(namespace, runnable);
     }
 
+    /**
+     * Obtains a {@link NodeEngine} reference from {@link NodeEngineThreadLocalContext}
+     * and uses it to call {@link NamespaceService#callWithNamespace(String, Callable)} with
+     * the provided parameters.
+     *
+     * @see NamespaceService#callWithNamespace(String, Callable)
+     */
     public static <V> V callWithNamespace(@Nullable String namespace, Callable<V> callable) {
         NodeEngine engine = NodeEngineThreadLocalContext.getNamespaceThreadLocalContext();
         return callWithNamespace(engine, namespace, callable);
     }
 
+    /**
+     * Convenience method for calling the same method name within the {@link NamespaceService},
+     * obtained from the provided {@link NodeEngine}.
+     *
+     * @see NamespaceService#callWithNamespace(String, Callable)
+     */
     public static <V> V callWithNamespace(NodeEngine engine, @Nullable String namespace, Callable<V> callable) {
         return engine.getNamespaceService().callWithNamespace(namespace, callable);
     }
@@ -175,20 +231,51 @@ public class NamespaceUtil {
         }
     }
 
-    // Use namespace ClassLoader if it exists, otherwise fallback to config class loader
+    /**
+     * Looks for a Namespace associated {@link MapResourceClassLoader} defined by the provided
+     * {@code Namespace} name, and returns it if available. If not available, this method
+     * will retrieve a default {@link ClassLoader} instance to use as a fallback, as
+     * defined by {@link #getDefaultClassloader(NodeEngine)}.
+     *
+     * @param engine    the {@link NodeEngine} instance to use for accessing the {@link NamespaceService}
+     * @param namespace the {@code Namespace} name to use for looking up the Namespace {@link ClassLoader}
+     * @return the {@link ClassLoader} for the provided {@code Namespace} if it exists, or else a fallback
+     *         {@link ClassLoader} as defined by {@link #getDefaultClassloader(NodeEngine)}.
+     */
     public static ClassLoader getClassLoaderForNamespace(NodeEngine engine, @Nullable String namespace) {
         ClassLoader loader = engine.getNamespaceService().getClassLoaderForNamespace(namespace);
         return loader != null ? loader : getDefaultClassloader(engine);
     }
 
-    // Use namespace CL if exists, otherwise fallback to config class loader
+    /**
+     * Looks for a Namespace associated {@link MapResourceClassLoader} defined by the provided
+     * {@code Namespace} name, and returns it if available. If not available, this method
+     * will return the provided {@link ClassLoader}.
+     *
+     * @param engine        the {@link NodeEngine} instance to use for accessing the {@link NamespaceService}
+     * @param namespace     the {@code Namespace} name to use for looking up the Namespace {@link ClassLoader}
+     * @param defaultLoader the fallback {@link ClassLoader} to use if a Namespace-associated one is not available.
+     * @return the {@link ClassLoader} for the provided {@code Namespace} if it exists, or else the provided
+     *         {@link ClassLoader} {@code defaultLoader}.
+     */
     public static ClassLoader getClassLoaderForNamespace(NodeEngine engine, @Nullable String namespace,
                                                          ClassLoader defaultLoader) {
         ClassLoader loader = engine.getNamespaceService().getClassLoaderForNamespace(namespace);
         return loader != null ? loader : defaultLoader;
     }
 
-    // Use default namespace CL if exists, otherwise fallback to config class loader
+    /**
+     * Attempts to retrieve the default {@code Namespace} {@link ClassLoader} if available, otherwise
+     * retrieves the config-defined {@link ClassLoader} from {@link NodeEngine#getConfigClassLoader()}.
+     * <p>
+     * The default Namespace is retrieved by calling {@link NamespaceService#getClassLoaderForNamespace(String)}
+     * with a {@code null} Namespace name, which results in the {@link NamespaceService} checking for a
+     * default Namespace (defined with name {@link NamespaceService#DEFAULT_NAMESPACE_NAME}).
+     *
+     * @param engine the {@link NodeEngine} instance to use for accessing the {@link NamespaceService}
+     * @return the default {@code Namespace} {@link MapResourceClassLoader} if defined, or the
+     *         config-defined {@link ClassLoader} from {@link NodeEngine#getConfigClassLoader()}.
+     */
     public static ClassLoader getDefaultClassloader(NodeEngine engine) {
         // Call with `null` namespace, which will fallback to a default Namespace if available
         ClassLoader loader = engine.getNamespaceService().getClassLoaderForNamespace(null);

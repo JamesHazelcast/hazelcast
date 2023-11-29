@@ -23,7 +23,9 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
- * A thread-local context that maintains a ClassLoader instance for use in operations.
+ * A thread-local context that maintains a {@link ClassLoader} instance for use in providing
+ * Namespace awareness to areas of execution that require it.
+ * <p><
  * Must be setup around user-code serde in client messages, and execution on members.
  * Additionally, should be propagated via member-to-member operations.
  */
@@ -59,6 +61,15 @@ public final class NamespaceThreadLocalContext {
                 + '}';
     }
 
+    /**
+     * Sets the provided {@link ClassLoader} as this thread's {@link ThreadLocal}
+     * loader instance, to be used for Namespace aware class loading.
+     * <p>
+     * @implNote It is important that <b>context is cleaned up after</b> by invoking
+     * either {@link #onCompleteNsAware(ClassLoader)} or {@link #onCompleteNsAware(String)}.
+     *
+     * @param classLoader the {@link ClassLoader} to use for Namespace awareness.
+     */
     public static void onStartNsAware(ClassLoader classLoader) {
         assert classLoader != null;
         NamespaceThreadLocalContext tlContext = NS_THREAD_LOCAL.get();
@@ -76,12 +87,25 @@ public final class NamespaceThreadLocalContext {
         }
     }
 
+    /**
+     * Removes the currently set {@link ClassLoader} from this thread's {@link ThreadLocal}
+     * variable, if it matches the provided {@link ClassLoader} instance.
+     *
+     * @param classLoader the {@link ClassLoader} to expect when removing.
+     */
     public static void onCompleteNsAware(ClassLoader classLoader) {
         onCompleteNsAware(tlContext -> Objects.equals(tlContext.classLoader, classLoader),
                 tlContext -> "Attempted to complete NSTLContext for classLoader " + classLoader
                         + " but there is an existing context: " + tlContext);
     }
 
+    /**
+     * Removes the currently set {@link ClassLoader} from this thread's {@link ThreadLocal}
+     * variable, if it's {@link MapResourceClassLoader#getNamespace()} matches the provided
+     * {@code Namespace} ID.
+     *
+     * @param namespace the {@code Namespace} ID to expect when removing.
+     */
     public static void onCompleteNsAware(String namespace) {
         onCompleteNsAware(tlContext -> tlContext.classLoader instanceof MapResourceClassLoader
                         && Objects.equals(((MapResourceClassLoader) tlContext.classLoader).getNamespace(), namespace),
@@ -109,6 +133,12 @@ public final class NamespaceThreadLocalContext {
         }
     }
 
+    /**
+     * Retrieves the {@link ClassLoader} currently stored within this
+     * thread's {@link ThreadLocal} variable.
+     *
+     * @return the {@link ClassLoader} instance if available, or {@code null}.
+     */
     public static ClassLoader getClassLoader() {
         NamespaceThreadLocalContext tlContext = NS_THREAD_LOCAL.get();
         if (tlContext == null) {

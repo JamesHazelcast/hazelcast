@@ -65,12 +65,7 @@ import static com.hazelcast.jet.impl.util.ReflectionUtils.toClassResourceId;
  *  </ul>
  */
 public class MapResourceClassLoader extends JetDelegatingClassLoader {
-    public static final String DEBUG_OUTPUT_PROPERTY = "hazelcast.classloading.debug";
-
     static final String PROTOCOL = "map-resource";
-
-    // TODO Shouldn't this be a logging param?
-    private static final boolean DEBUG_OUTPUT = Boolean.getBoolean(DEBUG_OUTPUT_PROPERTY);
 
     protected final Supplier<? extends Map<String, byte[]>> resourcesSupplier;
     /**
@@ -78,10 +73,10 @@ public class MapResourceClassLoader extends JetDelegatingClassLoader {
      * is queried. Otherwise, only resources in this ClassLoader are searched.
      */
     protected final boolean childFirst;
-    protected volatile boolean isShutdown;
 
     private final ILogger logger = Logger.getLogger(getClass());
     private final @Nullable String namespace;
+    protected volatile boolean isShutdown;
 
     static {
         ClassLoader.registerAsParallelCapable();
@@ -107,6 +102,7 @@ public class MapResourceClassLoader extends JetDelegatingClassLoader {
         this.childFirst = childFirst;
     }
 
+    @Nullable
     public String getNamespace() {
         return namespace;
     }
@@ -124,7 +120,7 @@ public class MapResourceClassLoader extends JetDelegatingClassLoader {
                     klass = findClass(name);
                 }
             } catch (ClassNotFoundException ignored) {
-                if (DEBUG_OUTPUT) {
+                if (logger.isFinestEnabled()) {
                     logger.finest(ignored);
                 }
             }
@@ -275,10 +271,10 @@ public class MapResourceClassLoader extends JetDelegatingClassLoader {
     }
 
     ClassNotFoundException newClassNotFoundException(String name) {
-        if (DEBUG_OUTPUT) {
-            String message = "For name " + name + " no resource could be identified. List of resources:\n"
-                    + getResourceMap().keySet();
-            return new ClassNotFoundException(message);
+        // Output more detail if we're `FINEST` logging
+        if (logger.isFinestEnabled()) {
+            return new ClassNotFoundException("No resource could be identified for '" + name + "'. List of resources:\n"
+                    + getResourceMap().keySet());
         }
         return new ClassNotFoundException(name);
     }

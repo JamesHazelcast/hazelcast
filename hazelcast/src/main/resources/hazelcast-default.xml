@@ -564,8 +564,4 @@
         </edge-defaults>
     </jet>
     <integrity-checker enabled="false"/>
-
-    <!-- TODO NS: Properly document -->
-    <namespaces enabled="false">
-    </namespaces>
 </hazelcast>

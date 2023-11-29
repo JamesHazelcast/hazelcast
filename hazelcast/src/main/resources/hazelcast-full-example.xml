@@ -869,7 +869,7 @@
             Adds the Split Brain Protection for this data-structure which you configure using the <split-brain-protection>
             element. You should set the <split-brain-protection-ref>'s value as the <split-brain-protection>'s name.
         * <namespace>:
-            Associates this executor with the specified Namespace ID, as defined in the <namespaces> config section.
+            Associates this executor with the specified Namespace Name, as defined in the <namespaces> config section.
             This means all executions related to this executor will run with the context of that Namespace.
     -->
     <executor-service name="default">
@@ -896,7 +896,7 @@
             Adds the Split Brain Protection for this data-structure which you configure using the <split-brain-protection>
             element. You should set the <split-brain-protection-ref>'s value as the <split-brain-protection>'s name.
         * <namespace>:
-            Associates this executor with the specified Namespace ID, as defined in the <namespaces> config section.
+            Associates this executor with the specified Namespace Name, as defined in the <namespaces> config section.
             This means all executions related to this executor will run with the context of that Namespace.
     -->
     <durable-executor-service name="default">
@@ -930,7 +930,7 @@
             The default policy is PutIfAbsentMergePolicy with a batch size of 100.
             This is the policy used when merging entries from sub-clusters (after split-brain recovery).
         * <namespace>:
-            Associates this executor with the specified Namespace ID, as defined in the <namespaces> config section.
+            Associates this executor with the specified Namespace Name, as defined in the <namespaces> config section.
             This means all executions related to this executor will run with the context of that Namespace.
     -->
     <scheduled-executor-service name="default">
@@ -1026,7 +1026,7 @@
             If this value is non-null, then Hazelcast will ignore the queue store
             "memory-limit" configuration value.
         * <namespace>:
-            Associates this queue with the specified Namespace ID, as defined in the <namespaces> config section.
+            Associates this queue with the specified Namespace Name, as defined in the <namespaces> config section.
             This means all executions related to this queue will run with the context of that Namespace.
     -->
     <queue name="default">
@@ -1361,7 +1361,7 @@
             Adds the split brain protection for this map which you configure using the <split-brain-protection> element.
             You should set the <split-brain-protection-ref>'s value as the <split-brain-protection>'s name.
         * <namespace>:
-            Associates this map with the specified Namespace ID, as defined in the <namespaces> config section.
+            Associates this map with the specified Namespace Name, as defined in the <namespaces> config section.
             This means all executions related to this map will run with the context of that Namespace.
      -->
     <map name="default">
@@ -1609,7 +1609,7 @@
             Adds the Split Brain Protection for this data-structure which you configure using the <split-brain-protection>
             element. You should set the <split-brain-protection-ref>'s value as the <split-brain-protection>'s name.
         * <namespace>:
-            Associates this replicated map with the specified Namespace ID, as defined in the <namespaces> config section.
+            Associates this replicated map with the specified Namespace Name, as defined in the <namespaces> config section.
             This means all executions related to this replicated map will run with the context of that Namespace.
     -->
     <replicatedmap name="replicatedMap1">
@@ -1779,7 +1779,7 @@
             Full-flush invalidation means the invalidation of events for all entries when clear is called.
             The default value is false.
         * <namespace>:
-            Associates this cache with the specified Namespace ID, as defined in the <namespaces> config section.
+            Associates this cache with the specified Namespace Name, as defined in the <namespaces> config section.
             This means all executions related to this cache will run with the context of that Namespace.
     -->
     <cache name="default">
@@ -1857,7 +1857,7 @@
             Adds the Split Brain Protection for this data-structure which you configure using the <split-brain-protection>
             element. You should set the <split-brain-protection-ref>'s value as the <split-brain-protection>'s name.
         * <namespace>:
-            Associates this list with the specified Namespace ID, as defined in the <namespaces> config section.
+            Associates this list with the specified Namespace Name, as defined in the <namespaces> config section.
             This means all executions related to this list will run with the context of that Namespace.
     -->
     <list name="default">
@@ -1896,7 +1896,7 @@
             Adds the Split Brain Protection for this data-structure which you configure using the <split-brain-protection>
             element. You should set the <split-brain-protection-ref>'s value as the <split-brain-protection>'s name.
         * <namespace>:
-            Associates this set with the specified Namespace ID, as defined in the <namespaces> config section.
+            Associates this set with the specified Namespace Name, as defined in the <namespaces> config section.
             This means all executions related to this set will run with the context of that Namespace.
     -->
     <set name="default">
@@ -1930,7 +1930,7 @@
             Default is `false`, meaning only one dedicated thread will handle topic messages.
             When multi-threading is enabled (true), all threads from event thread pool can be used for message handling.
         * <namespace>:
-            Associates this topic with the specified Namespace ID, as defined in the <namespaces> config section.
+            Associates this topic with the specified Namespace Name, as defined in the <namespaces> config section.
             This means all executions related to this topic will run with the context of that Namespace.
     -->
     <topic name="default">
@@ -2015,7 +2015,7 @@
         * <message-listeners>:
             Adds listeners (listener classes) for the Reliable Topic messages using its sub-element <message-listener>.
         * <namespace>:
-            Associates this reliable topic with the specified Namespace ID, as defined in the <namespaces> config section.
+            Associates this reliable topic with the specified Namespace Name, as defined in the <namespaces> config section.
             This means all executions related to this reliable topic will run with the context of that Namespace.
     -->
     <reliable-topic name="default">
@@ -2075,7 +2075,7 @@
             using the <split-brain-protection> element. You should set the
             <split-brain-protection-ref>'s value as the <split-brain-protection>'s name.
         * <namespace>:
-            Associates this ringbuffer with the specified Namespace ID, as defined in the <namespaces> config section.
+            Associates this ringbuffer with the specified Namespace Name, as defined in the <namespaces> config section.
             This means all executions related to this ringbuffer will run with the context of that Namespace.
     -->
     <ringbuffer name="default">

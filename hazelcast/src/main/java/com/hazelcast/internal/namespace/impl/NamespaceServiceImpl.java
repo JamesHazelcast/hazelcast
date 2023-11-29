@@ -47,11 +47,18 @@ import static com.hazelcast.config.ConfigAccessor.getResourceDefinitions;
 import static com.hazelcast.jet.impl.JobRepository.classKeyName;
 import static com.hazelcast.jet.impl.util.ReflectionUtils.toClassResourceId;
 
+/**
+ * Actual implementation for {@link NamespaceService} used when Namespaces are enabled.
+ * Replaced by {@link NoOpNamespaceService} when Namespaces are disabled.
+ */
 public final class NamespaceServiceImpl implements NamespaceService {
 
-    final ConcurrentMap<String, MapResourceClassLoader> namespaceToClassLoader = new ConcurrentHashMap<>();
+    /** Map of available {@link MapResourceClassLoader} instances, keyed by Namespace name*/
+    private final ConcurrentMap<String, MapResourceClassLoader> namespaceToClassLoader = new ConcurrentHashMap<>();
 
+    /** The fallback {@link ClassLoader} to use for awareness */
     private final ClassLoader configClassLoader;
+    /** Config-populated filter for Namespace loaded classes */
     private final SerializationClassNameFilter classFilter;
     private boolean hasDefaultNamespace;
 
@@ -66,6 +73,25 @@ public final class NamespaceServiceImpl implements NamespaceService {
         nsConfigs.forEach((nsName, nsConfig) -> addNamespace(nsName, getResourceDefinitions(nsConfig)));
     }
 
+    /**
+     * @inheritDocs
+     */
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
+    /**
+     * @inheritDocs
+     */
+    @Override
+    public boolean isDefaultNamespaceDefined() {
+        return hasDefaultNamespace;
+    }
+
+    /**
+     * @inheritDocs
+     */
     @Override
     public void addNamespace(@Nonnull String nsName, @Nonnull Collection<ResourceDefinition> resources) {
         Objects.requireNonNull(nsName, "namespace name cannot be null");
@@ -83,17 +109,20 @@ public final class NamespaceServiceImpl implements NamespaceService {
             cleanUpClassLoader(nsName, removed);
         }
         initializeClassLoader(nsName, updated);
-        if (nsName.equals(DEFAULT_NAMESPACE_ID)) {
+        if (nsName.equals(DEFAULT_NAMESPACE_NAME)) {
             hasDefaultNamespace = true;
         }
     }
 
+    /**
+     * @inheritDocs
+     */
     @Override
     public boolean removeNamespace(@Nonnull String nsName) {
         MapResourceClassLoader removed = namespaceToClassLoader.remove(nsName);
         if (removed != null) {
             cleanUpClassLoader(nsName, removed);
-            if (nsName.equals(DEFAULT_NAMESPACE_ID)) {
+            if (nsName.equals(DEFAULT_NAMESPACE_NAME)) {
                 hasDefaultNamespace = false;
             }
             return true;
@@ -102,19 +131,12 @@ public final class NamespaceServiceImpl implements NamespaceService {
         }
     }
 
+    /**
+     * @inheritDocs
+     */
     @Override
     public boolean hasNamespace(String namespace) {
         return namespaceToClassLoader.containsKey(namespace);
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
-
-    @Override
-    public boolean isDefaultNamespaceDefined() {
-        return hasDefaultNamespace;
     }
 
     // Namespace setup/cleanup handling functions
@@ -126,9 +148,9 @@ public final class NamespaceServiceImpl implements NamespaceService {
 
         ClassLoader loader = getClassLoaderForExactNamespace(namespace);
         if (loader == null) {
-            // TODO NS: Do we want to be this aggressive about floating Namespaces? We can only reach here if a
-            //  Namespace was defined for a Distributed Object, but not within Namespaces config; feels correct
-            throw new IllegalArgumentException("There is no environment defined for provided namespace: " + namespace);
+            throw new IllegalArgumentException(String.format("There is no environment defined for provided Namespace: %s\n"
+                    + "Add a new NamespaceConfig with the name '%s' and define resources to use this Namespace.",
+                    namespace, namespace));
         }
 
         NamespaceThreadLocalContext.onStartNsAware(loader);
@@ -141,16 +163,25 @@ public final class NamespaceServiceImpl implements NamespaceService {
         NamespaceThreadLocalContext.onCompleteNsAware(namespace);
     }
 
+    /**
+     * @inheritDocs
+     */
     @Override
     public void setupNamespace(@Nullable String namespace) {
         setupNs(transformNamespace(namespace));
     }
 
+    /**
+     * @inheritDocs
+     */
     @Override
     public void cleanupNamespace(@Nullable String namespace) {
         cleanupNs(transformNamespace(namespace));
     }
 
+    /**
+     * @inheritDocs
+     */
     @Override
     public void runWithNamespace(@Nullable String namespace, Runnable runnable) {
         namespace = transformNamespace(namespace);
@@ -162,6 +193,9 @@ public final class NamespaceServiceImpl implements NamespaceService {
         }
     }
 
+    /**
+     * @inheritDocs
+     */
     @Override
     public <V> V callWithNamespace(@Nullable String namespace, Callable<V> callable) {
         namespace = transformNamespace(namespace);
@@ -175,13 +209,25 @@ public final class NamespaceServiceImpl implements NamespaceService {
         }
     }
 
+    /**
+     * @inheritDocs
+     */
+    @Override
+    public ClassLoader getClassLoaderForNamespace(@Nullable String namespace) {
+        namespace = transformNamespace(namespace);
+        if (namespace != null) {
+            return namespaceToClassLoader.get(namespace);
+        }
+        return null;
+    }
+
     // Internal method to transform a `null` namespace into the default namespace if available
     private String transformNamespace(String namespace) {
         if (namespace != null) {
             return namespace;
             // Check if we have a `default` environment available
         } else if (isDefaultNamespaceDefined()) {
-            return DEFAULT_NAMESPACE_ID;
+            return DEFAULT_NAMESPACE_NAME;
         } else {
             // Namespace is null, no default Namespace is defined, fail-fast
             return null;
@@ -299,14 +345,5 @@ public final class NamespaceServiceImpl implements NamespaceService {
 
     MapResourceClassLoader getClassLoaderForExactNamespace(@Nonnull String namespace) {
         return namespaceToClassLoader.get(namespace);
-    }
-
-    @Override
-    public ClassLoader getClassLoaderForNamespace(@Nullable String namespace) {
-         namespace = transformNamespace(namespace);
-         if (namespace != null) {
-             return namespaceToClassLoader.get(namespace);
-         }
-        return null;
     }
 }

@@ -18,28 +18,27 @@ package com.hazelcast.instance.impl;
 
 import com.hazelcast.config.Config;
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.test.Accessors;
+import com.hazelcast.internal.namespace.impl.NodeEngineThreadLocalContext;
+import com.hazelcast.spi.impl.NodeEngine;
 import com.hazelcast.test.HazelcastTestSupport;
+
+import static com.hazelcast.test.Accessors.getNodeEngineImpl;
 
 /** Stub to get a qualified instance of {@link Node#getConfigClassLoader()} */
 public abstract class ConfigClassLoaderTest extends HazelcastTestSupport {
     protected Config config;
-    protected ClassLoader nodeClassLoader;
-
-    protected HazelcastInstance lastInstance;
+    protected NodeEngine engine;
+    protected ClassLoader engineConfigClassLoader;
 
     public ConfigClassLoaderTest() {
         config = new Config();
         config.setClassLoader(HazelcastInstance.class.getClassLoader());
     }
 
-    // TODO NS: Better way of doing this? We need to create an instance (or mock lots of pieces that account for NS)
-    //  and we need to reference that instance for NodeEngine context in tests
-    protected void populateConfigClassLoader() {
-        if (lastInstance != null) {
-            lastInstance.getLifecycleService().terminate();
-        }
-        lastInstance = createHazelcastInstance(config);
-        nodeClassLoader = Accessors.getNode(lastInstance).getConfigClassLoader();
+    protected void createHazelcastInstanceWithConfig() {
+        HazelcastInstance instance = createHazelcastInstance(config);
+        engine = getNodeEngineImpl(instance);
+        engineConfigClassLoader = engine.getConfigClassLoader();
+        NodeEngineThreadLocalContext.declareNodeEngineReference(engine);
     }
 }

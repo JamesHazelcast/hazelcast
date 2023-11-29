@@ -86,18 +86,10 @@ public class NamespaceAwareClassLoaderIntegrationTest extends HazelcastTestSuppo
 
     @BeforeClass
     public static void setUpClass() throws IOException {
-        // TODO NS Remove?
-        System.setProperty(MapResourceClassLoader.DEBUG_OUTPUT_PROPERTY, "true");
         classRoot = Paths.get("src/test/class");
         mapResourceClassLoader = generateMapResourceClassLoaderForDirectory(classRoot);
         h2V202Artifact = new DefaultArtifact("com.h2database", "h2", null, "2.0.202");
         h2V204Artifact = new DefaultArtifact("com.h2database", "h2", null, "2.0.204");
-    }
-
-    @AfterClass
-    public static void cleanUpClass() {
-        // TODO NS Remove?
-        System.clearProperty(MapResourceClassLoader.DEBUG_OUTPUT_PROPERTY);
     }
 
     @Before
@@ -106,32 +98,11 @@ public class NamespaceAwareClassLoaderIntegrationTest extends HazelcastTestSuppo
         config.getNamespacesConfig().setEnabled(true);
     }
 
-    // TODO NS: This only validates cleanup from the test environment; would be good to
-    //  validate for all threads somehow?
-    @After
-    public void validateNamespaceCleanup() {
-        assertNull(NamespaceThreadLocalContext.getClassLoader());
-    }
-
     /**
-     * "As a java developer, I can statically configure a namespace with a java class that gets resolved at runtime. I can run a
-     * customer entry processor and configure an IMap in that namespace, allowing me to execute that entry processor on that
-     * IMap. Namespace isolation: As a Java developer, I can configure N > 1 namespaces with simple Java class resources of same
-     * name and different behavior. IMaps configured in the respective namespaces will correctly load and execute the respective
-     * EntryProcessor defined in their namespace, without class name clashes."
-     *
-     * Asserts a basic user workflow:
-     * <ol>
-     * <li>Add classes to the {@link NamespaceConfig}
-     * <li>Assert that those classes aren't accessible by default
-     * <li>Configure the a {@link HazelcastInstance} with isolated {@link IMap}s using those classes
-     * <li>Assert that those classes are isolated - even with overlapping names, the correct class is used
-     * <ol>
-     *
      * @see <a href="https://hazelcast.atlassian.net/browse/HZ-3301">HZ-3301 - Test case for Milestone 1 use cases</a>
      */
     @Test
-    public void testMilestone1() {
+    public void testNamespaceClassResolution() {
         // "I can statically configure a namespace with a java class that gets resolved at runtime"
         for (CaseValueProcessor processor : CaseValueProcessor.values()) {
             processor.addNamespaceToConfig(config);
@@ -152,22 +123,11 @@ public class NamespaceAwareClassLoaderIntegrationTest extends HazelcastTestSuppo
     }
 
     /**
-     * "As a Java developer, I can define a MapLoader with JDBC driver dependency in a namespace and IMap configured with that
-     * namespace will correctly instantiate and use my MapLoader."
-     *
-     * Asserts a basic user workflow:
-     * <ol>
-     * <li>Creates a {@link NamespaceConfig} referencing a {@link MapLoader} {@code .class} and it's database dependency - which
-     * *aren't* on the classpath
-     * <li>Create a map, configuring the {@link NamespaceConfig} and {@link MapLoader}
-     * <li>Assert the {@link MapLoader} has loaded data via the database dependency via some dummy call
-     * <ol>
-     *
      * @see <a href="https://hazelcast.atlassian.net/browse/HZ-3357">HZ-3357 - Test case for Milestone 1 dependencies use
      *      cases</a>
      */
     @Test
-    public void testMilestone1Dependencies() throws Exception {
+    public void testJDBCDriverDependencyHandling() throws Exception {
         String mapName = randomMapName();
         String className = "usercodedeployment.DerbyUpperCaseStringMapLoader";
 
@@ -192,22 +152,11 @@ public class NamespaceAwareClassLoaderIntegrationTest extends HazelcastTestSuppo
     }
 
     /**
-     * "Isolation against Hazelcast member classpath: even when Hazelcast member classpath includes a clashing version of my
-     * JDBC driver, my preferred JDBC driver version that is configured in namespace resources is used by my MapLoader."
-     *
-     * Asserts a basic user workflow:
-     * <ol>
-     * <li>Creates a {@link NamespaceConfig} referencing a {@link MapLoader} {@code .class} and it's database dependency - which
-     * is a *different* one than on classpath
-     * <li>Create a map, configuring the {@link NamespaceConfig} and {@link MapLoader}
-     * <li>Assert the {@link MapLoader} has used the {@link NamespaceConfig} database dependency version
-     * <ol>
-     *
      * @see <a href="https://hazelcast.atlassian.net/browse/HZ-3357">HZ-3357 - Test case for Milestone 1 dependencies use
      *      cases</a>
      */
     @Test
-    public void testMilestone1DependenciesIsolation() throws Exception {
+    public void testNamespaceClassapthIsolation() throws Exception {
         String mapName = randomMapName();
         String className = "usercodedeployment.H2WithDriverManagerBuildVersionMapLoader";
 
@@ -231,15 +180,11 @@ public class NamespaceAwareClassLoaderIntegrationTest extends HazelcastTestSuppo
                 namespaceH2Version);
     }
 
-    // TODO NS I think all the "milestone" tests should be in their own class(es) that extend this one
     /**
-     * "As a Java developer, I can dynamically configure namespaces and their resources. A new data structure config I add at
-     * runtime, can reference a namespace I dynamically added and resources will be looked up in the configured namespace."
-     *
      * @see <a href="https://hazelcast.atlassian.net/browse/HZ-3413">HZ-3413 - Test cases for Milestone 2</a>
      */
     @Test
-    public void testMilestone2TestCase1() {
+    public void testNamespaceResourceDynamicLoading() {
         HazelcastInstance hazelcastInstance = createHazelcastInstance(config);
 
         CaseValueProcessor processor = CaseValueProcessor.LOWER_CASE_VALUE_ENTRY_PROCESSOR;
@@ -259,14 +204,10 @@ public class NamespaceAwareClassLoaderIntegrationTest extends HazelcastTestSuppo
     }
 
     /**
-     * "As a Java developer, I can replace the resources in a namespace at runtime and they will be picked up the next time a
-     * user customization is instantiated. Can be tested e.g. with an EntryProcessor that is executed with on implementation,
-     * then namespace is updated with a new implementation and execute the EntryProcessor again to observe updated behaviour."
-     *
      * @see <a href="https://hazelcast.atlassian.net/browse/HZ-3413">HZ-3413 - Test cases for Milestone 2</a>
      */
     @Test
-    public void testMilestone2TestCase2() {
+    public void testNamespaceResourceOverwriting() {
         CaseValueProcessor processor = CaseValueProcessor.LOWER_CASE_VALUE_ENTRY_PROCESSOR;
         CaseValueProcessor otherProcessor = CaseValueProcessor.UPPER_CASE_VALUE_ENTRY_PROCESSOR;
 
@@ -337,8 +278,6 @@ public class NamespaceAwareClassLoaderIntegrationTest extends HazelcastTestSuppo
     }
 
     /**
-     * TODO NS Should this be somewhere else?
-     *
      * @see <a href="https://hazelcast.atlassian.net/browse/HZ-3450">HZ-3450 - Implement message tasks for adding & removing
      *      namespaces</a>
      */
@@ -395,7 +334,6 @@ public class NamespaceAwareClassLoaderIntegrationTest extends HazelcastTestSuppo
                 "usercodedeployment.ComplexProcessor");
     }
 
-    // TODO NS use test parameters for nodeCount
     private void testMemberToMemberDeserialization(int nodeCount, String entryProcessClassName,
                                                                String... resourceClassNames) throws ReflectiveOperationException {
         assertGreaterOrEquals("nodeCount", nodeCount, 2);
@@ -431,8 +369,9 @@ public class NamespaceAwareClassLoaderIntegrationTest extends HazelcastTestSuppo
 
             // Execute processor on keys owned by other members
             IMap<String, Integer> clientMap = client.getMap(mapName);
-            EntryProcessor<String, Integer, ?> entryProcessor = (EntryProcessor<String, Integer, ?>) mapResourceClassLoader.loadClass(entryProcessClassName)
-                                                                                   .getConstructor().newInstance();
+            EntryProcessor<String, Integer, ?> entryProcessor =
+                    (EntryProcessor<String, Integer, ?>) mapResourceClassLoader.loadClass(entryProcessClassName)
+                                                                               .getConstructor().newInstance();
             for (int k = 0; k < instances.length; k++) {
                 HazelcastInstance instance = instances[k];
                 String key = (String) instance.getMap(mapName).localKeySet().iterator().next();
@@ -539,8 +478,7 @@ public class NamespaceAwareClassLoaderIntegrationTest extends HazelcastTestSuppo
         return OsHelper.ensureUnixSeparators(classKeyName);
     }
 
-    // TODO NS Put somewhere more sensible
-    public static Class<?> tryLoadClass(HazelcastInstance instance, String namespace, String className) throws ClassNotFoundException  {
+    private static Class<?> tryLoadClass(HazelcastInstance instance, String namespace, String className) throws ClassNotFoundException  {
         if (namespace != null) {
             NamespaceUtil.setupNamespace(getNodeEngineImpl(instance), namespace);
         }

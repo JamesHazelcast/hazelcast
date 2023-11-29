@@ -411,14 +411,14 @@ public class MapService implements ManagedService, ChunkedMigrationAwareService,
     }
 
     /**
-     * Looks up the UCD Namespace ID associated with the specified map name. This starts
+     * Looks up the UCD Namespace Name associated with the specified map name. This starts
      * by looking for an existing {@link MapContainer} and checking its defined
      * {@link MapConfig}. If the {@link MapContainer} does not exist (containers are
      * created lazily), then fallback to checking the Node's config tree directly.
      *
      * @param engine  {@link NodeEngine} implementation of this member for service and config lookups
      * @param mapName The name of the {@link com.hazelcast.map.IMap} to lookup for
-     * @return the Namespace ID if found, or {@code null} otherwise.
+     * @return the Namespace Name if found, or {@code null} otherwise.
      */
     public static String lookupNamespace(@Nonnull NodeEngine engine, @Nonnull String mapName) {
         if (engine.getNamespaceService().isEnabled()) {

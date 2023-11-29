@@ -116,12 +116,12 @@ public class ReliableTopicService implements ManagedService, RemoteService,
     }
 
     /**
-     * Looks up the UCD Namespace ID associated with the specified reliable topic name. This is done
+     * Looks up the UCD Namespace Name associated with the specified reliable topic name. This is done
      * by checking the Node's config tree directly.
      *
      * @param nodeEngine {@link NodeEngine} implementation of this member for service and config lookups
      * @param topicName  The name of the reliable {@link com.hazelcast.topic.ITopic} to lookup for
-     * @return the Namespace ID if found, or {@code null} otherwise.
+     * @return the Namespace Name if found, or {@code null} otherwise.
      */
     public static String lookupNamespace(NodeEngine nodeEngine, String topicName) {
         if (nodeEngine.getNamespaceService().isEnabled()) {

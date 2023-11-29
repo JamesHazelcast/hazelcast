@@ -31,18 +31,17 @@ public class NodeTest extends ConfigClassLoaderTest {
 
     @Test
     public void testConfigClassLoader_whenNoNamespaceExists_andUCDDisabled() {
-        populateConfigClassLoader();
-
-        assertSame(config.getClassLoader(), nodeClassLoader);
+        createHazelcastInstanceWithConfig();
+        assertSame(config.getClassLoader(), engineConfigClassLoader);
     }
 
     @Test
     public void testConfigClassLoader_whenNoNamespaceExists_andUCDEnabled_thenIsUCDClassLoader() {
         config.getUserCodeDeploymentConfig().setEnabled(true);
 
-        populateConfigClassLoader();
-        assertTrue(nodeClassLoader instanceof UserCodeDeploymentClassLoader);
-        assertSame(config.getClassLoader(), nodeClassLoader.getParent());
+        createHazelcastInstanceWithConfig();
+        assertTrue(engineConfigClassLoader instanceof UserCodeDeploymentClassLoader);
+        assertSame(config.getClassLoader(), engineConfigClassLoader.getParent());
     }
 
     @Test
@@ -51,9 +50,9 @@ public class NodeTest extends ConfigClassLoaderTest {
         config.getNamespacesConfig().setEnabled(true);
         config.getNamespacesConfig().addNamespaceConfig(new NamespaceConfig("namespace"));
 
-        populateConfigClassLoader();
-        assertTrue(nodeClassLoader instanceof NamespaceAwareClassLoader);
-        assertTrue(nodeClassLoader.getParent() instanceof UserCodeDeploymentClassLoader);
-        assertSame(config.getClassLoader(), nodeClassLoader.getParent().getParent());
+        createHazelcastInstanceWithConfig();
+        assertTrue(engineConfigClassLoader instanceof NamespaceAwareClassLoader);
+        assertTrue(engineConfigClassLoader.getParent() instanceof UserCodeDeploymentClassLoader);
+        assertSame(config.getClassLoader(), engineConfigClassLoader.getParent().getParent());
     }
 }

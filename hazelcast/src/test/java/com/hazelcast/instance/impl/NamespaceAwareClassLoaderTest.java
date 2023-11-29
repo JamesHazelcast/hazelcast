@@ -19,8 +19,6 @@ package com.hazelcast.instance.impl;
 import com.hazelcast.config.NamespaceConfig;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.internal.namespace.NamespaceUtil;
-import com.hazelcast.internal.namespace.impl.NamespaceThreadLocalContext;
-import com.hazelcast.internal.namespace.impl.NodeEngineThreadLocalContext;
 import com.hazelcast.internal.nio.IOUtil;
 import com.hazelcast.jet.impl.JobRepository;
 import com.hazelcast.jet.impl.deployment.MapResourceClassLoader;
@@ -30,7 +28,6 @@ import com.hazelcast.test.starter.MavenInterface;
 import org.apache.commons.io.FilenameUtils;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -77,23 +74,16 @@ public class NamespaceAwareClassLoaderTest extends ConfigClassLoaderTest {
         config.getNamespacesConfig().setEnabled(true);
     }
 
-    // TODO NS: This only validates cleanup from the test environment; would be good to
-    //  validate for all threads somehow?
-    @After
-    public void validateNamespaceCleanup() {
-        assertNull(NamespaceThreadLocalContext.getClassLoader());
-    }
-
     @Test
     public void whenLoadClassKnownToParent_thenIsLoaded() throws Exception {
-        populateConfigClassLoader();
+        createHazelcastInstanceWithConfig();
         Class<?> klass = tryLoadClass(null, "com.hazelcast.core.HazelcastInstance");
         assertSame(HazelcastInstance.class, klass);
     }
 
     @Test
     public void whenLoadClassKnownToParent_thenIsLoadedWithNoNamespaceDefined() throws Exception {
-        populateConfigClassLoader();
+        createHazelcastInstanceWithConfig();
         Class<?> klass = tryLoadClass(null, "com.hazelcast.core.HazelcastInstance");
         assertSame(HazelcastInstance.class, klass);
     }
@@ -102,7 +92,7 @@ public class NamespaceAwareClassLoaderTest extends ConfigClassLoaderTest {
     public void whenSimpleClassInNs_thenIsLoaded() throws Exception {
         config.getNamespacesConfig().addNamespaceConfig(
                 new NamespaceConfig("ns1").addClass(mapResourceClassLoader.loadClass("usercodedeployment.ParentClass")));
-         populateConfigClassLoader();
+         createHazelcastInstanceWithConfig();
 
         Class<?> parentClass = tryLoadClass("ns1", "usercodedeployment.ParentClass");
         assertInstanceOf(MapResourceClassLoader.class, parentClass.getClassLoader());
@@ -112,7 +102,7 @@ public class NamespaceAwareClassLoaderTest extends ConfigClassLoaderTest {
     public void whenSimpleClassInNs_thenIsNotLoadedWithNoNamespaceDefined() throws Exception {
         config.getNamespacesConfig().addNamespaceConfig(
                 new NamespaceConfig("ns1").addClass(mapResourceClassLoader.loadClass("usercodedeployment.ParentClass")));
-        populateConfigClassLoader();
+        createHazelcastInstanceWithConfig();
 
         assertThrows(ClassNotFoundException.class, () -> tryLoadClass(null, "usercodedeployment.ParentClass"));
     }
@@ -122,7 +112,7 @@ public class NamespaceAwareClassLoaderTest extends ConfigClassLoaderTest {
         config.getNamespacesConfig().addNamespaceConfig(
                 new NamespaceConfig("ns1").addClass(mapResourceClassLoader.loadClass("usercodedeployment.ParentClass"))
                         .addClass(mapResourceClassLoader.loadClass("usercodedeployment.ChildClass")));
-         populateConfigClassLoader();
+         createHazelcastInstanceWithConfig();
 
         Class<?> childClass = tryLoadClass("ns1", "usercodedeployment.ChildClass");
         assertEquals("usercodedeployment.ParentClass", childClass.getSuperclass().getName());
@@ -134,7 +124,7 @@ public class NamespaceAwareClassLoaderTest extends ConfigClassLoaderTest {
     public void whenLoadInnerClassKnownToParent_thenIsLoaded() throws Exception {
         config.getNamespacesConfig().addNamespaceConfig(new NamespaceConfig("ns1").addJar(
                 urlFromFile(fileRelativeToBinariesFolder("/usercodedeployment/EntryProcessorWithAnonymousAndInner.jar")), null));
-         populateConfigClassLoader();
+         createHazelcastInstanceWithConfig();
 
         tryLoadClass("ns1", "usercodedeployment.EntryProcessorWithAnonymousAndInner");
         tryLoadClass("ns1", "usercodedeployment.EntryProcessorWithAnonymousAndInner$Test");
@@ -154,14 +144,13 @@ public class NamespaceAwareClassLoaderTest extends ConfigClassLoaderTest {
     public void testServiceLoader_whenMultipleServicesOnClasspath() throws Exception {
         config.getNamespacesConfig().addNamespaceConfig(
                 new NamespaceConfig("ns1").addJar(MavenInterface.locateArtifact(h2V202Artifact).toUri().toURL(), null));
-        populateConfigClassLoader();
+        createHazelcastInstanceWithConfig();
         ClassLoader testClassLoader = NamespaceAwareClassLoaderTest.class.getClassLoader();
 
         // We need to provide NodeEngine context (as would be in place for Operations normally)
-        NodeEngineThreadLocalContext.declareNodeEngineReference(getNodeEngineImpl(lastInstance));
         NamespaceUtil.runWithNamespace("ns1", () -> {
             int countInTestClasspath = countSqlDriversOf(testClassLoader);
-            int countInNamespace = countSqlDriversOf(nodeClassLoader);
+            int countInNamespace = countSqlDriversOf(engineConfigClassLoader);
             // namespace classpath contains one additional URL to META-INF/services/java.sql.Driver
             // in the H2 JDBC driver artifact added to the namespace
             assertEquals(countInTestClasspath + 1, countInNamespace);
@@ -179,7 +168,7 @@ public class NamespaceAwareClassLoaderTest extends ConfigClassLoaderTest {
             assertEquals(2, h2DriverFromTestCP.getMinorVersion());
 
             Driver h2DriverFromNamespaceCP = null;
-            loader = ServiceLoader.load(Driver.class, nodeClassLoader);
+            loader = ServiceLoader.load(Driver.class, engineConfigClassLoader);
             List<ServiceLoader.Provider<Driver>> providers =
                     loader.stream().filter(d -> d.type().getName().equals("org.h2.Driver")).collect(Collectors.toList());
             assertEquals(1, providers.size());
@@ -211,16 +200,16 @@ public class NamespaceAwareClassLoaderTest extends ConfigClassLoaderTest {
 
     Class<?> tryLoadClass(String namespace, String className) throws Exception {
         if (namespace != null) {
-            NamespaceUtil.setupNamespace(getNodeEngineImpl(lastInstance), namespace);
+            NamespaceUtil.setupNamespace(engine, namespace);
         }
         try {
-            return nodeClassLoader.loadClass(className);
+            return engineConfigClassLoader.loadClass(className);
         } catch (ClassNotFoundException e) {
             throw new ClassNotFoundException(
                     MessageFormat.format("\"{0}\" class not found in \"{1}\" namespace", className, namespace), e);
         } finally {
             if (namespace != null) {
-                NamespaceUtil.cleanupNamespace(getNodeEngineImpl(lastInstance), namespace);
+                NamespaceUtil.cleanupNamespace(engine, namespace);
             }
         }
     }

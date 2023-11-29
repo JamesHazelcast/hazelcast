@@ -25,6 +25,7 @@ import com.hazelcast.config.ListenerConfig;
 import com.hazelcast.config.MapConfig;
 import com.hazelcast.config.NamespaceConfig;
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.internal.dynamicconfig.DynamicConfigYamlGenerator;
 import com.hazelcast.internal.util.ExceptionUtil;
 import com.hazelcast.logging.ILogger;
 import com.hazelcast.logging.Logger;
@@ -193,8 +194,7 @@ public abstract class UCDTest extends HazelcastTestSupport {
                 break;
 
             case STATIC_YAML:
-                // TODO NS - replace with YAML variant once located
-                configString = new ConfigXmlGenerator(true, false).generate(config);
+                configString = new DynamicConfigYamlGenerator().generate(config, false);
                 break;
 
             default:
@@ -364,17 +364,15 @@ public abstract class UCDTest extends HazelcastTestSupport {
     protected void assertListenerFired(String key) throws ReflectiveOperationException {
         Collection<String> result = instance.getSet(getClassObject().getSimpleName());
 
-        // TODO NS replace polling with entrylistener, to catch as values are added
         assertTrueEventually(() -> {
             if (LOGGER.isFinestEnabled()) {
                 LOGGER.finest("Checking map for values, currently contains %s", result);
             }
 
             assertTrue(result.contains(key));
-        }, 5);
+        });
     }
 
-    // TODO NS Should these be moved into their own classes?
     protected enum ConnectionStyle {
         /** Work directly with the underlying {@link HazelcastInstance} */
         EMBEDDED,
@@ -384,7 +382,6 @@ public abstract class UCDTest extends HazelcastTestSupport {
         MEMBER_TO_MEMBER;
     }
 
-    // TODO NS Should these be moved into their own classes?
     protected enum ConfigStyle {
         /** All configuration is set programmatically <strong>before</strong> the instance is started */
         STATIC_PROGRAMMATIC,
@@ -396,7 +393,6 @@ public abstract class UCDTest extends HazelcastTestSupport {
         STATIC_XML;
     }
 
-    // TODO NS Should these be moved into their own classes?
     /**
      * Classes can be registered in multiple ways, parameterized to allow tests to define what they support and then each to be
      * tested the same way
@@ -428,7 +424,6 @@ public abstract class UCDTest extends HazelcastTestSupport {
         }
     }
 
-    // TODO NS Should these be moved into their own classes?
     public enum AssertionStyle {
         /** Happy path - assert the functionality works when configured correctly */
         POSITIVE,
