@@ -54,8 +54,8 @@ public final class ConfigAccessor {
         return config.getInstanceTrackingConfig().isEnabledSet;
     }
 
-    public static Map<String, NamespaceConfig> getNamespaceConfigs(Config config) {
-       return config.getNamespacesConfig().getNamespaceConfigs();
+    public static Map<String, NamespaceConfig> getNamespaceConfigs(NamespacesConfig config) {
+       return config.getNamespaceConfigs();
     }
 
     public static void add(NamespaceConfig config, @Nonnull ResourceDefinitionHolder holder) {

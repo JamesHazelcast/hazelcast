@@ -17,6 +17,8 @@ Contents:
 - `H2WitHDataSourceBuilderVerionMapLoader`, `H2WithDriverManagerBuildVersionMapLoader`: connects to an embedded H2 database and returns the results of an SQL query for the databases' version.
 - `IdentityProjection`: a `Projection` that returns the input.
 - `CustomCachePartitionLostListener`: a simple CachePartitionLostListener implementation that pushes notifications to an ISet
+- `CustomMapPartitionLostListener`: a simple MapPartitionLostListener implementation that pushes notifications to an ISet
+- `CustomSplitBrainProtectionListener`: a simple SplitBrainProtectionListener implementation that pushes notifications to an ISet
 
 Note: unless package is explicitly specified, all classes described above reside in package `usercodedeployment`.
 
@@ -56,5 +58,7 @@ usercodedeployment/ObservableListener.class \
 usercodedeployment/TruePagingPredicate.class \
 usercodedeployment/TruePartition1PartitionPredicate.class \
 usercodedeployment/TruePredicate.class \
-usercodedeployment/CustomCachePartitionLostListener.class
+usercodedeployment/CustomCachePartitionLostListener.class \
+usercodedeployment/CustomMapPartitionLostListener.class \
+usercodedeployment/CustomSplitBrainProtectionListener.class
 ```

@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
-package com.hazelcast.internal.namespace.icache;
+package com.hazelcast.internal.namespace.imap;
 
-import com.hazelcast.cache.impl.event.CachePartitionLostListener;
 import com.hazelcast.internal.partition.InternalPartition;
 import com.hazelcast.internal.partition.impl.InternalPartitionServiceImpl;
 import com.hazelcast.internal.partition.impl.PartitionEventManager;
+import com.hazelcast.map.listener.MapPartitionLostListener;
 import com.hazelcast.spi.impl.NodeEngineImpl;
 
 import static com.hazelcast.test.Accessors.getNodeEngineImpl;
 
-public class ICachePartitionLostListenerUCDTest extends ICacheUCDTest {
+public class IMapPartitionLostListenerUCDTest extends IMapUCDTest {
     @Override
     public void test() throws Exception {
-        CachePartitionLostListener classInstance = getClassInstance();
-        cache.addPartitionLostListener(classInstance);
+        MapPartitionLostListener classInstance = getClassInstance();
+        map.addPartitionLostListener(classInstance);
 
         // Fire a fake partition lost event
         NodeEngineImpl nodeEngine = getNodeEngineImpl(member);
@@ -41,6 +41,6 @@ public class ICachePartitionLostListenerUCDTest extends ICacheUCDTest {
 
     @Override
     protected String getUserDefinedClassName() {
-        return "usercodedeployment.CustomCachePartitionLostListener";
+        return "usercodedeployment.CustomMapPartitionLostListener";
     }
 }

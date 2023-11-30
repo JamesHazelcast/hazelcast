@@ -1721,9 +1721,9 @@ public class TestFullApplicationContext extends HazelcastTestSupport {
 
         final NamespacesConfig namespacesConfig = config.getNamespacesConfig();
         assertTrue(namespacesConfig.isEnabled());
-        assertEquals(2, ConfigAccessor.getNamespaceConfigs(config).size());
+        assertEquals(2, ConfigAccessor.getNamespaceConfigs(config.getNamespacesConfig()).size());
 
-        final NamespaceConfig namespaceConfig = ConfigAccessor.getNamespaceConfigs(config).get("ns1");
+        final NamespaceConfig namespaceConfig = ConfigAccessor.getNamespaceConfigs(config.getNamespacesConfig()).get("ns1");
 
         assertNotNull(namespaceConfig);
         assertEquals("ns1", namespaceConfig.getName());
@@ -1748,7 +1748,7 @@ public class TestFullApplicationContext extends HazelcastTestSupport {
         assertArrayEquals(getTestFileBytes(zipPath.toFile()), zipId.get().payload());
         //validate NS2 ResourceDefinition contents.
 
-        final NamespaceConfig namespaceConfig2 = ConfigAccessor.getNamespaceConfigs(config).get("ns2");
+        final NamespaceConfig namespaceConfig2 = ConfigAccessor.getNamespaceConfigs(config.getNamespacesConfig()).get("ns2");
         assertNotNull(namespaceConfig2);
         assertEquals("ns2", namespaceConfig2.getName());
 

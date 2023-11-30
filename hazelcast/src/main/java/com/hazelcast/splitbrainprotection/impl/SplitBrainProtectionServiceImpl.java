@@ -22,6 +22,7 @@ import com.hazelcast.cluster.memberselector.MemberSelectors;
 import com.hazelcast.config.InvalidConfigurationException;
 import com.hazelcast.config.SplitBrainProtectionConfig;
 import com.hazelcast.config.SplitBrainProtectionListenerConfig;
+import com.hazelcast.core.HazelcastInstanceAware;
 import com.hazelcast.internal.cluster.ClusterService;
 import com.hazelcast.internal.namespace.NamespaceUtil;
 import com.hazelcast.internal.nio.ClassLoaderUtil;
@@ -189,6 +190,10 @@ public class SplitBrainProtectionServiceImpl implements EventPublishingService<S
             }
         }
         if (listener != null) {
+            // Provide context to the listener
+            if (listener instanceof HazelcastInstanceAware) {
+                ((HazelcastInstanceAware)listener).setHazelcastInstance(nodeEngine.getHazelcastInstance());
+            }
             addSplitBrainProtectionListener(instanceName, listener);
         }
     }
