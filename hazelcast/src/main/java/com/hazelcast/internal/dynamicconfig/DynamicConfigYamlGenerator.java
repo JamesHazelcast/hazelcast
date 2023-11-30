@@ -1159,17 +1159,6 @@ public class DynamicConfigYamlGenerator {
         }
     }
 
-    /*
-  split-brain-protection:
-    splitBrainProtectionRuleWithThreeMembers:
-      enabled: true
-      minimum-cluster-size: 3
-      protect-on: READ_WRITE
-      function-class-name: com.your-package.AbsPresMySplitBrainProtection
-      listeners:
-        - com.your-package.ThreeMemberSplitBrainProtectionListener
-     */
-
     private static void splitBrainProtectionConfigsGenerator(Map<String, Object> parent, Config config) {
         Map<String, SplitBrainProtectionConfig> splitBrainProtectionConfigs = config.getSplitBrainProtectionConfigs();
         if (splitBrainProtectionConfigs.isEmpty()) {

@@ -192,7 +192,7 @@ public class SplitBrainProtectionServiceImpl implements EventPublishingService<S
         if (listener != null) {
             // Provide context to the listener
             if (listener instanceof HazelcastInstanceAware) {
-                ((HazelcastInstanceAware)listener).setHazelcastInstance(nodeEngine.getHazelcastInstance());
+                ((HazelcastInstanceAware) listener).setHazelcastInstance(nodeEngine.getHazelcastInstance());
             }
             addSplitBrainProtectionListener(instanceName, listener);
         }
