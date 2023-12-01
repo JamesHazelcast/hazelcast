@@ -4750,16 +4750,16 @@ public class YamlConfigBuilderTest extends AbstractConfigBuilderTest {
                 + "        prefix:\n"
                 + "          - com.hazelcast.\n"
                 + "    ns1:\n"
-                + "      - jar:\n"
-                + "          id: \"jarId\"\n"
-                + "          url: " + tempJar.toURI().toURL() + "\n"
-                + "      - jars-in-zip:\n"
-                + "          id: \"zipId\"\n"
-                + "          url: " + tempJarZip.toURI().toURL() + "\n"
+                + "      - id: \"jarId\"\n"
+                + "        resource-type: \"jar\"\n"
+                + "        url: " + tempJar.toURI().toURL() + "\n"
+                + "      - id: \"zipId\"\n"
+                + "        resource-type: \"jars_in_zip\"\n"
+                + "        url: " + tempJarZip.toURI().toURL() + "\n"
                 + "    ns2:\n"
-                + "      - jar:\n"
-                + "          id: \"jarId2\"\n"
-                + "          url: " + tempJar.toURI().toURL() + "\n";
+                + "      - id: \"jarId2\"\n"
+                + "        resource-type: \"jar\"\n"
+                + "        url: " + tempJar.toURI().toURL() + "\n";
 
         final NamespacesConfig namespacesConfig = buildConfig(yamlTestString).getNamespacesConfig();
         assertThat(namespacesConfig.isEnabled()).isTrue();
