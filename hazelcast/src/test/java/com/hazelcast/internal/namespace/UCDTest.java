@@ -46,11 +46,9 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
@@ -159,7 +157,7 @@ public abstract class UCDTest extends HazelcastTestSupport {
         }
     }
 
-    private void setupConfigs(Config config) throws IOException {
+    private void setupConfigs(Config config) {
         registerNamespacesConfig(config);
         classRegistrationStyle.action.accept(this);
         registerConfig(config);
@@ -293,7 +291,7 @@ public abstract class UCDTest extends HazelcastTestSupport {
         throw new UnsupportedOperationException();
     }
 
-    private void registerNamespacesConfig(Config config) throws IOException {
+    private void registerNamespacesConfig(Config config) {
         config.getNamespacesConfig().addNamespaceConfig(namespaceConfig);
     }
 
@@ -442,7 +440,7 @@ public abstract class UCDTest extends HazelcastTestSupport {
         //   that use the other values can override parameters to provide all but `NONE`
         // We *probably* don't need all config styles for all 3 connection styles, but to avoid
         //   accidentally missing use cases, they will be kept
-        return Arrays.asList(
+        return List.of(
                 // Client to member
                 new Object[]{CLIENT_TO_MEMBER, STATIC_PROGRAMMATIC, NONE, POSITIVE},
                 new Object[]{CLIENT_TO_MEMBER, STATIC_XML, NONE, POSITIVE},
