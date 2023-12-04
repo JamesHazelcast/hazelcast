@@ -29,18 +29,9 @@ import com.hazelcast.spi.impl.NodeEngine;
  */
 public final class NodeEngineThreadLocalContext {
 
-    private static final ThreadLocal<NodeEngineThreadLocalContext> NE_THREAD_LOCAL = new ThreadLocal<>();
-    private final NodeEngine nodeEngine;
+    private static final ThreadLocal<NodeEngine> NE_THREAD_LOCAL = new ThreadLocal<>();
 
-    private NodeEngineThreadLocalContext(NodeEngine nodeEngine) {
-        this.nodeEngine = nodeEngine;
-    }
-
-    @Override
-    public String toString() {
-        return "NodeEngineThreadLocalContext{"
-                + "nodeEngine='" + nodeEngine.getThisAddress() + '\''
-                + '}';
+    private NodeEngineThreadLocalContext() {
     }
 
     /**
@@ -51,7 +42,7 @@ public final class NodeEngineThreadLocalContext {
      */
     public static void declareNodeEngineReference(NodeEngine nodeEngine) {
         if (nodeEngine != null) {
-            NE_THREAD_LOCAL.set(new NodeEngineThreadLocalContext(nodeEngine));
+            NE_THREAD_LOCAL.set(nodeEngine);
         }
     }
 
@@ -69,12 +60,12 @@ public final class NodeEngineThreadLocalContext {
      * @return This thread's {@link NodeEngine} reference.
      */
     public static NodeEngine getNamespaceThreadLocalContext() {
-        NodeEngineThreadLocalContext tlContext = NE_THREAD_LOCAL.get();
+        NodeEngine tlContext = NE_THREAD_LOCAL.get();
         if (tlContext == null) {
             throw new IllegalStateException("NodeEngine context is not available for Namespaces! Current thread: "
                     + Thread.currentThread().getName() + " (" + Thread.currentThread().getId() + ")");
         } else {
-            return tlContext.nodeEngine;
+            return tlContext;
         }
     }
 
@@ -85,11 +76,11 @@ public final class NodeEngineThreadLocalContext {
      * @return This thread's {@link NodeEngine} reference if available, or {@code null}.
      */
     public static NodeEngine getNamespaceThreadLocalContextOrNull() {
-        NodeEngineThreadLocalContext tlContext = NE_THREAD_LOCAL.get();
+        NodeEngine tlContext = NE_THREAD_LOCAL.get();
         if (tlContext == null) {
             return null;
         } else {
-            return tlContext.nodeEngine;
+            return tlContext;
         }
     }
 }
