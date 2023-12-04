@@ -214,8 +214,6 @@ public final class CachedExecutorServiceDelegate implements ExecutorService, Man
         @Override
         public void run() {
             try {
-                // Provide NodeEngine context for Namespaces; no need to rescind as this thread will always be for our instance
-                NodeEngineThreadLocalContext.declareNodeEngineReference(nodeEngine);
                 Runnable r;
                 do {
                     r = taskQ.poll(1, TimeUnit.MILLISECONDS);
