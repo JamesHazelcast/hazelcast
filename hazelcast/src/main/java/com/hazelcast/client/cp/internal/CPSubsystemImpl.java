@@ -17,7 +17,6 @@
 package com.hazelcast.client.cp.internal;
 
 import com.hazelcast.client.cp.internal.datastructures.proxy.ClientRaftProxyFactory;
-import com.hazelcast.client.impl.clientside.HazelcastClientInstanceImpl;
 import com.hazelcast.client.impl.protocol.ClientMessage;
 import com.hazelcast.client.impl.protocol.codec.CPSubsystemAddGroupAvailabilityListenerCodec;
 import com.hazelcast.client.impl.protocol.codec.CPSubsystemAddMembershipListenerCodec;
@@ -26,6 +25,7 @@ import com.hazelcast.client.impl.protocol.codec.CPSubsystemRemoveMembershipListe
 import com.hazelcast.client.impl.spi.ClientContext;
 import com.hazelcast.client.impl.spi.EventHandler;
 import com.hazelcast.client.impl.spi.impl.ListenerMessageCodec;
+import com.hazelcast.cp.CPMap;
 import com.hazelcast.cp.CPMember;
 import com.hazelcast.cp.CPSubsystem;
 import com.hazelcast.cp.CPSubsystemManagementService;
@@ -57,6 +57,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
+import static com.hazelcast.cp.internal.CPSubsystemImpl.CPMAP_LICENSE_MESSAGE;
 import static com.hazelcast.internal.util.Preconditions.checkNotNull;
 
 /**
@@ -64,11 +65,11 @@ import static com.hazelcast.internal.util.Preconditions.checkNotNull;
  */
 public class CPSubsystemImpl implements CPSubsystem {
 
-    private final ClientRaftProxyFactory proxyFactory;
+    protected final ClientRaftProxyFactory proxyFactory;
     private volatile ClientContext context;
 
-    public CPSubsystemImpl(HazelcastClientInstanceImpl client) {
-        this.proxyFactory = new ClientRaftProxyFactory(client);
+    public CPSubsystemImpl(ClientRaftProxyFactory proxyFactory) {
+        this.proxyFactory = proxyFactory;
     }
 
     public void init(ClientContext context) {
@@ -146,6 +147,11 @@ public class CPSubsystemImpl implements CPSubsystem {
     @Override
     public boolean removeGroupAvailabilityListener(UUID id) {
         return context.getListenerService().deregisterListener(id);
+    }
+
+    @Override
+    public <K, V> CPMap<K, V> getMap(@Nonnull String name) {
+        throw new UnsupportedOperationException(CPMAP_LICENSE_MESSAGE);
     }
 
     private static class CPMembershipEventHandler extends CPSubsystemAddMembershipListenerCodec.AbstractEventHandler

@@ -41,6 +41,7 @@ import com.hazelcast.config.HotRestartConfig;
 import com.hazelcast.config.InMemoryFormat;
 import com.hazelcast.config.IndexConfig;
 import com.hazelcast.config.IndexType;
+import com.hazelcast.config.InvalidConfigurationException;
 import com.hazelcast.config.ItemListenerConfig;
 import com.hazelcast.config.ListConfig;
 import com.hazelcast.config.ListenerConfig;
@@ -104,6 +105,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(HazelcastParallelClassRunner.class)
 @Category({QuickTest.class, ParallelJVMTest.class})
@@ -218,7 +220,7 @@ public class DynamicConfigTest extends HazelcastTestSupport {
 
     @Test
     public void testDurableExecutorConfig() {
-        DurableExecutorConfig config = new DurableExecutorConfig(name, 7, 3, 10, false);
+        DurableExecutorConfig config = new DurableExecutorConfig(name, 7, 3, 10, false, null);
 
         driver.getConfig().addDurableExecutorConfig(config);
 
@@ -229,7 +231,7 @@ public class DynamicConfigTest extends HazelcastTestSupport {
     public void testScheduledExecutorConfig() {
         ScheduledExecutorConfig config = new ScheduledExecutorConfig(name, 2, 3, 10, null,
                 new MergePolicyConfig(NON_DEFAULT_MERGE_POLICY, NON_DEFAULT_MERGE_BATCH_SIZE),
-                ScheduledExecutorConfig.CapacityPolicy.PER_NODE, false);
+                ScheduledExecutorConfig.CapacityPolicy.PER_NODE, false, null);
 
         driver.getConfig().addScheduledExecutorConfig(config);
 
@@ -478,6 +480,19 @@ public class DynamicConfigTest extends HazelcastTestSupport {
 
         assertConfigurationsEqualOnAllMembers(config);
         assertConfigurationsEqualOnAllMembers(reordered);
+    }
+
+    @Test
+    public void testMapConfig_throws_InvalidConfigurationException_when_tiered_store_enabled() {
+        MapConfig config = getMapConfig();
+
+        config.getTieredStoreConfig().setEnabled(true);
+
+        InvalidConfigurationException exception = assertThrows(InvalidConfigurationException.class,
+                () -> driver.getConfig().addMapConfig(config));
+
+        assertTrue(exception.getMessage().contains("Tiered store enabled map config cannot be added dynamically"));
+
     }
 
     @Test

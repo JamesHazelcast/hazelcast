@@ -23,8 +23,10 @@ import com.hazelcast.collection.impl.set.SetService;
 import com.hazelcast.cp.internal.datastructures.atomiclong.AtomicLongService;
 import com.hazelcast.cp.internal.datastructures.atomicref.AtomicRefService;
 import com.hazelcast.cp.internal.datastructures.countdownlatch.CountDownLatchService;
+import com.hazelcast.cp.internal.datastructures.cpmap.CPMapServiceUtil;
 import com.hazelcast.cp.internal.datastructures.semaphore.SemaphoreService;
 import com.hazelcast.internal.locksupport.LockSupportService;
+import com.hazelcast.internal.namespace.NamespaceService;
 import com.hazelcast.executor.impl.DistributedExecutorService;
 import com.hazelcast.flakeidgen.impl.FlakeIdGeneratorService;
 import com.hazelcast.map.impl.MapService;
@@ -169,5 +171,21 @@ public class ActionConstantsTest {
 
         assertNotNull(permission);
         assertTrue(permission instanceof QueuePermission);
+    }
+
+    @Test
+    public void getPermission_CPMap() {
+        Permission permission = ActionConstants.getPermission("foo", CPMapServiceUtil.SERVICE_NAME);
+
+        assertNotNull(permission);
+        assertTrue(permission instanceof CPMapPermission);
+    }
+
+    @Test
+    public void getPermission_NamespaceService() {
+        Permission permission = ActionConstants.getPermission("foo", NamespaceService.SERVICE_NAME);
+
+        assertNotNull(permission);
+        assertTrue(permission instanceof NamespacePermission);
     }
 }

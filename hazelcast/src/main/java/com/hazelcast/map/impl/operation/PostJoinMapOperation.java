@@ -18,6 +18,7 @@ package com.hazelcast.map.impl.operation;
 
 import com.hazelcast.cluster.Address;
 import com.hazelcast.internal.namespace.NamespaceUtil;
+import com.hazelcast.internal.namespace.impl.NodeEngineThreadLocalContext;
 import com.hazelcast.map.IMapEvent;
 import com.hazelcast.map.MapInterceptor;
 import com.hazelcast.map.impl.InterceptorRegistry;
@@ -35,6 +36,7 @@ import com.hazelcast.map.impl.querycache.publisher.PublisherRegistry;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
+import com.hazelcast.spi.impl.NodeEngine;
 import com.hazelcast.spi.impl.operationservice.Operation;
 import com.hazelcast.spi.impl.operationservice.TargetAware;
 
@@ -108,11 +110,17 @@ public class PostJoinMapOperation extends Operation implements IdentifiedDataSer
             mapName = in.readString();
             int size = in.readInt();
 
-            String namespace = MapServiceContext.getNamespace(mapName);
-            for (int i = 0; i < size; i++) {
-                String id = in.readString();
-                MapInterceptor interceptor = NamespaceUtil.callWithNamespace(namespace, in::readObject);
-                interceptors.add(new AbstractMap.SimpleImmutableEntry<>(id, interceptor));
+            NodeEngine engine = NodeEngineThreadLocalContext.getNamespaceThreadLocalContext();
+            String namespace = MapService.lookupNamespace(engine, mapName);
+            NamespaceUtil.setupNamespace(engine, namespace);
+            try {
+                for (int i = 0; i < size; i++) {
+                    String id = in.readString();
+                    MapInterceptor interceptor = in.readObject();
+                    interceptors.add(new AbstractMap.SimpleImmutableEntry<>(id, interceptor));
+                }
+            } finally {
+                NamespaceUtil.cleanupNamespace(engine, namespace);
             }
         }
 

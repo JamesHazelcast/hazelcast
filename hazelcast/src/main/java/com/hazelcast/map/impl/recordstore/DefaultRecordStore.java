@@ -153,7 +153,7 @@ public class DefaultRecordStore extends AbstractEvictableRecordStore {
         this.recordStoreLoader = createRecordStoreLoader(mapStoreContext);
         this.partitionService = mapServiceContext.getNodeEngine().getPartitionService();
         this.interceptorRegistry = mapContainer.getInterceptorRegistry();
-        this.wanReplicateEvictions = mapContainer.isWanReplicationEnabled()
+        this.wanReplicateEvictions = mapContainer.getWanContext().isWanReplicationEnabled()
                 && mapServiceContext.getNodeEngine().getProperties().getBoolean(ClusterProperty.WAN_REPLICATE_IMAP_EVICTIONS);
         initJsonMetadataStore();
     }
@@ -320,6 +320,12 @@ public class DefaultRecordStore extends AbstractEvictableRecordStore {
     @Override
     public void forEach(BiConsumer<Data, Record> consumer,
                         boolean backup, boolean includeExpiredRecords) {
+        forEach(consumer, backup, includeExpiredRecords, true);
+    }
+
+    @Override
+    public void forEach(BiConsumer<Data, Record> consumer,
+                        boolean backup, boolean includeExpiredRecords, boolean noCaching) {
 
         long now = getNow();
         Iterator<Map.Entry<Data, Record>> entries = storage.mutationTolerantIterator();
@@ -591,7 +597,7 @@ public class DefaultRecordStore extends AbstractEvictableRecordStore {
         return value;
     }
 
-    private void removeKeyFromExpirySystem(Data key) {
+    protected void removeKeyFromExpirySystem(Data key) {
         expirySystem.removeKeyFromExpirySystem(key);
     }
 
@@ -1128,7 +1134,7 @@ public class DefaultRecordStore extends AbstractEvictableRecordStore {
                 //  changed data and use that. Since this only matters for WAN-received merge events, we can avoid
                 //  additional overhead by checking provenance. Fixes HZ-3392, Backlog for merge changes: HZ-3397
                 boolean shouldMergeExpiration = provenance != CallerProvenance.WAN
-                        || valueComparator.isEqual(oldValue, mergingEntry.getValue(), serializationService);
+                        || valueComparator.isEqual(existingEntry.getRawValue(), mergingEntry.getRawValue(), serializationService);
                 if (shouldMergeExpiration && mergeRecordExpiration(key, record, mergingEntry, now)) {
                     return MapMergeResponse.RECORD_EXPIRY_UPDATED;
                 }
@@ -1275,6 +1281,12 @@ public class DefaultRecordStore extends AbstractEvictableRecordStore {
         storage.removeRecord(key, record);
     }
 
+    public Record removeByKey(Data key, boolean backup) {
+        Record record = getRecord(key);
+        removeRecord0(key, record, backup);
+        return record;
+    }
+
     @Override
     public Record getRecordOrNull(Data key, boolean backup) {
         long now = getNow();
@@ -1282,6 +1294,29 @@ public class DefaultRecordStore extends AbstractEvictableRecordStore {
     }
 
     public Record getRecordOrNull(Data key, long now, boolean backup) {
+        return getRecordOrNull(key, now, backup, false);
+    }
+
+    public Record getRecordOrNull(Data key, boolean backup, boolean noCaching) {
+        long now = getNow();
+        return getRecordOrNull(key, now, backup, noCaching);
+    }
+
+    /**
+     * Returns live record or null if record is already expired. Does not load missing keys from a map store.
+     *
+     * @param key   key to be accessed
+     * @param now   the now timestamp
+     * @param backup true if partition is a backup-partition otherwise set false
+     * @param noCaching true if the record should be returned as it is in the record store.
+     *                  Applies to the tiered storage if a record read from device and then there is no
+     *                  copying (caching) it in-memory region. For other types of record store
+     *                  the flag is ignored.
+     *
+     * @return live record or null
+     * @see #get
+     */
+    public Record getRecordOrNull(Data key, long now, boolean backup, boolean noCaching) {
         Record record = storage.get(key);
         if (record != null) {
             return evictIfExpired(key, now, backup) ? null : record;

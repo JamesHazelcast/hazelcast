@@ -21,17 +21,21 @@ import com.hazelcast.config.AdvancedNetworkConfig;
 import com.hazelcast.config.Config;
 import com.hazelcast.config.EndpointConfig;
 import com.hazelcast.config.InvalidConfigurationException;
+import com.hazelcast.config.SSLConfig;
 import com.hazelcast.config.ServerSocketEndpointConfig;
 import com.hazelcast.config.tpc.TpcSocketConfig;
 import com.hazelcast.core.HazelcastException;
 import com.hazelcast.instance.EndpointQualifier;
-import com.hazelcast.internal.tpcengine.net.AsyncServerSocket;
 import com.hazelcast.internal.tpcengine.Reactor;
-import com.hazelcast.internal.tpcengine.net.AsyncSocketReader;
 import com.hazelcast.internal.tpcengine.TpcEngine;
 import com.hazelcast.internal.tpcengine.TpcEngineBuilder;
+import com.hazelcast.internal.tpcengine.net.AsyncServerSocket;
+import com.hazelcast.internal.tpcengine.net.AsyncSocket;
+import com.hazelcast.internal.tpcengine.net.AsyncSocketBuilder;
+import com.hazelcast.internal.tpcengine.net.AsyncSocketReader;
 import com.hazelcast.internal.tpcengine.nio.NioReactorBuilder;
 import com.hazelcast.logging.ILogger;
+import com.hazelcast.nio.ssl.SSLEngineFactory;
 import com.hazelcast.spi.impl.NodeEngineImpl;
 import com.hazelcast.spi.impl.operationexecutor.impl.OperationExecutorImpl;
 import com.hazelcast.spi.impl.operationexecutor.impl.TpcOperationScheduler;
@@ -39,8 +43,8 @@ import com.hazelcast.spi.impl.operationexecutor.impl.TpcPartitionOperationThread
 import com.hazelcast.spi.properties.HazelcastProperty;
 
 import java.io.UncheckedIOException;
-import java.net.BindException;
 import java.net.InetSocketAddress;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -50,10 +54,12 @@ import java.util.concurrent.ThreadFactory;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import static com.hazelcast.internal.nio.IOUtil.closeResource;
 import static com.hazelcast.internal.server.ServerContext.KILO_BYTE;
 import static com.hazelcast.internal.tpcengine.net.AsyncSocketOptions.SO_KEEPALIVE;
 import static com.hazelcast.internal.tpcengine.net.AsyncSocketOptions.SO_RCVBUF;
 import static com.hazelcast.internal.tpcengine.net.AsyncSocketOptions.SO_SNDBUF;
+import static com.hazelcast.internal.tpcengine.net.AsyncSocketOptions.SSL_ENGINE_FACTORY;
 import static com.hazelcast.internal.tpcengine.net.AsyncSocketOptions.TCP_NODELAY;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
@@ -186,12 +192,17 @@ public class TpcServerBootstrap {
         }
 
         tpcEngine.start();
-        openServerSockets();
+        startServerSockets();
         clientPorts = serverSockets.stream().map(AsyncServerSocket::getLocalPort).collect(Collectors.toList());
     }
 
-    private void openServerSockets() {
+    private void startServerSockets() {
         TpcSocketConfig clientSocketConfig = getClientSocketConfig();
+        SSLConfig clientSslConfig = getClientEndpointTlsConfig();
+        boolean sslEnabled = clientSslConfig != null && clientSslConfig.isEnabled();
+        SSLEngineFactory sslEngineFactory = sslEnabled
+                ? nodeEngine.getNode().getNodeExtension().createSslEngineFactory(clientSslConfig)
+                : null;
 
         String[] range = clientSocketConfig.getPortRange().split("-");
         int port = Integer.parseInt(range[0]);
@@ -206,23 +217,58 @@ public class TpcServerBootstrap {
                     () -> new ClientAsyncSocketReader(nodeEngine.getNode().clientEngine, nodeEngine.getProperties());
             readHandlerSuppliers.put(reactor, readHandlerSupplier);
 
-            AsyncServerSocket serverSocket = reactor.newAsyncServerSocketBuilder()
-                    .set(SO_RCVBUF, clientSocketConfig.getReceiveBufferSizeKB() * KILO_BYTE)
-                    .setAcceptConsumer(acceptRequest -> {
-                        reactor.newAsyncSocketBuilder(acceptRequest)
-                                .setReader(readHandlerSuppliers.get(reactor).get())
-                                .set(SO_SNDBUF, clientSocketConfig.getSendBufferSizeKB() * KILO_BYTE)
-                                .set(SO_RCVBUF, clientSocketConfig.getReceiveBufferSizeKB() * KILO_BYTE)
-                                .set(TCP_NODELAY, tcpNoDelay)
-                                .set(SO_KEEPALIVE, true)
-                                .build()
-                                .start();
-                    })
-                    .build();
-            serverSockets.add(serverSocket);
-            port = bind(serverSocket, port, limit);
-            serverSocket.start();
+            boolean success = false;
+            while (!success) {
+                if (port > limit) {
+                    throw new HazelcastException("Could not find a free port in the TPC socket port range.");
+                }
+
+                AsyncServerSocket serverSocket = newServerSocket(reactor, clientSocketConfig, sslEnabled, sslEngineFactory);
+                try {
+                    serverSocket.bind(new InetSocketAddress(thisAddress.getInetAddress(), port));
+                    success = true;
+                } catch (UncheckedIOException e) {
+                    if (!(e.getCause() instanceof SocketException)) {
+                        throw e;
+                    }
+                } catch (UnknownHostException e) {
+                    throw new UncheckedIOException(e);
+                } finally {
+                    if (!success) {
+                        closeResource(serverSocket);
+                    }
+                }
+
+                if (success) {
+                    serverSockets.add(serverSocket);
+                    serverSocket.start();
+                }
+
+                port++;
+            }
         }
+    }
+
+    private AsyncServerSocket newServerSocket(Reactor reactor,
+                                              TpcSocketConfig clientSocketConfig,
+                                              boolean sslEnabled,
+                                              SSLEngineFactory sslEngineFactory) {
+        return reactor.newAsyncServerSocketBuilder()
+                .set(SO_RCVBUF, clientSocketConfig.getReceiveBufferSizeKB() * KILO_BYTE)
+                .setAcceptConsumer(acceptRequest -> {
+                    AsyncSocketBuilder socketBuilder = reactor.newAsyncSocketBuilder(acceptRequest)
+                            .setReader(readHandlerSuppliers.get(reactor).get())
+                            .set(SO_SNDBUF, clientSocketConfig.getSendBufferSizeKB() * KILO_BYTE)
+                            .set(SO_RCVBUF, clientSocketConfig.getReceiveBufferSizeKB() * KILO_BYTE)
+                            .set(TCP_NODELAY, tcpNoDelay)
+                            .set(SO_KEEPALIVE, true);
+                    if (sslEnabled) {
+                        socketBuilder.set(SSL_ENGINE_FACTORY, sslEngineFactory);
+                    }
+                    AsyncSocket socket = socketBuilder.build();
+                    socket.start();
+                })
+                .build();
     }
 
     // public for testing
@@ -267,24 +313,11 @@ public class TpcServerBootstrap {
         }
     }
 
-    private int bind(AsyncServerSocket serverSocket, int port, int limit) {
-        while (port < limit) {
-            try {
-                serverSocket.bind(new InetSocketAddress(thisAddress.getInetAddress(), port));
-                return port + 1;
-            } catch (UncheckedIOException e) {
-                if (e.getCause() instanceof BindException) {
-                    // this port is occupied probably by another hz member, try another one
-                    port += tpcEngine.reactorCount();
-                } else {
-                    throw e;
-                }
-            } catch (UnknownHostException e) {
-                throw new UncheckedIOException(e);
-            }
+    private SSLConfig getClientEndpointTlsConfig() {
+        if (config.getAdvancedNetworkConfig().isEnabled()) {
+            return config.getAdvancedNetworkConfig().getEndpointConfigs().get(EndpointQualifier.CLIENT).getSSLConfig();
         }
-
-        throw new HazelcastException("Could not find a free port in the TPC socket port range.");
+        return config.getNetworkConfig().getSSLConfig();
     }
 
     public void shutdown() {

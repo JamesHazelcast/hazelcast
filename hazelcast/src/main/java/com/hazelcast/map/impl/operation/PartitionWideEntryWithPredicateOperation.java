@@ -16,7 +16,6 @@
 
 package com.hazelcast.map.impl.operation;
 
-import com.hazelcast.internal.namespace.NamespaceUtil;
 import com.hazelcast.map.EntryProcessor;
 import com.hazelcast.map.impl.MapDataSerializerHook;
 import com.hazelcast.nio.ObjectDataInput;
@@ -72,7 +71,15 @@ public class PartitionWideEntryWithPredicateOperation extends PartitionWideEntry
     @Override
     protected void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
-        predicate = NamespaceUtil.callWithNamespace(getNamespace(), in::readObject);
+        // Namespace inherited from PartitionWideEntryOperation
+        predicate = in.readObject();
+        // We need to handle Namespace cleanup as the end of the line class
+        super.afterReadInternal();
+    }
+
+    @Override
+    protected void afterReadInternal() {
+        // No-op to avoid Namespace cleanup in parent class
     }
 
     @Override

@@ -16,30 +16,30 @@
 
 package com.hazelcast.jet.config;
 
-import com.hazelcast.internal.util.Preconditions;
-import com.hazelcast.internal.util.StringUtil;
 import com.hazelcast.jet.impl.util.ReflectionUtils;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
+import com.hazelcast.spi.annotation.PrivateApi;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+import static com.hazelcast.internal.config.ConfigUtils.resolveResourceId;
 import static com.hazelcast.jet.impl.util.ReflectionUtils.toClassResourceId;
 
 /**
  * Describes a single resource to deploy to the Jet cluster.
- * TODO - agreed will be exposed, but migrated to an {@code internal} package
  *
  * @since Jet 3.0
- */public class ResourceConfig implements IdentifiedDataSerializable {
+ */
+@PrivateApi
+public class ResourceConfig implements IdentifiedDataSerializable {
 
     private URL url;
     private String id;
@@ -56,11 +56,11 @@ import static com.hazelcast.jet.impl.util.ReflectionUtils.toClassResourceId;
      * @param resourceType  type of the resource
      */
     public ResourceConfig(@Nonnull URL url, @Nullable String id, @Nonnull ResourceType resourceType) {
-        Preconditions.checkNotNull(url, "url");
-        Preconditions.checkNotNull(resourceType, "resourceType");
+        Objects.requireNonNull(url, "url");
+        Objects.requireNonNull(resourceType, "resourceType");
 
         this.url = url;
-        this.id = StringUtil.isNullOrEmpty(id) ? urlToFileName() : id;
+        this.id = resolveResourceId(id, url);
         this.resourceType = resourceType;
     }
 
@@ -71,7 +71,7 @@ import static com.hazelcast.jet.impl.util.ReflectionUtils.toClassResourceId;
      * @param clazz the class to deploy
      */
     private ResourceConfig(@Nonnull Class<?> clazz) {
-        Preconditions.checkNotNull(clazz, "clazz");
+        Objects.requireNonNull(clazz, "clazz");
 
         this.id = toClassResourceId(clazz.getName());
         ClassLoader cl = clazz.getClassLoader();
@@ -169,11 +169,5 @@ import static com.hazelcast.jet.impl.util.ReflectionUtils.toClassResourceId;
         id = in.readString();
         resourceType = ResourceType.getById(in.readShort());
         url = in.readObject();
-    }
-
-    @Nonnull
-    private String urlToFileName() {
-        String filename = new File(url.getPath()).getName();
-        return Preconditions.checkHasText(filename, "URL has no path: " + url);
     }
 }

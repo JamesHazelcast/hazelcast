@@ -68,8 +68,11 @@ import com.hazelcast.internal.dynamicconfig.DynamicConfigurationAwareConfig;
 import com.hazelcast.internal.management.ManagementCenterService;
 import com.hazelcast.internal.metrics.MetricsRegistry;
 import com.hazelcast.internal.metrics.impl.MetricsConfigHelper;
+import com.hazelcast.internal.namespace.NamespaceService;
+import com.hazelcast.internal.namespace.NamespaceUtil;
 import com.hazelcast.internal.namespace.impl.NamespaceAwareClassLoader;
 import com.hazelcast.internal.namespace.impl.NamespaceServiceImpl;
+import com.hazelcast.internal.namespace.impl.NoOpNamespaceService;
 import com.hazelcast.internal.nio.ClassLoaderUtil;
 import com.hazelcast.internal.nio.Packet;
 import com.hazelcast.internal.partition.InternalPartitionService;
@@ -177,7 +180,6 @@ public class Node {
      */
     public final Address address;
     public final SecurityContext securityContext;
-    public volatile boolean namespacesEnabled;
 
     final ClusterTopologyIntentTracker clusterTopologyIntentTracker;
 
@@ -188,6 +190,7 @@ public class Node {
     private final InternalSerializationService serializationService;
     private final InternalSerializationService compatibilitySerializationService;
     private final ClassLoader configClassLoader;
+    private NamespaceService namespaceService;
     private final NodeExtension nodeExtension;
     private final HazelcastProperties properties;
     private final BuildInfo buildInfo;
@@ -213,8 +216,7 @@ public class Node {
         DynamicConfigurationAwareConfig config = new DynamicConfigurationAwareConfig(staticConfig, this.properties);
         this.hazelcastInstance = hazelcastInstance;
         this.config = config;
-        this.namespacesEnabled = !ConfigAccessor.getNamespaceConfigs(config).isEmpty();
-        this.configClassLoader = getConfigClassloader(config);
+        this.configClassLoader = generateConfigClassloader(config);
 
         String policy = properties.getString(SHUTDOWNHOOK_POLICY);
         this.shutdownHookThread = new NodeShutdownHookThread("hz.ShutdownThread", policy);
@@ -327,17 +329,16 @@ public class Node {
         return clientEndpointConfig != null;
     }
 
-    static ClassLoader getConfigClassloader(Config config) {
-        // determine a parent classloader: either the legacy
-        // UserCodeDeploymentClassLoader (if enabled), or config.getClassLoader().
+    private ClassLoader generateConfigClassloader(Config config) {
         ClassLoader parent = getLegacyUCDClassLoader(config);
-        Map<String, NamespaceConfig> staticNsConfig = ConfigAccessor.getNamespaceConfigs(config);
-        if (staticNsConfig.isEmpty()) {
+        if (!config.getNamespacesConfig().isEnabled()) {
+            namespaceService = new NoOpNamespaceService(parent);
             return parent;
         }
-        // create the NamespaceAwareClassLoader with the determined parent.
-        NamespaceServiceImpl namespaceService = new NamespaceServiceImpl(parent, staticNsConfig);
-        return new NamespaceAwareClassLoader(parent, namespaceService);
+        Map<String, NamespaceConfig> staticNsConfig = ConfigAccessor.getNamespaceConfigs(config.getNamespacesConfig());
+        namespaceService = new NamespaceServiceImpl(parent, staticNsConfig, config.getNamespacesConfig()
+                .getJavaSerializationFilterConfig());
+        return new NamespaceAwareClassLoader(parent, this);
     }
 
     /**
@@ -358,6 +359,9 @@ public class Node {
             });
         } else {
             classLoader = config.getClassLoader();
+            if (classLoader == null) {
+                classLoader = Node.class.getClassLoader();
+            }
         }
         return classLoader;
     }
@@ -393,7 +397,8 @@ public class Node {
             Object listener = listenerCfg.getImplementation();
             if (listener == null) {
                 try {
-                    listener = ClassLoaderUtil.newInstance(configClassLoader, listenerCfg.getClassName());
+                    listener = ClassLoaderUtil.newInstance(NamespaceUtil.getDefaultClassloader(getNodeEngine()),
+                            listenerCfg.getClassName());
                 } catch (Exception e) {
                     logger.severe(e);
                 }
@@ -473,6 +478,10 @@ public class Node {
 
     public InternalPartitionService getPartitionService() {
         return partitionService;
+    }
+
+    public NamespaceService getNamespaceService() {
+        return namespaceService;
     }
 
     public Address getMasterAddress() {

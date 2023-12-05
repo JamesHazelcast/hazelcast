@@ -17,8 +17,9 @@
 package com.hazelcast.internal.namespace;
 
 import com.hazelcast.jet.config.ResourceType;
+import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
 
-public interface ResourceDefinition {
+public interface ResourceDefinition extends IdentifiedDataSerializable {
 
     /**
      * Returns the identifier of this resource. For example, for a {@code CLASS} type resource it can be the fully-qualified
@@ -34,7 +35,12 @@ public interface ResourceDefinition {
 
     /**
      * @return the contents of the resource.
-     * todo byte[] or input stream? if the latter, what is its lifecycle?
      */
     byte[] payload();
+
+    /**
+     *
+     * @return the path of the resource
+     */
+    String url();
 }

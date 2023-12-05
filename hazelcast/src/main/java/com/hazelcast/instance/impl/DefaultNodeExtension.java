@@ -29,12 +29,15 @@ import com.hazelcast.config.InstanceTrackingConfig.InstanceMode;
 import com.hazelcast.config.InstanceTrackingConfig.InstanceProductName;
 import com.hazelcast.config.InvalidConfigurationException;
 import com.hazelcast.config.PersistenceConfig;
+import com.hazelcast.config.SSLConfig;
 import com.hazelcast.config.SecurityConfig;
 import com.hazelcast.config.SerializationConfig;
 import com.hazelcast.config.SymmetricEncryptionConfig;
 import com.hazelcast.config.cp.CPSubsystemConfig;
 import com.hazelcast.core.HazelcastInstanceAware;
 import com.hazelcast.core.HazelcastInstanceNotActiveException;
+import com.hazelcast.cp.CPSubsystem;
+import com.hazelcast.cp.internal.CPSubsystemImpl;
 import com.hazelcast.cp.internal.persistence.CPPersistenceService;
 import com.hazelcast.cp.internal.persistence.NopCPPersistenceService;
 import com.hazelcast.hotrestart.HotRestartService;
@@ -75,6 +78,7 @@ import com.hazelcast.internal.jmx.ManagementService;
 import com.hazelcast.internal.management.TimedMemberStateFactory;
 import com.hazelcast.internal.memory.DefaultMemoryStats;
 import com.hazelcast.internal.memory.MemoryStats;
+import com.hazelcast.internal.namespace.impl.NodeEngineThreadLocalContext;
 import com.hazelcast.internal.networking.ChannelInitializer;
 import com.hazelcast.internal.networking.InboundHandler;
 import com.hazelcast.internal.networking.OutboundHandler;
@@ -100,6 +104,7 @@ import com.hazelcast.jet.impl.JobEventService;
 import com.hazelcast.logging.ILogger;
 import com.hazelcast.map.impl.MapService;
 import com.hazelcast.nio.MemberSocketInterceptor;
+import com.hazelcast.nio.ssl.SSLEngineFactory;
 import com.hazelcast.partition.PartitioningStrategy;
 import com.hazelcast.partition.strategy.DefaultPartitioningStrategy;
 import com.hazelcast.security.SecurityContext;
@@ -669,6 +674,11 @@ public class DefaultNodeExtension implements NodeExtension {
         return NopCPPersistenceService.INSTANCE;
     }
 
+    @Override
+    public CPSubsystem createCPSubsystem(NodeEngine nodeEngine) {
+        return new CPSubsystemImpl(nodeEngine);
+    }
+
     protected void createAndSetPhoneHome() {
         this.phoneHome = new PhoneHome(node);
     }
@@ -692,5 +702,22 @@ public class DefaultNodeExtension implements NodeExtension {
     @Nullable
     public JetServiceBackend getJetServiceBackend() {
         return jetServiceBackend;
+    }
+
+    @Override
+    public SSLEngineFactory createSslEngineFactory(SSLConfig sslConfig) {
+        throw new IllegalStateException("SSL/TLS requires Hazelcast Enterprise Edition");
+    }
+
+    @Override
+    public void onThreadStart(Thread thread) {
+        // Setup NodeEngine context for User Code Deployment Namespacing in operations
+        NodeEngineThreadLocalContext.declareNodeEngineReference(node.getNodeEngine());
+    }
+
+    @Override
+    public void onThreadStop(Thread thread) {
+        // Destroy NodeEngine context from User Code Deployment Namespacing
+        NodeEngineThreadLocalContext.destroyNodeEngineReference();
     }
 }

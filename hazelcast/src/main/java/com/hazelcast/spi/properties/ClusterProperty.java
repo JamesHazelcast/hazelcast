@@ -32,7 +32,7 @@ import com.hazelcast.instance.BuildInfoProvider;
 import com.hazelcast.instance.EndpointQualifier;
 import com.hazelcast.internal.cluster.fd.ClusterFailureDetectorType;
 import com.hazelcast.internal.diagnostics.HealthMonitorLevel;
-import com.hazelcast.internal.util.OsHelper;
+import com.hazelcast.internal.tpcengine.util.OS;
 import com.hazelcast.internal.util.RuntimeAvailableProcessors;
 import com.hazelcast.map.IMap;
 import com.hazelcast.map.QueryResultSizeExceededException;
@@ -1845,7 +1845,7 @@ public final class ClusterProperty {
      * @since 5.0
      */
     public static final HazelcastProperty LOG_EMOJI_ENABLED = new HazelcastProperty("hazelcast.logging.emoji.enabled",
-            StandardCharsets.UTF_8.equals(Charset.defaultCharset()) && !OsHelper.isWindows());
+            StandardCharsets.UTF_8.equals(Charset.defaultCharset()) && !OS.isWindows());
 
     /**
      * When set to any not-{@code null} value, security recommendations are logged on INFO level during the node start. The
@@ -1857,15 +1857,15 @@ public final class ClusterProperty {
             "hazelcast.security.recommendations");
 
     /**
-     * Enable experimental support for accessing nested fields by using custom
-     * types in SQL. The feature is unstable in 5.2, this property will be
+     * Enable experimental support for accessing cyclic nested fields by using custom
+     * types in SQL. The feature is unstable in 5.4, this property will be
      * removed once the feature is stable.
      *
-     * @since 5.2
+     * @since 5.4
      */
     @Beta
-    public static final HazelcastProperty SQL_CUSTOM_TYPES_ENABLED = new HazelcastProperty(
-            "hazelcast.sql.experimental.custom.types.enabled", false);
+    public static final HazelcastProperty SQL_CUSTOM_CYCLIC_TYPES_ENABLED = new HazelcastProperty(
+            "hazelcast.sql.experimental.custom.cyclic.types.enabled", false);
 
     /**
      * When {@code true}, enables monitoring of the runtime environment to detect the intent of shutdown
@@ -1939,6 +1939,14 @@ public final class ClusterProperty {
      */
     public static final HazelcastProperty WAN_REPLICATE_ICACHE_EVICTIONS
             = new HazelcastProperty("hazelcast.wan.replicate.icache.evictions", false);
+
+    /**
+     * Maximum wait in seconds during member demotion to a lite member.
+     *
+     * @since 5.4
+     */
+    public static final HazelcastProperty DEMOTE_MAX_WAIT
+            = new HazelcastProperty("hazelcast.member.demote.max.wait", 600, SECONDS);
 
     private ClusterProperty() {
     }

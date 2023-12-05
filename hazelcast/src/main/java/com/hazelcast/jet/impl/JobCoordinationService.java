@@ -23,7 +23,9 @@ import com.hazelcast.core.HazelcastInstanceNotActiveException;
 import com.hazelcast.function.FunctionEx;
 import com.hazelcast.instance.impl.Node;
 import com.hazelcast.internal.cluster.ClusterService;
+import com.hazelcast.internal.metrics.DynamicMetricsProvider;
 import com.hazelcast.internal.metrics.MetricDescriptor;
+import com.hazelcast.internal.metrics.MetricsCollectionContext;
 import com.hazelcast.internal.metrics.MetricsRegistry;
 import com.hazelcast.internal.metrics.Probe;
 import com.hazelcast.internal.partition.impl.InternalPartitionServiceImpl;
@@ -137,7 +139,7 @@ import static java.util.stream.Collectors.toList;
  * A service that handles MasterContexts on the coordinator member.
  * Job-control operations from client are handled here.
  */
-public class JobCoordinationService {
+public class JobCoordinationService implements DynamicMetricsProvider {
 
     private static final String COORDINATOR_EXECUTOR_NAME = "jet:coordinator";
 
@@ -421,7 +423,7 @@ public class JobCoordinationService {
         return submitToCoordinatorThread(() -> {
             CompletableFuture[] futures = masterContexts
                     .values().stream()
-                    .map(mc -> mc.jobContext().gracefullyTerminate())
+                    .map(mc -> mc.jobContext().gracefullyTerminateOrCancel())
                     .toArray(CompletableFuture[]::new);
             return CompletableFuture.allOf(futures);
         }).thenCompose(identity());
@@ -687,6 +689,18 @@ public class JobCoordinationService {
         );
     }
 
+    @Override
+    public void provideDynamicMetrics(MetricDescriptor descriptor, MetricsCollectionContext context) {
+        try {
+            descriptor.withTag(MetricTags.MODULE, "jet");
+            masterContexts.forEach((id, ctx) ->
+                    ctx.provideDynamicMetrics(descriptor.copy(), context));
+        } catch (Throwable t) {
+            logger.warning("Dynamic metric collection failed", t);
+            throw t;
+        }
+    }
+
     /**
      * Returns the latest metrics for a job or fails with {@link JobNotFoundException}
      * if the requested job is not found.
@@ -776,7 +790,7 @@ public class JobCoordinationService {
                             JobExecutionRecord executionRecord = jobRepository.getJobExecutionRecord(r.getJobId());
                             return new JobAndSqlSummary(
                                     false, r.getJobId(), 0, r.getJobNameOrId(), r.getJobStatus(), r.getCreationTime(),
-                                    r.getCompletionTime(), r.getFailureText(), null,
+                                    r.getCompletionTime(), r.getFailureText(), getSqlSummary(r.getJobConfig()),
                                     executionRecord == null || executionRecord.getSuspensionCause() == null ? null :
                                             executionRecord.getSuspensionCause().description(),
                                     r.isUserCancelled());
@@ -796,10 +810,7 @@ public class JobCoordinationService {
     }
 
     private JobAndSqlSummary getJobAndSqlSummary(LightMasterContext lmc) {
-        String query = lmc.getJobConfig().getArgument(JobConfigArguments.KEY_SQL_QUERY_TEXT);
-        Object unbounded = lmc.getJobConfig().getArgument(JobConfigArguments.KEY_SQL_UNBOUNDED);
-        SqlSummary sqlSummary = query != null && unbounded != null ?
-                new SqlSummary(query, Boolean.TRUE.equals(unbounded)) : null;
+        SqlSummary sqlSummary = getSqlSummary(lmc.getJobConfig());
 
         // For simplicity, we assume here that light job is running iff LightMasterContext exists:
         // running jobs are not cancelled and others are not visible.
@@ -813,7 +824,7 @@ public class JobCoordinationService {
         // Also, future completion handlers (thenApply etc.) are not guaranteed to run in
         // any particular order and can be executed in parallel.
         //
-        // This is unlikely and we do not care however such scenario is possible:
+        // This is unlikely, and we do not care; however, such scenario is possible:
         // 1. user submits a light job
         // 2. user gets the job by id and joins it (separate Job proxy instance is necessary
         //    because different future will be used than for submit)
@@ -828,6 +839,15 @@ public class JobCoordinationService {
                 true, lmc.getJobId(), lmc.getJobId(), idToString(lmc.getJobId()),
                 RUNNING, lmc.getStartTime(), 0, null, sqlSummary, null,
                 false);
+    }
+
+    @Nullable
+    private static SqlSummary getSqlSummary(JobConfig jobConfig) {
+        String query = jobConfig.getArgument(JobConfigArguments.KEY_SQL_QUERY_TEXT);
+        Object unbounded = jobConfig.getArgument(JobConfigArguments.KEY_SQL_UNBOUNDED);
+        SqlSummary sqlSummary = query != null && unbounded != null ?
+                new SqlSummary(query, Boolean.TRUE.equals(unbounded)) : null;
+        return sqlSummary;
     }
 
     /**
@@ -920,6 +940,10 @@ public class JobCoordinationService {
 
     public void registerInvocationObserver(JobInvocationObserver observer) {
         this.jobInvocationObservers.add(observer);
+    }
+
+    public void unregisterInvocationObserver(JobInvocationObserver observer) {
+        this.jobInvocationObservers.remove(observer);
     }
 
     JetServiceBackend getJetServiceBackend() {
@@ -1098,7 +1122,7 @@ public class JobCoordinationService {
             // the order of operations is important.
             List<RawJobMetrics> jobMetrics =
                     masterContext.jobConfig().isStoreMetricsAfterJobCompletion()
-                            ? masterContext.jobContext().jobMetrics()
+                            ? masterContext.jobContext().persistentMetrics()
                             : null;
             jobRepository.completeJob(masterContext, jobMetrics, error, completionTime, userCancelled);
             if (removeMasterContext(masterContext)) {
@@ -1372,7 +1396,7 @@ public class JobCoordinationService {
                     maybeTerminationRequest.map(TerminationRequest::isUserInitiated).orElse(false);
         }
         return new JobAndSqlSummary(false, record.getJobId(), execId, record.getJobNameOrId(), status,
-                record.getCreationTime(), 0, null, null, suspensionCause,
+                record.getCreationTime(), 0, null, getSqlSummary(record.getConfig()), suspensionCause,
                 userCancelled);
     }
 

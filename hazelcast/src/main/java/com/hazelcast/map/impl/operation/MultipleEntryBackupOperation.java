@@ -16,7 +16,6 @@
 
 package com.hazelcast.map.impl.operation;
 
-import com.hazelcast.internal.namespace.NamespaceUtil;
 import com.hazelcast.internal.nio.IOUtil;
 import com.hazelcast.map.EntryProcessor;
 import com.hazelcast.map.impl.MapDataSerializerHook;
@@ -54,7 +53,7 @@ public class MultipleEntryBackupOperation extends AbstractMultipleEntryBackupOpe
     @Override
     protected void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
-        backupProcessor = NamespaceUtil.callWithNamespace(getNamespace(), in::readObject);
+        backupProcessor = callWithNamespaceAwareness(in::readObject);
         int size = in.readInt();
         keys = createLinkedHashSet(size);
         for (int i = 0; i < size; i++) {

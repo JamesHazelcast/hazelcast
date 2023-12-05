@@ -16,9 +16,13 @@
 
 package com.hazelcast.config;
 
+import com.hazelcast.client.impl.protocol.task.dynamicconfig.ResourceDefinitionHolder;
 import com.hazelcast.internal.config.ServicesConfig;
-import com.hazelcast.jet.config.ResourceConfig;
+import com.hazelcast.internal.namespace.ResourceDefinition;
+import com.hazelcast.internal.namespace.impl.ResourceDefinitionImpl;
 import com.hazelcast.spi.annotation.PrivateApi;
+
+import javax.annotation.Nonnull;
 
 import java.util.Collection;
 import java.util.Map;
@@ -50,15 +54,15 @@ public final class ConfigAccessor {
         return config.getInstanceTrackingConfig().isEnabledSet;
     }
 
-    public static Map<String, NamespaceConfig> getNamespaceConfigs(Config config) {
+    public static Map<String, NamespaceConfig> getNamespaceConfigs(NamespacesConfig config) {
        return config.getNamespaceConfigs();
     }
 
-    public static void setNamespaceConfigs(Config config, Map<String, NamespaceConfig> namespaceConfigs) {
-       config.setNamespaceConfigs(namespaceConfigs);
+    public static void add(NamespaceConfig config, @Nonnull ResourceDefinitionHolder holder) {
+        config.add(new ResourceDefinitionImpl(holder));
     }
 
-    public static Collection<ResourceConfig> getResourceConfigs(NamespaceConfig nsConfig) {
+    public static Collection<ResourceDefinition> getResourceDefinitions(NamespaceConfig nsConfig) {
         return nsConfig.getResourceConfigs();
     }
 }

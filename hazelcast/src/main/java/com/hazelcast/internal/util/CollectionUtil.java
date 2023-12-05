@@ -19,7 +19,6 @@ package com.hazelcast.internal.util;
 import com.hazelcast.internal.serialization.Data;
 import com.hazelcast.internal.serialization.SerializationService;
 
-import javax.annotation.Nonnull;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -56,7 +55,6 @@ public final class CollectionUtil {
     public static boolean isNotEmpty(Collection collection) {
         return !isEmpty(collection);
     }
-
 
     /**
      * Returns the n-th item or {@code null} if collection is smaller.
@@ -154,17 +152,5 @@ public final class CollectionUtil {
     /** Returns an empty Collection if argument is null. **/
     public static <T> Collection<T> nullToEmpty(Collection<T> collection) {
         return collection == null ? Collections.<T>emptyList() : collection;
-    }
-
-    /**
-     * Returns true, if the two collections contain any common item.
-     */
-    public static <T> boolean hasNonEmptyIntersection(@Nonnull Collection<T> a, @Nonnull Collection<T> b) {
-        for (T t : a) {
-            if (b.contains(t)) {
-                return true;
-            }
-        }
-        return false;
     }
 }

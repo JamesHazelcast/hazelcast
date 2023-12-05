@@ -16,12 +16,14 @@
 
 package com.hazelcast.internal.namespace.impl;
 
+import com.hazelcast.instance.impl.Node;
 import com.hazelcast.internal.util.ExceptionUtil;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodHandles.Lookup;
+import java.lang.invoke.MethodType;
 import java.net.URL;
 import java.util.Enumeration;
 
@@ -37,25 +39,28 @@ public class NamespaceAwareClassLoader extends ClassLoader {
     private static final MethodHandle FIND_RESOURCES_METHOD_HANDLE;
 
     private final NamespaceServiceImpl namespaceService;
+    // Retain Parent for faster referencing (skips permission checks)
+    private final ClassLoader parent;
 
     static {
         try {
             ClassLoader.registerAsParallelCapable();
+            Lookup lookup = MethodHandles.lookup();
 
-            Lookup privateLookup = MethodHandles.privateLookupIn(ClassLoader.class, MethodHandles.lookup());
+            FIND_RESOURCE_METHOD_HANDLE = lookup.findSpecial(ClassLoader.class, "findResource",
+                    MethodType.methodType(URL.class, String.class), NamespaceAwareClassLoader.class);
 
-            FIND_RESOURCE_METHOD_HANDLE = privateLookup
-                    .unreflect(ClassLoader.class.getDeclaredMethod("findResource", String.class));
-            FIND_RESOURCES_METHOD_HANDLE = privateLookup
-                    .unreflect(ClassLoader.class.getDeclaredMethod("findResources", String.class));
+            FIND_RESOURCES_METHOD_HANDLE = lookup.findSpecial(ClassLoader.class, "findResources",
+                    MethodType.methodType(Enumeration.class, String.class), NamespaceAwareClassLoader.class);
         } catch (ReflectiveOperationException e) {
             throw new ExceptionInInitializerError(e);
         }
     }
 
-    public NamespaceAwareClassLoader(ClassLoader parent, NamespaceServiceImpl namespaceService) {
+    public NamespaceAwareClassLoader(ClassLoader parent, Node node) {
         super(parent);
-        this.namespaceService = namespaceService;
+        this.parent = parent;
+        this.namespaceService = (NamespaceServiceImpl) node.getNamespaceService();
     }
 
     @Override
@@ -68,12 +73,6 @@ public class NamespaceAwareClassLoader extends ClassLoader {
             }
             return klass;
         }
-    }
-
-    /** TODO Do we actually need this method? */
-    @Override
-    protected Class<?> findClass(String name) throws ClassNotFoundException {
-        return super.findClass(name);
     }
 
     @Override
@@ -95,13 +94,11 @@ public class NamespaceAwareClassLoader extends ClassLoader {
     }
 
     ClassLoader pickClassLoader() {
-        String namespace = NamespaceThreadLocalContext.getNamespaceThreadLocalContext();
-        if (namespace == null) {
-            return getParent();
-        } else {
-            ClassLoader candidate = namespaceService.namespaceToClassLoader.get(namespace);
-            return candidate == null ? getParent() : candidate;
+        ClassLoader classLoader = NamespaceThreadLocalContext.getClassLoader();
+        if (classLoader != null) {
+            return classLoader;
         }
+        return parent;
     }
 
     @Override

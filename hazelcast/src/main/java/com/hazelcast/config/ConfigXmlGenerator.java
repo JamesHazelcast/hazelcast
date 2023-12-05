@@ -16,6 +16,7 @@
 
 package com.hazelcast.config;
 
+import com.hazelcast.config.cp.CPMapConfig;
 import com.hazelcast.config.tpc.TpcConfig;
 import com.hazelcast.config.tpc.TpcSocketConfig;
 import com.hazelcast.config.cp.CPSubsystemConfig;
@@ -35,10 +36,12 @@ import com.hazelcast.config.security.UsernamePasswordIdentityConfig;
 import com.hazelcast.internal.cluster.Versions;
 import com.hazelcast.internal.config.ConfigXmlGeneratorHelper;
 import com.hazelcast.internal.config.PersistenceAndHotRestartPersistenceMerger;
+import com.hazelcast.internal.namespace.ResourceDefinition;
 import com.hazelcast.internal.util.CollectionUtil;
 import com.hazelcast.internal.util.MapUtil;
 import com.hazelcast.jet.config.EdgeConfig;
 import com.hazelcast.jet.config.JetConfig;
+import com.hazelcast.jet.config.ResourceType;
 import com.hazelcast.logging.ILogger;
 import com.hazelcast.logging.Logger;
 import com.hazelcast.memory.Capacity;
@@ -200,7 +203,7 @@ public class ConfigXmlGenerator {
         integrityCheckerXmlGenerator(gen, config);
         dataConnectionConfiguration(gen, config);
         tpcConfiguration(gen, config);
-
+        namespacesConfiguration(gen, config);
         xml.append("</hazelcast>");
 
         String xmlString = xml.toString();
@@ -987,7 +990,8 @@ public class ConfigXmlGenerator {
                 .node("persistence-enabled", cpSubsystemConfig.isPersistenceEnabled())
                 .node("base-dir", cpSubsystemConfig.getBaseDir().getAbsolutePath())
                 .node("data-load-timeout-seconds", cpSubsystemConfig.getDataLoadTimeoutSeconds())
-                .node("cp-member-priority", cpSubsystemConfig.getCPMemberPriority());
+                .node("cp-member-priority", cpSubsystemConfig.getCPMemberPriority())
+                .node("map-limit", cpSubsystemConfig.getCPMapLimit());
 
         RaftAlgorithmConfig raftAlgorithmConfig = cpSubsystemConfig.getRaftAlgorithmConfig();
         gen.open("raft-algorithm")
@@ -1018,6 +1022,15 @@ public class ConfigXmlGenerator {
                     .node("name", lockConfig.getName())
                     .node("lock-acquire-limit", lockConfig.getLockAcquireLimit())
                     .close();
+        }
+
+        gen.close().open("maps");
+
+        for (CPMapConfig cpMapConfig : cpSubsystemConfig.getCpMapConfigs().values()) {
+            gen.open("map")
+               .node("name", cpMapConfig.getName())
+               .node("max-size-mb", cpMapConfig.getMaxSizeMb())
+               .close();
         }
 
         gen.close().close();
@@ -1240,9 +1253,50 @@ public class ConfigXmlGenerator {
                 .close();
     }
 
+    private static void namespacesConfiguration(XmlGenerator gen, Config config) {
+        NamespacesConfig namespacesConfig = config.getNamespacesConfig();
+        if (namespacesConfig == null) {
+            return;
+        }
+        gen.open("namespaces", "enabled", namespacesConfig.isEnabled());
+        JavaSerializationFilterConfig filterConfig = namespacesConfig.getJavaSerializationFilterConfig();
+        if (filterConfig != null) {
+            gen.open("java-serialization-filter", "defaults-disabled", filterConfig.isDefaultsDisabled());
+            appendFilterList(gen, "blacklist", filterConfig.getBlacklist());
+            appendFilterList(gen, "whitelist", filterConfig.getWhitelist());
+            gen.close();
+        }
+
+        Map<String, NamespaceConfig> namespaces = namespacesConfig.getNamespaceConfigs();
+        for (Map.Entry<String, NamespaceConfig> entry : namespaces.entrySet()) {
+            NamespaceConfig namespaceConfig = entry.getValue();
+            gen.open("namespace", "name", entry.getKey());
+            Collection<ResourceDefinition> resourceDefinition =  namespaceConfig.getResourceConfigs();
+            resourceDefinition.forEach(resource -> {
+                String resourceId = resource.id();
+                gen.open(translateResourceType(resource.type()), "id", resourceId);
+                gen.node("url", resource.url());
+                gen.close();
+            });
+            gen.close();
+        }
+
+        gen.close();
+    }
+
+    private static String translateResourceType(ResourceType type) {
+        if (ResourceType.JAR.equals(type)) {
+            return "jar";
+        } else if (ResourceType.JARS_IN_ZIP.equals(type)) {
+            return "jars-in-zip";
+        } else {
+            throw new IllegalArgumentException("Unknown resource type: " + type);
+        }
+    }
+
     /**
-     * Utility class to build xml using a {@link StringBuilder}.
-     */
+         * Utility class to build xml using a {@link StringBuilder}.
+         */
     public static final class XmlGenerator {
 
         private static final int CAPACITY = 64;

@@ -30,6 +30,7 @@ import com.hazelcast.map.IMap;
 import com.hazelcast.test.HazelcastParallelParametersRunnerFactory;
 import com.hazelcast.test.HazelcastParametrizedRunner;
 import com.hazelcast.test.UserCodeUtil;
+import com.hazelcast.test.annotation.NamespaceTest;
 import com.hazelcast.test.annotation.ParallelJVMTest;
 import com.hazelcast.test.annotation.QuickTest;
 import org.junit.After;
@@ -59,7 +60,7 @@ import static org.junit.Assert.assertEquals;
 
 @RunWith(HazelcastParametrizedRunner.class)
 @UseParametersRunnerFactory(HazelcastParallelParametersRunnerFactory.class)
-@Category({QuickTest.class, ParallelJVMTest.class})
+@Category({QuickTest.class, ParallelJVMTest.class, NamespaceTest.class})
 public class ClientUserCodeDeploymentTest extends ClientTestSupport {
 
     private final TestHazelcastFactory factory = new TestHazelcastFactory();
@@ -77,7 +78,7 @@ public class ClientUserCodeDeploymentTest extends ClientTestSupport {
 
     @Parameters(name = "ClassCacheMode:{0}, ProviderMode:{1}")
     public static Collection<Object[]> parameters() {
-        LinkedList<Object[]> parameters = new LinkedList<Object[]>();
+        LinkedList<Object[]> parameters = new LinkedList<>();
         for (UserCodeDeploymentConfig.ClassCacheMode classCacheMode : UserCodeDeploymentConfig.ClassCacheMode.values()) {
             for (UserCodeDeploymentConfig.ProviderMode providerMode : UserCodeDeploymentConfig.ProviderMode.values()) {
                 parameters.add(new Object[]{classCacheMode, providerMode});
@@ -97,7 +98,7 @@ public class ClientUserCodeDeploymentTest extends ClientTestSupport {
         return config;
     }
 
-    private ClientConfig createClientConfig() {
+    private static ClientConfig createClientConfig() {
         ClientConfig config = new ClientConfig();
         ClientUserCodeDeploymentConfig clientUserCodeDeploymentConfig = new ClientUserCodeDeploymentConfig();
         clientUserCodeDeploymentConfig.addClass("usercodedeployment.IncrementingEntryProcessor");
@@ -200,7 +201,7 @@ public class ClientUserCodeDeploymentTest extends ClientTestSupport {
         assertCodeDeploymentWorking(client, new IncrementingEntryProcessor());
     }
 
-    private void assertCodeDeploymentWorking(HazelcastInstance client, EntryProcessor entryProcessor) {
+    private static void assertCodeDeploymentWorking(HazelcastInstance client, EntryProcessor<Integer, Integer, ?> entryProcessor) {
         int keyCount = 100;
         IMap<Integer, Integer> map = client.getMap(randomName());
 

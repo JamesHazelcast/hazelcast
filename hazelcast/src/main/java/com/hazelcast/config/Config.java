@@ -112,6 +112,8 @@ public class Config {
      */
     public static final String DEFAULT_CLUSTER_NAME = "dev";
 
+    protected NamespacesConfig namespacesConfig = new NamespacesConfig();
+
     private URL configurationUrl;
 
     private File configurationFile;
@@ -167,8 +169,6 @@ public class Config {
     private final Map<String, DeviceConfig> deviceConfigs = new ConcurrentHashMap<>(
             Collections.singletonMap(DEFAULT_DEVICE_NAME, new LocalDeviceConfig())
     );
-
-    private final Map<String, NamespaceConfig> namespaceConfigs = new ConcurrentHashMap<>();
 
     // @since 3.12
     private AdvancedNetworkConfig advancedNetworkConfig = new AdvancedNetworkConfig();
@@ -404,19 +404,23 @@ public class Config {
         checkTrue(properties != null, "properties can't be null");
 
         String path = configFile.getPath();
-        InputStream stream = new FileInputStream(configFile);
-        if (path.endsWith(".xml")) {
-            return applyEnvAndSystemVariableOverrides(
-                    new XmlConfigBuilder(stream).setProperties(properties).build().setConfigurationFile(configFile)
-            );
-        }
-        if (path.endsWith(".yaml") || path.endsWith(".yml")) {
-            return applyEnvAndSystemVariableOverrides(
-                    new YamlConfigBuilder(stream).setProperties(properties).build().setConfigurationFile(configFile)
-            );
-        }
+        try (InputStream stream = new FileInputStream(configFile)) {
+            final Config config;
 
-        throw new IllegalArgumentException("Unknown configuration file extension");
+            if (path.endsWith(".xml")) {
+                config = new XmlConfigBuilder(stream).setProperties(properties).build();
+            } else if (path.endsWith(".yaml") || path.endsWith(".yml")) {
+                config = new YamlConfigBuilder(stream).setProperties(properties).build();
+            } else {
+                throw new IllegalArgumentException("Unknown configuration file extension");
+            }
+
+            return applyEnvAndSystemVariableOverrides(config.setConfigurationFile(configFile));
+        } catch (FileNotFoundException e) {
+            throw e;
+        } catch (IOException e) {
+            throw ExceptionUtil.sneakyThrow(e);
+        }
     }
 
     /**
@@ -3228,31 +3232,21 @@ public class Config {
     }
 
     /**
-     * Adds the specified {@code namespaceConfig}, replacing any existing {@link NamespaceConfig} with the same
-     * {@link NamespaceConfig#getName() name}.
-     *
-     * @since 5.4
+     * @return the namespaces configuration object
+     * @since 5.4.0
      */
-    public Config addNamespaceConfig(NamespaceConfig namespaceConfig) {
-        namespaceConfigs.put(namespaceConfig.getName(), namespaceConfig);
+    public NamespacesConfig getNamespacesConfig() {
+        return namespacesConfig;
+    }
+
+    /**
+     * Sets the namespaces configuration .
+     *
+     * @since 5.4.0
+     */
+    public @Nonnull Config setNamespacesConfig(@Nonnull NamespacesConfig namespacesConfig) {
+        this.namespacesConfig = checkNotNull(namespacesConfig);
         return this;
-    }
-
-    /** @since 5.4 */
-    public Config removeNamespaceConfig(String namespaceName) {
-        namespaceConfigs.remove(namespaceName);
-        return this;
-    }
-
-    /** @since 5.4 */
-    Map<String, NamespaceConfig> getNamespaceConfigs() {
-        return Collections.unmodifiableMap(namespaceConfigs);
-    }
-
-    /** @since 5.4 */
-    void setNamespaceConfigs(Map<String, NamespaceConfig> namespaceConfigs) {
-        this.namespaceConfigs.clear();
-        this.namespaceConfigs.putAll(namespaceConfigs);
     }
 
     /**
@@ -3321,7 +3315,7 @@ public class Config {
                 + ", cardinalityEstimatorConfigs=" + cardinalityEstimatorConfigs
                 + ", flakeIdGeneratorConfigMap=" + flakeIdGeneratorConfigMap
                 + ", pnCounterConfigs=" + pnCounterConfigs
-                + ", namespaceConfigs=" + namespaceConfigs
+                + ", namespacesConfig=" + namespacesConfig
                 + ", advancedNetworkConfig=" + advancedNetworkConfig
                 + ", servicesConfig=" + servicesConfig
                 + ", securityConfig=" + securityConfig
@@ -3347,6 +3341,7 @@ public class Config {
                 + ", integrityCheckerConfig=" + integrityCheckerConfig
                 + ", dataConnectionConfigs=" + dataConnectionConfigs
                 + ", tpcConfig=" + tpcConfig
+                + ", namespacesConfig=" + namespacesConfig
                 + '}';
     }
 }

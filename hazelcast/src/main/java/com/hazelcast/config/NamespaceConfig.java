@@ -16,31 +16,47 @@
 
 package com.hazelcast.config;
 
-import static com.hazelcast.internal.util.Preconditions.checkNotNull;
-
+import com.hazelcast.internal.config.ConfigDataSerializerHook;
+import com.hazelcast.internal.namespace.ResourceDefinition;
+import com.hazelcast.internal.namespace.impl.ResourceDefinitionImpl;
+import com.hazelcast.internal.serialization.impl.SerializationUtil;
 import com.hazelcast.jet.config.ResourceConfig;
 import com.hazelcast.jet.config.ResourceType;
+import com.hazelcast.nio.ObjectDataInput;
+import com.hazelcast.nio.ObjectDataOutput;
+import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import java.io.IOException;
 import java.net.URL;
-import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class NamespaceConfig implements NamedConfig {
+public class NamespaceConfig implements NamedConfig, IdentifiedDataSerializable {
     @Nullable
     private String name;
 
-    private final Map<String, ResourceConfig> resourceConfigs = new ConcurrentHashMap<>();
+    private final Map<String, ResourceDefinition> resourceDefinitions = new ConcurrentHashMap<>();
 
     public NamespaceConfig() {
     }
 
     public NamespaceConfig(String name) {
         this.name = name;
+    }
+
+    public NamespaceConfig(NamespaceConfig config) {
+        this.name = config.name;
+        this.resourceDefinitions.putAll(config.resourceDefinitions);
+    }
+
+    public NamespaceConfig(@Nonnull String name, @Nonnull Map<String, ResourceDefinition> resources) {
+        this.name = name;
+        this.resourceDefinitions.putAll(resources);
     }
 
     @Override
@@ -55,35 +71,76 @@ public class NamespaceConfig implements NamedConfig {
     }
 
     public NamespaceConfig addClass(@Nonnull Class<?>... classes) {
-        checkNotNull(classes, "Classes cannot be null");
-        ResourceConfig.fromClass(classes).forEach(cfg -> resourceConfigs.put(cfg.getId(), cfg));
+        Objects.requireNonNull(classes, "Classes cannot be null");
+        ResourceConfig.fromClass(classes).map(ResourceDefinitionImpl::new)
+                .forEach(resourceDefinition -> resourceDefinitions.put(resourceDefinition.id(), resourceDefinition));
         return this;
     }
 
-    public NamespaceConfig addJar(@Nonnull URL url) {
-       return add(url, null, ResourceType.JAR);
+     public NamespaceConfig addJar(@Nonnull URL url, @Nullable String id) {
+        return add(url, id, ResourceType.JAR);
     }
 
-    public NamespaceConfig addJarsInZip(@Nonnull URL url) {
-        return add(url, null, ResourceType.JARS_IN_ZIP);
+    public NamespaceConfig addJarsInZip(@Nonnull URL url, @Nullable String id) {
+        return add(url, id, ResourceType.JARS_IN_ZIP);
     }
 
-    private NamespaceConfig add(@Nonnull URL url, @Nullable String id, @Nonnull ResourceType resourceType) {
-        final ResourceConfig cfg = new ResourceConfig(url, id, resourceType);
+    NamespaceConfig add(@Nonnull URL url, @Nullable String id, @Nonnull ResourceType resourceType) {
+        return add(new ResourceDefinitionImpl(new ResourceConfig(url, id, resourceType)));
+    }
 
-        if (resourceConfigs.putIfAbsent(cfg.getId(), cfg) != null) {
-            throw new IllegalArgumentException("Resource with id: " + cfg.getId() + " already exists");
+    protected NamespaceConfig add(ResourceDefinition resourceDefinition) {
+        if (resourceDefinitions.putIfAbsent(resourceDefinition.id(), resourceDefinition) != null) {
+            throw new IllegalArgumentException("Resource with id: " + resourceDefinition.id() + " already exists");
         } else {
             return this;
         }
     }
 
-    public NamespaceConfig removeResourceConfig(String id) {
-        resourceConfigs.remove(id);
-        return this;
+    public Set<ResourceDefinition> getResourceConfigs() {
+        return Set.copyOf(resourceDefinitions.values());
     }
 
-    Collection<ResourceConfig> getResourceConfigs() {
-        return Set.copyOf(resourceConfigs.values());
+    @Override
+    public void writeData(ObjectDataOutput out) throws IOException {
+        out.writeString(name);
+        SerializationUtil.writeMapStringKey(resourceDefinitions, out);
+    }
+
+    @Override
+    public void readData(ObjectDataInput in) throws IOException {
+        name = in.readString();
+
+        int size = in.readInt();
+        for (int i = 0; i < size; i++) {
+            resourceDefinitions.put(in.readString(), in.readObject());
+        }
+    }
+
+    @Override
+    public int getFactoryId() {
+        return ConfigDataSerializerHook.F_ID;
+    }
+
+    @Override
+    public int getClassId() {
+        return ConfigDataSerializerHook.NAMESPACE_CONFIG;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if ((obj == null) || (getClass() != obj.getClass())) {
+            return false;
+        }
+        NamespaceConfig other = (NamespaceConfig) obj;
+        return Objects.equals(name, other.name);
     }
 }

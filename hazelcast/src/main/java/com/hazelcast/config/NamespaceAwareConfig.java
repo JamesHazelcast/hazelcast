@@ -16,12 +16,32 @@
 
 package com.hazelcast.config;
 
-import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public interface NamespaceAwareConfig {
-    String DEFAULT_NAMESPACE = "default";
+    /**
+     * Defines the default Namespace Name used for all {@link NamespaceAwareConfig} implementations.
+     * <p>
+     * The default is currently {@code null} which results in the following behaviour, as defined
+     * by the {@link com.hazelcast.internal.namespace.impl.NamespaceServiceImpl} implementation:
+     *   * When a "default" Namespace is defined in the {@code NamespaceService}, i.e. a Namespace
+     *     exists with the ID {@link com.hazelcast.internal.namespace.NamespaceService#DEFAULT_NAMESPACE_NAME},
+     *     that Namespace is used for relevant operations after being transformed by the function
+     *     {@link com.hazelcast.internal.namespace.impl.NamespaceServiceImpl#transformNamespace(String)}.
+     *   * When there is no "default" Namespace defined, this value remains {@code null} and there is
+     *     no Namespace awareness used during relevant operations.
+     */
+    String DEFAULT_NAMESPACE = null;
 
-    @Nonnull
+    /**
+     * Retrieve the User Code Deployment Namespace to be used for {@link ClassLoader} awareness
+     * during operations related to the structure associated with this configuration.
+     *
+     * @return Namespace Name for use with the {@link com.hazelcast.internal.namespace.NamespaceService},
+     *         or {@code null} if there is no Namespace to associate with.
+     * @since 5.4
+     */
+    @Nullable
     default String getNamespace() {
         return DEFAULT_NAMESPACE;
     }

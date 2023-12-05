@@ -31,6 +31,8 @@ import org.junit.experimental.categories.Category;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 
+import static com.hazelcast.cp.internal.CPSubsystemImpl.CPMAP_LICENSE_MESSAGE;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 @RunWith(HazelcastParallelClassRunner.class)
@@ -177,4 +179,14 @@ public class CPSubsystemImplTest extends HazelcastTestSupport {
         assertNotNull(instance.getCPSubsystem().getCPSessionManagementService());
     }
 
+    @Test
+    public void testCPMapUnsupported() {
+        Config config = new Config();
+        config.getCPSubsystemConfig().setCPMemberCount(3);
+        factory.newHazelcastInstance(config);
+        factory.newHazelcastInstance(config);
+        HazelcastInstance instance = factory.newHazelcastInstance(config);
+        Throwable t = assertThrows(UnsupportedOperationException.class, () -> instance.getCPSubsystem().getMap("myMap"));
+        assertEquals(CPMAP_LICENSE_MESSAGE, t.getMessage());
+    }
 }

@@ -18,7 +18,6 @@ package com.hazelcast.map.impl.operation;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.HazelcastInstanceAware;
-import com.hazelcast.internal.namespace.NamespaceUtil;
 import com.hazelcast.internal.serialization.Data;
 import com.hazelcast.map.EntryProcessor;
 import com.hazelcast.map.impl.MapDataSerializerHook;
@@ -64,7 +63,7 @@ public class EntryBackupOperation extends KeyBasedMapOperation implements Backup
     @Override
     protected void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
-        entryBackupProcessor = NamespaceUtil.callWithNamespace(getNamespace(), in::readObject);;
+        entryBackupProcessor = callWithNamespaceAwareness(in::readObject);
     }
 
     @Override

@@ -45,6 +45,7 @@ import com.hazelcast.config.MapPartitionLostListenerConfig;
 import com.hazelcast.config.MemberGroupConfig;
 import com.hazelcast.config.MergePolicyConfig;
 import com.hazelcast.config.MultiMapConfig;
+import com.hazelcast.config.NamespaceConfig;
 import com.hazelcast.config.NetworkConfig;
 import com.hazelcast.config.OnJoinPermissionOperationName;
 import com.hazelcast.config.PNCounterConfig;
@@ -75,6 +76,7 @@ import com.hazelcast.config.WanBatchPublisherConfig;
 import com.hazelcast.config.WanCustomPublisherConfig;
 import com.hazelcast.config.WanReplicationConfig;
 import com.hazelcast.config.WanReplicationRef;
+import com.hazelcast.config.cp.CPMapConfig;
 import com.hazelcast.config.cp.CPSubsystemConfig;
 import com.hazelcast.config.cp.FencedLockConfig;
 import com.hazelcast.config.cp.SemaphoreConfig;
@@ -92,6 +94,9 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
@@ -306,6 +311,49 @@ public class YamlMemberDomConfigProcessor extends MemberDomConfigProcessor {
             String name = mapNode.getNodeName();
             MapConfig mapConfig = ConfigUtils.getByNameOrNew(config.getMapConfigs(), name, MapConfig.class);
             handleMapNode(mapNode, mapConfig);
+        }
+    }
+
+    @Override
+    protected void handleNamespacesNode(Node node) {
+        for (Node n : childElements(node)) {
+            String nodeName = cleanNodeName(n);
+            if (matches(nodeName, "java-serialization-filter")) {
+                fillJavaSerializationFilter(n, config.getNamespacesConfig());
+            } else if (!matches("enabled", nodeName)) {
+                NamespaceConfig ns = new NamespaceConfig(nodeName);
+                //get list of resources
+                for (Node subChild : childElements(n)) {
+                    String resourceId = null;
+                    String resourceTypeName = null;
+                    String resourceUrl = null;
+                    for (Node resourceChild : childElements(subChild)) {
+                        if (resourceChild.getNodeName().equals("resource-type")) {
+                            resourceTypeName = resourceChild.getNodeValue();
+                        } else if (resourceChild.getNodeName().equals("url")) {
+                            resourceUrl = resourceChild.getNodeValue();
+                        } else if (resourceChild.getNodeName().equals("id")) {
+                            resourceId = resourceChild.getNodeValue();
+                        }
+                    }
+                    if (resourceTypeName == null || resourceUrl == null || resourceId == null) {
+                        throw new IllegalArgumentException("For each namespace, resource elements \"id\","
+                                + " \"resource-type\" and \"url\" must be defined.");
+                    }
+                    try {
+                        if ("jar".equalsIgnoreCase(resourceTypeName)) {
+                            ns.addJar(new URI(resourceUrl).toURL(), resourceId);
+                        } else if ("jars_in_zip".equalsIgnoreCase(resourceTypeName)) {
+                            ns.addJarsInZip(new URI(resourceUrl).toURL(), resourceId);
+                        }
+                    } catch (MalformedURLException | URISyntaxException e) {
+                        throw new IllegalArgumentException(
+                                String.format("Namespace resource %s was configured with invalid URL %s",
+                                        resourceId, resourceUrl), e);
+                    }
+                }
+                config.getNamespacesConfig().addNamespaceConfig(ns);
+            }
         }
     }
 
@@ -895,6 +943,33 @@ public class YamlMemberDomConfigProcessor extends MemberDomConfigProcessor {
                 }
             }
             cpSubsystemConfig.addLockConfig(lockConfig);
+        }
+    }
+
+//    @Override
+//    void handleNamespace(Node node) {
+//        for (Node child : childElements(node)) {
+//            Node named = getNamedItemNode(child, "name");
+//            NamespaceConfig nsConfig = new NamespaceConfig(named.getNodeValue());
+//            Node resources = getNamedItemNode(child, "resources");
+//            for (Node subC : childElements(resources)) {
+//                handleResources(subC, nsConfig);
+//            }
+//        }
+//    }
+
+    @Override
+    void handleCPMaps(CPSubsystemConfig cpSubsystemConfig, Node node) {
+        for (Node child : childElements(node)) {
+            CPMapConfig cpMapConfig = new CPMapConfig();
+            cpMapConfig.setName(child.getNodeName());
+            for (Node subChild : childElements(child)) {
+                String nodeName = cleanNodeName(subChild);
+                if (matches("max-size-mb", nodeName)) {
+                    cpMapConfig.setMaxSizeMb(Integer.parseInt(getTextContent(subChild)));
+                }
+            }
+            cpSubsystemConfig.addCPMapConfig(cpMapConfig);
         }
     }
 

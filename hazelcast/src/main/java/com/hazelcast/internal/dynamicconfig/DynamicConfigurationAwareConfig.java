@@ -42,7 +42,7 @@ import com.hazelcast.config.MapConfig;
 import com.hazelcast.config.MemberAttributeConfig;
 import com.hazelcast.config.MetricsConfig;
 import com.hazelcast.config.MultiMapConfig;
-import com.hazelcast.config.NamespaceConfig;
+import com.hazelcast.config.NamespacesConfig;
 import com.hazelcast.config.NativeMemoryConfig;
 import com.hazelcast.config.NetworkConfig;
 import com.hazelcast.config.PNCounterConfig;
@@ -61,8 +61,8 @@ import com.hazelcast.config.SqlConfig;
 import com.hazelcast.config.TopicConfig;
 import com.hazelcast.config.UserCodeDeploymentConfig;
 import com.hazelcast.config.WanReplicationConfig;
-import com.hazelcast.config.tpc.TpcConfig;
 import com.hazelcast.config.cp.CPSubsystemConfig;
+import com.hazelcast.config.tpc.TpcConfig;
 import com.hazelcast.core.ManagedContext;
 import com.hazelcast.internal.config.CacheSimpleConfigReadOnly;
 import com.hazelcast.internal.config.DataConnectionConfigReadOnly;
@@ -88,6 +88,7 @@ import com.hazelcast.spi.impl.NodeEngineImpl;
 import com.hazelcast.spi.properties.HazelcastProperties;
 
 import javax.annotation.Nonnull;
+
 import java.io.File;
 import java.net.URL;
 import java.util.List;
@@ -106,7 +107,7 @@ import static com.hazelcast.spi.properties.ClusterProperty.SEARCH_DYNAMIC_CONFIG
         "checkstyle:classdataabstractioncoupling"})
 public class DynamicConfigurationAwareConfig extends Config {
 
-    private final ConfigSupplier<MapConfig> mapConfigOrNullConfigSupplier = new ConfigSupplier<MapConfig>() {
+    private final ConfigSupplier<MapConfig> mapConfigOrNullConfigSupplier = new ConfigSupplier<>() {
         @Override
         public MapConfig getDynamicConfig(@Nonnull ConfigurationService configurationService, @Nonnull String name) {
             return configurationService.findMapConfig(name);
@@ -142,8 +143,7 @@ public class DynamicConfigurationAwareConfig extends Config {
         this.dynamicSecurityConfig = new DynamicSecurityConfig(staticConfig.getSecurityConfig(), null);
         this.dynamicCPSubsystemConfig = new DynamicCPSubsystemConfig(staticConfig.getCPSubsystemConfig());
         this.configSearcher = initConfigSearcher();
-        // todo reconsider access
-        ConfigAccessor.setNamespaceConfigs(this, ConfigAccessor.getNamespaceConfigs(staticConfig));
+        namespacesConfig = new DynamicNamespacesConfig(() -> configurationService, staticConfig.getNamespacesConfig());
     }
 
     @Override
@@ -270,6 +270,10 @@ public class DynamicConfigurationAwareConfig extends Config {
         boolean staticConfigDoesNotExist = checkStaticConfigDoesNotExist(staticConfig.getMapConfigs(),
                 mapConfig.getName(), mapConfig);
         if (staticConfigDoesNotExist) {
+            if (mapConfig.getTieredStoreConfig().isEnabled()) {
+                throw new InvalidConfigurationException("Tiered store enabled map config"
+                        + " cannot be added dynamically [" + mapConfig + "]");
+            }
             configurationService.broadcastConfig(mapConfig);
         }
         return this;
@@ -1258,6 +1262,22 @@ public class DynamicConfigurationAwareConfig extends Config {
         return getDataConnectionConfigInternal(name, name);
     }
 
+    // S1185:S1612 A test (testDecorateAllPublicMethodsFromTest) forces this class to implement all of the parent methods, but
+    // as we are overriding "namespaceConfig" with our own version, the parent implementation is sufficient
+    @SuppressWarnings("squid:S1185")
+    @Override
+    public NamespacesConfig getNamespacesConfig() {
+        return super.getNamespacesConfig();
+    }
+
+    // S1185:S1612 A test (testDecorateAllPublicMethodsFromTest) forces this class to implement all of the parent methods, but
+    // as we are overriding "namespaceConfig" with our own version, the parent implementation is sufficient
+    @SuppressWarnings("squid:S1185")
+    @Override
+    public Config setNamespacesConfig(NamespacesConfig namespacesConfig) {
+        throw new UnsupportedOperationException("Unsupported operation");
+    }
+
     private DataConnectionConfig getDataConnectionConfigInternal(String name, String fallbackName) {
         return (DataConnectionConfig) configSearcher.getConfig(name, fallbackName, supplierFor(DataConnectionConfig.class));
     }
@@ -1265,18 +1285,6 @@ public class DynamicConfigurationAwareConfig extends Config {
     @Override
     public DataConnectionConfig findDataConnectionConfig(String name) {
         return new DataConnectionConfigReadOnly(getDataConnectionConfigInternal(name, "default"));
-    }
-
-    @Override
-    public Config addNamespaceConfig(NamespaceConfig namespaceConfig) {
-        // todo actually add
-        return super.addNamespaceConfig(namespaceConfig);
-    }
-
-    @Override
-    public Config removeNamespaceConfig(String namespaceName) {
-        // todo actually remove namespace
-        return super.removeNamespaceConfig(namespaceName);
     }
 
     @Override

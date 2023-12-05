@@ -17,7 +17,6 @@
 package com.hazelcast.map.impl.operation;
 
 import com.hazelcast.config.InMemoryFormat;
-import com.hazelcast.internal.namespace.NamespaceUtil;
 import com.hazelcast.map.impl.MapDataSerializerHook;
 import com.hazelcast.internal.iteration.IterationPointer;
 import com.hazelcast.map.impl.query.Query;
@@ -80,8 +79,8 @@ public class MapFetchWithQueryOperation extends MapOperation implements Readonly
         for (int i = 0; i < pointersCount; i++) {
             pointers[i] = new IterationPointer(in.readInt(), in.readInt());
         }
-        // todo NS-aware required?
-        query = NamespaceUtil.callWithNamespace(getNamespace(), in::readObject);
+        // Namespace awareness handled within Query object
+        query = in.readObject();
     }
 
     @Override

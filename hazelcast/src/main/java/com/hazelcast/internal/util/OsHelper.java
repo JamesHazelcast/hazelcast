@@ -16,52 +16,27 @@
 
 package com.hazelcast.internal.util;
 
+import com.hazelcast.internal.tpcengine.util.OS;
+
 /**
  * Helper methods related to operating system on which the code is actually running.
  */
 public final class OsHelper {
-
-    /**
-     * OS name in lower case.
-     */
-    public static final String OS = System.getProperty("os.name").toLowerCase();
-
     private OsHelper() {
     }
 
     /**
-     * Returns {@code true} if the system is Linux.
+     * Returns a file path string that replaces Windows `\\` file
+     * separators with the Unix equivalent `/` if the current machine
+     * is using Windows as its Operating System.
      *
-     * @return {@code true} if the current system is Linux.
+     * @param path the file path string to convert
+     * @return the file path string, with file separators set to `/`
      */
-    public static boolean isLinux() {
-        return OS.contains("nux");
-    }
-
-    /**
-     * Returns {@code true} if the system is from Unix family.
-     *
-     * @return {@code true} if the current system is Unix/Linux/AIX.
-     */
-    public static boolean isUnixFamily() {
-        return (OS.contains("nix") || OS.contains("nux") || OS.contains("aix"));
-    }
-
-    /**
-     * Returns {@code true} if the system is a Mac OS.
-     *
-     * @return {@code true} if the current system is Mac.
-     */
-    public static boolean isMac() {
-        return (OS.contains("mac") || OS.contains("darwin"));
-    }
-
-    /**
-     * Returns {@code true} if the system is a Windows.
-     *
-     * @return {@code true} if the current system is a Windows one.
-     */
-    public static boolean isWindows() {
-        return OS.contains("windows");
+    public static String ensureUnixSeparators(final String path) {
+        if (OS.isWindows()) {
+            return path.replace('\\', '/');
+        }
+        return path;
     }
 }

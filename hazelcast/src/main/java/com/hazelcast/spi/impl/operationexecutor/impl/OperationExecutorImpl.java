@@ -91,7 +91,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
  * </li>
  * </ol>
  */
-@SuppressWarnings("checkstyle:methodcount")
+@SuppressWarnings({"checkstyle:methodcount", "checkstyle:classfanoutcomplexity"})
 public final class OperationExecutorImpl implements OperationExecutor, StaticMetricsProvider {
     private static final HazelcastProperty IDLE_STRATEGY
             = new HazelcastProperty("hazelcast.operation.partitionthread.idlestrategy", "block");
@@ -114,6 +114,7 @@ public final class OperationExecutorImpl implements OperationExecutor, StaticMet
     private final OperationRunner adHocOperationRunner;
     private final int priorityThreadCount;
     private final TpcServerBootstrap tpcServerBootstrap;
+    private final NodeEngine engine;
 
     @SuppressWarnings("java:S107")
     public OperationExecutorImpl(HazelcastProperties properties,
@@ -131,9 +132,6 @@ public final class OperationExecutorImpl implements OperationExecutor, StaticMet
 
         this.adHocOperationRunner = runnerFactory.createAdHocRunner();
 
-        // Setup NodeEngine context for User Code Deployment Namespacing for operations
-        NodeEngineThreadLocalContext.declareNodeEngineReference(engine);
-
         this.partitionOperationRunners = initPartitionOperationRunners(properties, runnerFactory);
         if (!tpcServerBootstrap.isEnabled()) {
             this.partitionThreads = initClassicPartitionThreads(properties, hzName, nodeExtension, configClassLoader);
@@ -143,6 +141,7 @@ public final class OperationExecutorImpl implements OperationExecutor, StaticMet
         this.priorityThreadCount = properties.getInteger(PRIORITY_GENERIC_OPERATION_THREAD_COUNT);
         this.genericOperationRunners = initGenericOperationRunners(properties, runnerFactory);
         this.genericThreads = initGenericThreads(hzName, nodeExtension, configClassLoader);
+        this.engine = engine;
     }
 
     public PartitionOperationThread[] getPartitionThreads() {
@@ -496,6 +495,9 @@ public final class OperationExecutorImpl implements OperationExecutor, StaticMet
         int partitionId = op.getPartitionId();
         // TODO: do we want to allow non partition specific tasks to be run on a partitionSpecific operation thread?
         if (partitionId < 0) {
+            // Namespace awareness requires NodeEngine context, which is fine on Partition threads,
+            //  but otherwise we need to provide it manually
+            NodeEngineThreadLocalContext.declareNodeEngineReference(engine);
             return true;
         }
 

@@ -23,7 +23,6 @@ import com.hazelcast.config.MapStoreConfig;
 import com.hazelcast.config.PartitioningAttributeConfig;
 import com.hazelcast.config.PartitioningStrategyConfig;
 import com.hazelcast.internal.eviction.ExpirationManager;
-import com.hazelcast.internal.namespace.impl.NodeEngineThreadLocalContext;
 import com.hazelcast.internal.serialization.Data;
 import com.hazelcast.internal.util.collection.PartitionIdSet;
 import com.hazelcast.internal.util.comparators.ValueComparator;
@@ -44,7 +43,6 @@ import com.hazelcast.query.impl.IndexProvider;
 import com.hazelcast.query.impl.getters.Extractors;
 import com.hazelcast.query.impl.predicates.QueryOptimizer;
 import com.hazelcast.spi.impl.NodeEngine;
-import com.hazelcast.spi.impl.NodeEngineImpl;
 import com.hazelcast.spi.impl.eventservice.EventFilter;
 import com.hazelcast.spi.properties.HazelcastProperty;
 
@@ -228,6 +226,8 @@ public interface MapServiceContext extends MapServiceContextInterceptorSupport,
 
     boolean globalIndexEnabled();
 
+    boolean isForciblyEnabledGlobalIndex();
+
     ValueComparator getValueComparatorOf(InMemoryFormat inMemoryFormat);
 
     NodeWideUsedCapacityCounter getNodeWideUsedCapacityCounter();
@@ -274,27 +274,5 @@ public interface MapServiceContext extends MapServiceContextInterceptorSupport,
      */
     default boolean shouldEnableMerkleTree(MapConfig mapConfig, boolean log) {
         return false;
-    }
-
-    /**
-     * @return {@link EventListenerCounter} object.
-     */
-    EventListenerCounter getEventListenerCounter();
-
-    // todo move this somewhere proper?
-    // TODO: proper docs
-    static String getNamespace(String mapName) {
-        NodeEngine engine = NodeEngineThreadLocalContext.getNamespaceThreadLocalContext();
-        if (engine == null) {
-            throw new IllegalStateException("NodeEngine context is not available for Namespaces!");
-        }
-        if (((NodeEngineImpl) engine).getNode().namespacesEnabled) {
-            MapService mapService = engine.getService(MapService.SERVICE_NAME);
-            MapContainer container = mapService.getMapServiceContext().getExistingMapContainer(mapName);
-            if (container != null) {
-                return container.getMapConfig().getNamespace();
-            }
-        }
-        return null;
     }
 }

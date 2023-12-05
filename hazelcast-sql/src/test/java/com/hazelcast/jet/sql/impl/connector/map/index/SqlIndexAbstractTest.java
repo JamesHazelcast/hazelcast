@@ -18,6 +18,7 @@ package com.hazelcast.jet.sql.impl.connector.map.index;
 
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
+import com.hazelcast.config.Config;
 import com.hazelcast.config.IndexConfig;
 import com.hazelcast.config.IndexType;
 import com.hazelcast.config.MapConfig;
@@ -115,7 +116,15 @@ public abstract class SqlIndexAbstractTest extends SqlIndexTestSupport {
 
     @BeforeClass
     public static void beforeClass() {
-        initialize(DEFAULT_MEMBERS_COUNT, null);
+        Config config = smallInstanceConfig();
+
+        MapConfig mapConfig = new MapConfig();
+        mapConfig.setName("map*")
+                .setBackupCount(0);
+
+        config.addMapConfig(mapConfig);
+
+        initialize(DEFAULT_MEMBERS_COUNT, config);
     }
 
     @Before
@@ -124,9 +133,9 @@ public abstract class SqlIndexAbstractTest extends SqlIndexTestSupport {
         valueClass = ExpressionBiValue.createBiClass(f1, f2);
 
         createMapping(mapName, int.class, valueClass);
-        MapConfig mapConfig = getMapConfig();
-        instance().getConfig().addMapConfig(mapConfig);
         map = instance().getMap(mapName);
+        map.addIndex(getIndexConfig());
+
         fill();
     }
 
@@ -933,8 +942,8 @@ public abstract class SqlIndexAbstractTest extends SqlIndexTestSupport {
 
     private Multiset<Integer> sqlKeys(boolean withIndex, String sql, List<Object> params) {
         SqlStatement query = new SqlStatement(sql);
-        // with some bugs the queries could hang, prevent long waiting in such cases
-        query.setTimeoutMillis(10_000);
+        // with some bugs the queries could hang, however the CI tests sometimes are very slow
+        query.setTimeoutMillis(60_000);
         query.setParameters(params);
 
         Multiset<Integer> keys = HashMultiset.create();
