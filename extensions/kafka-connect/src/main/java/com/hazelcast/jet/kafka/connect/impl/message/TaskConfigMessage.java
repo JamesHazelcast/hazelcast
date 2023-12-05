@@ -14,20 +14,22 @@
  * limitations under the License.
  */
 
-package com.hazelcast.mapstore.mssql;
+package com.hazelcast.jet.kafka.connect.impl.message;
 
-import com.hazelcast.mapstore.GenericMapStoreTest;
-import com.hazelcast.test.annotation.NightlyTest;
-import com.hazelcast.test.jdbc.MSSQLDatabaseProvider;
-import org.junit.BeforeClass;
-import org.junit.experimental.categories.Category;
+import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
 
+public class TaskConfigMessage implements Serializable {
+    private static final long serialVersionUID = 1L;
 
-@Category(NightlyTest.class)
-public class MSSQLGenericMapStoreTest extends GenericMapStoreTest {
+    private List<Map<String, String>> taskConfigs;
 
-    @BeforeClass
-    public static void beforeClass() {
-        initialize(new MSSQLDatabaseProvider());
+    public List<Map<String, String>> getTaskConfigs() {
+        return taskConfigs;
+    }
+
+    public void setTaskConfigs(List<Map<String, String>> taskConfigs) {
+        this.taskConfigs = taskConfigs;
     }
 }

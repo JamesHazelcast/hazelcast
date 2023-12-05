@@ -14,20 +14,21 @@
  * limitations under the License.
  */
 
-package com.hazelcast.mapstore.postgres;
 
-import com.hazelcast.mapstore.GenericMapStoreBasicIT;
-import com.hazelcast.test.annotation.NightlyTest;
-import com.hazelcast.test.jdbc.PostgresDatabaseProvider;
-import org.junit.BeforeClass;
-import org.junit.experimental.categories.Category;
+package com.hazelcast.jet.kafka.connect.impl.processorsupplier;
 
-@Category(NightlyTest.class)
-public class PostgresGenericMapStoreSimpleIT extends GenericMapStoreBasicIT {
+import com.hazelcast.jet.core.ProcessorSupplier;
+import com.hazelcast.jet.kafka.connect.impl.ReadKafkaConnectP;
 
-    @BeforeClass
-    public static void beforeClass()  {
-        initialize(new PostgresDatabaseProvider());
-    }
+import javax.annotation.Nonnull;
+import java.util.Collection;
 
+/**
+ * ProcessorSupplier that provides polymorphic return type
+ */
+public interface ReadKafkaConnectProcessorSupplier extends ProcessorSupplier {
+
+    @Nonnull
+    @Override
+    Collection<ReadKafkaConnectP<?>> get(int localParallelismForMember);
 }
