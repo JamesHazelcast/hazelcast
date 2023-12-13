@@ -171,6 +171,9 @@ public class DynamicConfigYamlGenerator {
         metricsConfigGenerator(root, config);
         splitBrainProtectionConfigsGenerator(root, config);
 
+        // Reset maskSensitiveFields to default
+        DynamicConfigYamlGenerator.maskSensitiveFields = DEFAULT_MASK_SENSITIVE_FIELDS;
+
         DumpSettings dumpSettings = DumpSettings.builder()
                 .setDefaultFlowStyle(FlowStyle.BLOCK)
                 .setIndicatorIndent(INDENT - 2)
