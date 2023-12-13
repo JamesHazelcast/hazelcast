@@ -389,9 +389,10 @@ public class ClusterWideConfigurationService implements
     public void deregisterConfigLocally(IdentifiedDataSerializable newConfig) {
         if (newConfig instanceof NamespaceConfig) {
             NamespaceConfig config = (NamespaceConfig) newConfig;
-            if (namespaceConfigs.remove(config.getName(), newConfig)) {
-                nodeEngine.getNamespaceService().removeNamespaceConfig(config);
-            }
+            namespaceConfigs.remove(config.getName(), newConfig);
+            // remove even if our `namespaceConfigs` map did not contain it, as we may be removing
+            // a statically configured NamespaceConfig
+            nodeEngine.getNamespaceService().removeNamespaceConfig(config);
         } else {
             throw new UnsupportedOperationException("Unsupported config type: " + newConfig);
         }
@@ -610,11 +611,6 @@ public class ClusterWideConfigurationService implements
     @Override
     public Map<String, WanReplicationConfig> getWanReplicationConfigs() {
         return wanReplicationConfigs;
-    }
-
-    @Override
-    public NamespaceConfig findNamespaceConfig(String name) {
-        return lookupByPattern(configPatternMatcher, namespaceConfigs, name);
     }
 
     @Override

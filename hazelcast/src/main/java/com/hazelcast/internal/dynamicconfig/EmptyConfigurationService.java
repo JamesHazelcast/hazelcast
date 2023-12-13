@@ -231,11 +231,6 @@ class EmptyConfigurationService implements ConfigurationService {
     }
 
     @Override
-    public NamespaceConfig findNamespaceConfig(String name) {
-        return null;
-    }
-
-    @Override
     public Map<String, NamespaceConfig> getNamespaceConfigs() {
         return emptyMap();
     }

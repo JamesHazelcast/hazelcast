@@ -395,14 +395,6 @@ public interface ConfigurationService {
     Map<String, WanReplicationConfig> getWanReplicationConfigs();
 
     /**
-     * Finds existing namespace configuration by name.
-     *
-     * @param name name of the configuration
-     * @return Namespace configuration or {@code null} when the requested configuration does not exist
-     */
-    NamespaceConfig findNamespaceConfig(String name);
-
-    /**
      * Returns all registered namespace configurations keyed by configuration name.
      *
      * @return Namespace configurations keyed by configuration name
