@@ -17,6 +17,7 @@
 package com.hazelcast.spi.annotation;
 
 import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
@@ -26,8 +27,9 @@ import java.lang.annotation.Target;
  * Provides no functionality beyond being a marker for internal-use. Namely, this marker indicates that
  * the class can safely be deserialized in member-to-member communication, with Namespace awareness.
  *
- * <b>Implementation note:</b> This marker only indicates <b>AP</b> data structure support.
+ * @implNote This marker only indicates <b>AP</b> data structure support.
  */
+@Inherited
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface NamespacesSupported {
