@@ -29,6 +29,7 @@ import com.hazelcast.security.SecurityContext;
 import com.hazelcast.security.SecurityInterceptorConstants;
 import com.hazelcast.security.permission.ActionConstants;
 import com.hazelcast.security.permission.ExecutorServicePermission;
+import com.hazelcast.security.permission.NamespacePermission;
 import com.hazelcast.spi.impl.operationservice.Operation;
 
 import javax.security.auth.Subject;
@@ -90,6 +91,12 @@ public class ExecutorServiceSubmitToAddressMessageTask
     @Override
     public Permission getRequiredPermission() {
         return new ExecutorServicePermission(parameters.name, ActionConstants.ACTION_MODIFY);
+    }
+
+    @Override
+    public Permission getNamespacePermission() {
+        String namespace = DistributedExecutorService.lookupNamespace(nodeEngine, parameters.name);
+        return namespace != null ? new NamespacePermission(namespace, ActionConstants.ACTION_USE) : null;
     }
 
     @Override

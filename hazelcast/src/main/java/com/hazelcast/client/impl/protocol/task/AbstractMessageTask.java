@@ -336,19 +336,6 @@ public abstract class AbstractMessageTask<P> implements MessageTask, SecureReque
         return getServiceName();
     }
 
-    protected static Collection<Permission> extendPermissions(@Nullable Collection<Permission> parentPermissions,
-            Permission permission) {
-        Collection<Permission> permissions = new HashSet<>();
-
-        if (parentPermissions != null) {
-            permissions.addAll(parentPermissions);
-        }
-
-        permissions.add(permission);
-
-        return permissions;
-    }
-
     protected final BuildInfo getMemberBuildInfo() {
         return node.getBuildInfo();
     }

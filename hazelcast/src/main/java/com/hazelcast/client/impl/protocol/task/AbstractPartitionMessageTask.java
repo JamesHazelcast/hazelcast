@@ -20,9 +20,12 @@ import com.hazelcast.client.impl.protocol.ClientMessage;
 import com.hazelcast.instance.impl.Node;
 import com.hazelcast.internal.namespace.NamespaceUtil;
 import com.hazelcast.internal.nio.Connection;
+import com.hazelcast.security.permission.ActionConstants;
+import com.hazelcast.security.permission.NamespacePermission;
 import com.hazelcast.spi.impl.PartitionSpecificRunnable;
 import com.hazelcast.spi.impl.operationservice.Operation;
 
+import java.security.Permission;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -68,7 +71,15 @@ public abstract class AbstractPartitionMessageTask<P>
         op.setCallerUuid(endpoint.getUuid());
         return nodeEngine.getOperationService().createInvocationBuilder(getServiceName(), op, getPartitionId())
                          .setResultDeserialized(false).invoke();
+    }
 
+    @Override
+    public final Permission getNamespacePermission() {
+        if (namespaceAware) {
+            String namespace = getNamespace();
+            return namespace != null ? new NamespacePermission(namespace, ActionConstants.ACTION_USE) : null;
+        }
+        return null;
     }
 
     protected abstract Operation prepareOperation();
