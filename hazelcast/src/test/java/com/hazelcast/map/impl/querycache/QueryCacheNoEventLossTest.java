@@ -148,7 +148,7 @@ public class QueryCacheNoEventLossTest extends HazelcastTestSupport {
     private Config newConfig() {
         QueryCacheConfig queryCacheConfig = new QueryCacheConfig()
                 .setName(QUERY_CACHE_NAME)
-                .setPredicateConfig(new PredicateConfig(Predicates.alwaysTrue(), null));
+                .setPredicateConfig(new PredicateConfig(Predicates.alwaysTrue()));
 
         MapConfig mapConfig = new MapConfig(MAP_NAME)
                 .addQueryCacheConfig(queryCacheConfig);

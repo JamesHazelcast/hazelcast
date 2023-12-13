@@ -34,7 +34,8 @@ import static com.hazelcast.internal.util.Preconditions.checkPositive;
 /**
  * Contains the configuration for an {@link DurableExecutorService}.
  */
-public class DurableExecutorConfig implements IdentifiedDataSerializable, NamedConfig, Versioned, NamespaceAwareConfig {
+public class DurableExecutorConfig implements IdentifiedDataSerializable, NamedConfig, Versioned,
+                                              NamespaceAwareConfig<DurableExecutorConfig> {
 
     /**
      * The number of executor threads per Member for the Executor based on this configuration.

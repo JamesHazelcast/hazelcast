@@ -1514,6 +1514,39 @@
         </xs:complexType>
     </xs:element>
 
+    <!--> Copy of `java-serialization-filter` with a more appropriate naming/descriptions for Namespaces <-->
+    <xs:element name="class-filter">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="blacklist" type="filter-list" minOccurs="0">
+                    <xs:annotation>
+                        <xs:documentation>
+                            Blacklisted class names, package names, and prefixes, which are not allowed to be loaded by Namespaces.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element name="whitelist" type="filter-list" minOccurs="0">
+                    <xs:annotation>
+                        <xs:documentation>
+                            Whitelisted class names, package names, and prefixes, which are allowed to be loaded by Namespaces.
+                            If the list is empty (no class, package, or prefix patterns provided) then all classes are allowed.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+            </xs:sequence>
+            <xs:attribute name="defaults-disabled" default="false">
+                <xs:annotation>
+                    <xs:documentation>
+                        Disables including default list entries (hardcoded in Hazelcast source code).
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:boolean"/>
+                </xs:simpleType>
+            </xs:attribute>
+        </xs:complexType>
+    </xs:element>
+
     <xs:complexType name="filter-list">
         <xs:choice minOccurs="0" maxOccurs="unbounded">
             <xs:element name="class" type="xs:string" minOccurs="0" maxOccurs="unbounded">
@@ -6447,7 +6480,7 @@
             </xs:documentation>
         </xs:annotation>
         <xs:sequence>
-            <xs:element ref="java-serialization-filter" minOccurs="0"/>
+            <xs:element ref="class-filter" minOccurs="0"/>
             <xs:element name="namespace" type="namespace-type" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
         <xs:attribute name="enabled" type="xs:boolean" use="required"/>

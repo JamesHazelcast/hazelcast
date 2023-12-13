@@ -1118,10 +1118,10 @@ public class DynamicConfigYamlGenerator {
         if (!namespacesConfig.isEnabled()) {
             return;
         }
-        if (namespacesConfig.getJavaSerializationFilterConfig() != null) {
+        if (namespacesConfig.getClassFilterConfig() != null) {
             Map<String, Object> javaSerializationFilterCfg =
-                    javaSerializationFilterGenerator(namespacesConfig.getJavaSerializationFilterConfig());
-            addNonNullToMap(child, "java-serialization-filter", javaSerializationFilterCfg);
+                    javaSerializationFilterGenerator(namespacesConfig.getClassFilterConfig());
+            addNonNullToMap(child, "class-filter", javaSerializationFilterCfg);
         }
         ConfigAccessor.getNamespaceConfigs(namespacesConfig).forEach((namespace, namespaceConfig) -> {
             List<Map<String, Object>> resourcesList = new ArrayList<>();

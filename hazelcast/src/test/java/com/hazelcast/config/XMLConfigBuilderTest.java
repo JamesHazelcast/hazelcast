@@ -4809,7 +4809,7 @@ public class XMLConfigBuilderTest extends AbstractConfigBuilderTest {
 
         String xml = HAZELCAST_START_TAG
                 + "<namespaces enabled=\"true\">"
-                + "    <java-serialization-filter defaults-disabled=\"true\">\n"
+                + "    <class-filter defaults-disabled=\"true\">\n"
                 + "        <blacklist>\n"
                 + "            <class>com.acme.app.BeanComparator</class>\n"
                 + "        </blacklist>\n"
@@ -4817,7 +4817,7 @@ public class XMLConfigBuilderTest extends AbstractConfigBuilderTest {
                 + "            <package>com.acme.app</package>\n"
                 + "            <prefix>com.hazelcast.</prefix>\n"
                 + "        </whitelist>\n"
-                + "    </java-serialization-filter>"
+                + "    </class-filter>"
                 + "    <namespace name=\"ns1\">"
                 + "        <jar id=\"jarId\">"
                 + "            <url>" + tempJar.toURI().toURL() + "</url>"
@@ -4875,8 +4875,8 @@ public class XMLConfigBuilderTest extends AbstractConfigBuilderTest {
         assertArrayEquals(getTestFileBytes(tempJar), jarId2Resource.get().payload());
 
         // Validate filtering config
-        assertNotNull(namespacesConfig.getJavaSerializationFilterConfig());
-        JavaSerializationFilterConfig filterConfig = namespacesConfig.getJavaSerializationFilterConfig();
+        assertNotNull(namespacesConfig.getClassFilterConfig());
+        JavaSerializationFilterConfig filterConfig = namespacesConfig.getClassFilterConfig();
         assertTrue(filterConfig.isDefaultsDisabled());
         assertTrue(filterConfig.getWhitelist().isListed("com.acme.app.FakeClass"));
         assertTrue(filterConfig.getWhitelist().isListed("com.hazelcast.fake.place.MagicClass"));

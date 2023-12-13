@@ -1727,10 +1727,11 @@ public class TestFullApplicationContext extends HazelcastTestSupport {
 
         assertNotNull(namespaceConfig);
         assertEquals("ns1", namespaceConfig.getName());
-        assertEquals(2, namespaceConfig.getResourceConfigs().size());
+
+        assertEquals(2, ConfigAccessor.getResourceDefinitions(namespaceConfig).size());
 
         //validate NS1 ResourceDefinition contents.
-        Collection<ResourceDefinition> ns1Resources = namespaceConfig.getResourceConfigs();
+        Collection<ResourceDefinition> ns1Resources = ConfigAccessor.getResourceDefinitions(namespaceConfig);
         assertEquals(2, ns1Resources.size());
 
         Optional<ResourceDefinition> jarIdResource = ns1Resources.stream().filter(r -> r.id().equals("ns1jar")).findFirst();
@@ -1752,7 +1753,7 @@ public class TestFullApplicationContext extends HazelcastTestSupport {
         assertNotNull(namespaceConfig2);
         assertEquals("ns2", namespaceConfig2.getName());
 
-        Collection<ResourceDefinition> ns2Resources = namespaceConfig2.getResourceConfigs();
+        Collection<ResourceDefinition> ns2Resources = ConfigAccessor.getResourceDefinitions(namespaceConfig2);
         assertEquals(2, ns2Resources.size());
         Optional<ResourceDefinition> jarId2Resource = ns2Resources.stream().filter(r -> r.id().equals("ns2jar")).findFirst();
 
@@ -1771,8 +1772,8 @@ public class TestFullApplicationContext extends HazelcastTestSupport {
         assertArrayEquals(getTestFileBytes(zipPath.toFile()), jarResource.get().payload());
 
         // Validate filtering config
-        assertNotNull(namespacesConfig.getJavaSerializationFilterConfig());
-        JavaSerializationFilterConfig filterConfig = namespacesConfig.getJavaSerializationFilterConfig();
+        assertNotNull(namespacesConfig.getClassFilterConfig());
+        JavaSerializationFilterConfig filterConfig = namespacesConfig.getClassFilterConfig();
         assertTrue(filterConfig.isDefaultsDisabled());
         assertTrue(filterConfig.getWhitelist().isListed("com.acme.app.FakeClass"));
         assertTrue(filterConfig.getWhitelist().isListed("com.hazelcast.fake.place.MagicClass"));

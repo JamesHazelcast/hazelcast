@@ -336,8 +336,7 @@ public class Node {
             return parent;
         }
         Map<String, NamespaceConfig> staticNsConfig = ConfigAccessor.getNamespaceConfigs(config.getNamespacesConfig());
-        namespaceService = new NamespaceServiceImpl(parent, staticNsConfig, config.getNamespacesConfig()
-                .getJavaSerializationFilterConfig());
+        namespaceService = new NamespaceServiceImpl(parent, staticNsConfig, config.getNamespacesConfig().getClassFilterConfig());
         return new NamespaceAwareClassLoader(parent, this);
     }
 

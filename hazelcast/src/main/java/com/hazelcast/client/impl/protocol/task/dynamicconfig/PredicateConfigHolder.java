@@ -57,7 +57,7 @@ public class PredicateConfigHolder {
         } else if (implementation != null) {
             return NamespaceUtil.callWithNamespace(namespace, () -> {
                 Predicate predicate = serializationService.toObject(implementation);
-                return new PredicateConfig(predicate, namespace);
+                return new PredicateConfig(predicate);
             });
         } else {
             return new PredicateConfig();

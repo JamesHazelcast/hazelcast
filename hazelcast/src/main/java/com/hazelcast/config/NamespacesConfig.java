@@ -16,17 +16,26 @@
 
 package com.hazelcast.config;
 
+import com.hazelcast.spi.annotation.Beta;
+
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
-/** @since 5.4 */
+/**
+ * Serves as the configuration container for all aspects of Namespaces, used in User Code Deployment.
+ * Individual Namespaces are defined within {@link NamespaceConfig}, and a class filtering config
+ * can optionally be provided with an implementation of {@link JavaSerializationFilterConfig}.
+ *
+ * @since 5.4
+ */
+@Beta
 public class NamespacesConfig {
     private boolean enabled;
     private final Map<String, NamespaceConfig> namespaceConfigs = new ConcurrentHashMap<>();
-    private @Nullable JavaSerializationFilterConfig javaSerializationFilterConfig;
+    private @Nullable JavaSerializationFilterConfig classFilterConfig;
 
     public NamespacesConfig() {
     }
@@ -34,7 +43,7 @@ public class NamespacesConfig {
     public NamespacesConfig(NamespacesConfig config) {
         this.enabled = config.enabled;
         this.namespaceConfigs.putAll(config.namespaceConfigs);
-        this.javaSerializationFilterConfig = config.javaSerializationFilterConfig;
+        this.classFilterConfig = config.classFilterConfig;
     }
 
     public NamespacesConfig(boolean enabled, Map<String, NamespaceConfig> namespaceConfigs) {
@@ -70,12 +79,12 @@ public class NamespacesConfig {
     }
 
     @Nullable
-    public JavaSerializationFilterConfig getJavaSerializationFilterConfig() {
-        return javaSerializationFilterConfig;
+    public JavaSerializationFilterConfig getClassFilterConfig() {
+        return classFilterConfig;
     }
 
-    public void setJavaSerializationFilterConfig(@Nullable JavaSerializationFilterConfig javaSerializationFilterConfig) {
-        this.javaSerializationFilterConfig = javaSerializationFilterConfig;
+    public void setClassFilterConfig(@Nullable JavaSerializationFilterConfig javaSerializationFilterConfig) {
+        this.classFilterConfig = javaSerializationFilterConfig;
     }
 
     @Override
@@ -83,7 +92,7 @@ public class NamespacesConfig {
         return "NamespacesConfig{"
                 + "enabled=" + enabled
                 + ", namespaceConfigs=" + namespaceConfigs + '}'
-                + ", javaSerializationFilterConfig=" + javaSerializationFilterConfig
+                + ", classFilterConfig=" + classFilterConfig
                 + '}';
     }
 
@@ -97,11 +106,11 @@ public class NamespacesConfig {
         }
         NamespacesConfig that = (NamespacesConfig) o;
         return enabled == that.enabled && Objects.equals(namespaceConfigs, that.namespaceConfigs)
-                && Objects.equals(javaSerializationFilterConfig, that.javaSerializationFilterConfig);
+                && Objects.equals(classFilterConfig, that.classFilterConfig);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(enabled, namespaceConfigs, javaSerializationFilterConfig);
+        return Objects.hash(enabled, namespaceConfigs, classFilterConfig);
     }
 }

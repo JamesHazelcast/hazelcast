@@ -36,7 +36,7 @@ import static com.hazelcast.internal.util.Preconditions.isNotNull;
  *
  * @since 3.5
  */
-public class PredicateConfig implements IdentifiedDataSerializable, NamespaceAwareConfig, Versioned {
+public class PredicateConfig implements IdentifiedDataSerializable {
 
     protected String className;
 
@@ -72,7 +72,7 @@ public class PredicateConfig implements IdentifiedDataSerializable, NamespaceAwa
      * @param implementation the implementation to use as Predicate
      * @throws IllegalArgumentException if the implementation is {@code null}
      */
-    public PredicateConfig(Predicate implementation, @Nullable String namespace) {
+    public PredicateConfig(Predicate implementation) {
         this.implementation = isNotNull(implementation, "implementation");
     }
 

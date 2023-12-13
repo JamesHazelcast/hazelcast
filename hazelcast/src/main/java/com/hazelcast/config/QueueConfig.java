@@ -42,7 +42,7 @@ import static com.hazelcast.internal.util.Preconditions.checkNotNull;
  * Contains the configuration for an {@link IQueue}.
  */
 @SuppressWarnings("checkstyle:methodcount")
-public class QueueConfig implements IdentifiedDataSerializable, NamedConfig, Versioned, NamespaceAwareConfig {
+public class QueueConfig implements IdentifiedDataSerializable, NamedConfig, Versioned, NamespaceAwareConfig<QueueConfig> {
 
     /**
      * Default value for the maximum size of the Queue.

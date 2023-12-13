@@ -38,8 +38,7 @@ import static com.hazelcast.internal.util.Preconditions.isNotNull;
 /**
  * Contains the configuration for a {@link ITopic}.
  */
-public class TopicConfig implements IdentifiedDataSerializable, NamedConfig, Versioned,
-                                    NamespaceAwareConfig {
+public class TopicConfig implements IdentifiedDataSerializable, NamedConfig, Versioned, NamespaceAwareConfig<TopicConfig> {
 
     /**
      * Default global ordering configuration.

@@ -40,7 +40,8 @@ import static com.hazelcast.internal.util.Preconditions.checkPositive;
 /**
  * Configuration options for the {@link IScheduledExecutorService}.
  */
-public class ScheduledExecutorConfig implements IdentifiedDataSerializable, NamedConfig, Versioned, NamespaceAwareConfig {
+public class ScheduledExecutorConfig implements IdentifiedDataSerializable, NamedConfig, Versioned,
+                                                NamespaceAwareConfig<ScheduledExecutorConfig> {
 
     /**
      * The number of executor threads per Member for the Executor based on this configuration.

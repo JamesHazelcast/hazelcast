@@ -17,6 +17,7 @@
 package com.hazelcast.client.impl.protocol.task.dynamicconfig;
 
 import com.hazelcast.client.impl.protocol.codec.DynamicConfigAddNamespaceConfigCodec;
+import com.hazelcast.config.ConfigAccessor;
 import com.hazelcast.config.NamespaceConfig;
 import org.junit.Test;
 
@@ -29,9 +30,13 @@ public class AddNamespaceConfigMessageTaskTest extends ConfigMessageTaskTest {
     public void test() {
         NamespaceConfig config = new NamespaceConfig("my-namepsace");
 
+
         AddNamespaceConfigMessageTask task = new AddNamespaceConfigMessageTask(
                 DynamicConfigAddNamespaceConfigCodec.encodeRequest(config.getName(),
-                        config.getResourceConfigs().stream().map(ResourceDefinitionHolder::new).collect(Collectors.toList())),
+                        ConfigAccessor.getResourceDefinitions(config)
+                                      .stream()
+                                      .map(ResourceDefinitionHolder::new)
+                                      .collect(Collectors.toList())),
                 mockNode, mockConnection);
         task.run();
 

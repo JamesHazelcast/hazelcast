@@ -49,7 +49,7 @@ public class DynamicNamespacesConfig extends NamespacesConfig {
     }
 
     @Override
-    public void setJavaSerializationFilterConfig(@Nullable JavaSerializationFilterConfig javaSerializationFilterConfig) {
+    public void setClassFilterConfig(@Nullable JavaSerializationFilterConfig classFilterConfig) {
         throw new UnsupportedOperationException("Cannot define JavaSerializationFilterConfig for NamespacesConfig at runtime.");
     }
 

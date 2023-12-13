@@ -25,6 +25,7 @@ import com.hazelcast.jet.config.ResourceType;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
+import com.hazelcast.spi.annotation.Beta;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -36,8 +37,14 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Contains the configuration for a specific Namespace, defining its identifier
+ * (name) as well as the definitions for resources it provides.
+ *
+ * @since 5.4
+ */
+@Beta
 public class NamespaceConfig implements NamedConfig, IdentifiedDataSerializable {
-    @Nullable
     private String name;
 
     private final Map<String, ResourceDefinition> resourceDefinitions = new ConcurrentHashMap<>();
@@ -60,7 +67,8 @@ public class NamespaceConfig implements NamedConfig, IdentifiedDataSerializable 
     }
 
     @Override
-    public NamespaceConfig setName(String name) {
+    public NamespaceConfig setName(@Nonnull String name) {
+        Objects.requireNonNull(name, "Namespace name cannot be null");
         this.name = name;
         return this;
     }
@@ -97,7 +105,7 @@ public class NamespaceConfig implements NamedConfig, IdentifiedDataSerializable 
         }
     }
 
-    public Set<ResourceDefinition> getResourceConfigs() {
+    Set<ResourceDefinition> getResourceConfigs() {
         return Set.copyOf(resourceDefinitions.values());
     }
 

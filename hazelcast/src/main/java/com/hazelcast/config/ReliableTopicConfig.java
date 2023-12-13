@@ -58,7 +58,7 @@ import static com.hazelcast.topic.TopicOverloadPolicy.BLOCK;
  * will observe exactly the same order of sequence of messages.
  */
 public class ReliableTopicConfig implements IdentifiedDataSerializable, NamedConfig, Versioned,
-                                            NamespaceAwareConfig {
+                                            NamespaceAwareConfig<ReliableTopicConfig> {
 
     /**
      * The default read batch size.

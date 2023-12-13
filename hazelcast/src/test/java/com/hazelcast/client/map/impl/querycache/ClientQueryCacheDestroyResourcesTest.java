@@ -86,7 +86,7 @@ public class ClientQueryCacheDestroyResourcesTest extends ClientTestSupport {
 
     private QueryCacheConfig newQueryCacheConfig(String cacheName) {
         return new QueryCacheConfig(cacheName)
-                .setPredicateConfig(new PredicateConfig(predicate, null));
+                .setPredicateConfig(new PredicateConfig(predicate));
     }
 
     @Test

@@ -68,7 +68,7 @@ import static com.hazelcast.internal.util.Preconditions.isNotNull;
  * @param <K> the key type
  * @param <V> the value type
  */
-public class CacheConfig<K, V> extends AbstractCacheConfig<K, V> implements Versioned, NamespaceAwareConfig {
+public class CacheConfig<K, V> extends AbstractCacheConfig<K, V> implements Versioned, NamespaceAwareConfig<CacheConfig<K, V>> {
 
     private String name;
     private String managerPrefix;

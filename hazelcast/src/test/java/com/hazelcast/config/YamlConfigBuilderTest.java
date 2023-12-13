@@ -17,6 +17,7 @@
 package com.hazelcast.config;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import com.hazelcast.config.LoginModuleConfig.LoginModuleUsage;
 import com.hazelcast.config.cp.CPMapConfig;
 import com.hazelcast.config.PermissionConfig.PermissionType;
@@ -51,7 +52,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
-import wiremock.com.google.common.collect.Sets;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -4739,7 +4739,7 @@ public class YamlConfigBuilderTest extends AbstractConfigBuilderTest {
         String yamlTestString = "hazelcast:\n"
                 + "  namespaces:\n"
                 + "    enabled: true\n"
-                + "    java-serialization-filter:\n"
+                + "    class-filter:\n"
                 + "      defaults-disabled: false\n"
                 + "      blacklist:\n"
                 + "        class:\n"
@@ -4801,8 +4801,8 @@ public class YamlConfigBuilderTest extends AbstractConfigBuilderTest {
         assertArrayEquals(getTestFileBytes(tempJar), jarId2Resource.get().payload());
 
         // Validate filtering config
-        assertNotNull(namespacesConfig.getJavaSerializationFilterConfig());
-        JavaSerializationFilterConfig filterConfig = namespacesConfig.getJavaSerializationFilterConfig();
+        assertNotNull(namespacesConfig.getClassFilterConfig());
+        JavaSerializationFilterConfig filterConfig = namespacesConfig.getClassFilterConfig();
         assertFalse(filterConfig.isDefaultsDisabled());
         assertTrue(filterConfig.getWhitelist().isListed("com.acme.app.FakeClass"));
         assertTrue(filterConfig.getWhitelist().isListed("com.hazelcast.fake.place.MagicClass"));

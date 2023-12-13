@@ -44,7 +44,7 @@ import static com.hazelcast.internal.util.Preconditions.checkPositive;
  * backup in another member in the cluster.
  */
 public class RingbufferConfig implements IdentifiedDataSerializable, NamedConfig, Versioned,
-                                         NamespaceAwareConfig {
+                                         NamespaceAwareConfig<RingbufferConfig> {
 
     /**
      * Default value of capacity of the RingBuffer.

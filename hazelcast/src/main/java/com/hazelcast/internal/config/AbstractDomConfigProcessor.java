@@ -279,7 +279,7 @@ public abstract class AbstractDomConfigProcessor implements DomConfigProcessor {
     }
 
     protected void fillJavaSerializationFilter(final Node node, NamespacesConfig namespacesConfig) {
-        namespacesConfig.setJavaSerializationFilterConfig(getJavaSerializationFilter(node));
+        namespacesConfig.setClassFilterConfig(getJavaSerializationFilter(node));
     }
 
     private JavaSerializationFilterConfig getJavaSerializationFilter(final Node node) {

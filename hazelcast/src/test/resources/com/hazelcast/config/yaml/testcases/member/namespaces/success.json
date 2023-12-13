@@ -3,7 +3,7 @@
     "hazelcast": {
       "namespaces": {
         "enabled": false,
-        "java-serialization-filter": {
+        "class-filter": {
           "defaults-disabled": true,
           "blacklist": {
             "class": [

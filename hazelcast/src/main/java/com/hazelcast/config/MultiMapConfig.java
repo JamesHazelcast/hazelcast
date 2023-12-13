@@ -38,7 +38,7 @@ import static com.hazelcast.internal.util.Preconditions.checkNotNull;
  * Configuration for MultiMap.
  */
 @SuppressWarnings("checkstyle:methodcount")
-public class MultiMapConfig implements IdentifiedDataSerializable, NamedConfig, Versioned, NamespaceAwareConfig {
+public class MultiMapConfig implements IdentifiedDataSerializable, NamedConfig, Versioned, NamespaceAwareConfig<MultiMapConfig> {
 
     /**
      * The default number of synchronous backups for this MultiMap.

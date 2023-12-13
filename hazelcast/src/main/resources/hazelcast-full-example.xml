@@ -4103,7 +4103,7 @@
             Its default value is false.
 
         It has the following sub-elements:
-        * <java-serialization-filter>:
+        * <class-filter>:
             Allows to configure blacklisting and whitelisting by class, package or prefix.
             If a filtered class has been blacklisted, a SecurityException will be thrown.
             If whitelisting is enabled, either by explicit declaration under <whitelist>
@@ -4159,7 +4159,7 @@
                         Defines the URL of the zip resource.
     -->
     <namespaces enabled="true">
-        <java-serialization-filter defaults-disabled="true">
+        <class-filter defaults-disabled="true">
             <blacklist>
                 <class>com.acme.app.BeanComparator</class>
             </blacklist>
@@ -4171,7 +4171,7 @@
                 <prefix>com.hazelcast.</prefix>
                 <prefix>java</prefix>
             </whitelist>
-        </java-serialization-filter>
+        </class-filter>
         <namespace name="ns1">
             <jar id="jarId">
                 <url>file:./src/test/class/usercodedeployment/ShadedClasses.jar</url>

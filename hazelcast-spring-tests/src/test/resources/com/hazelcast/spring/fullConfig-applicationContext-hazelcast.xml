@@ -1166,7 +1166,7 @@
                 <hz:eventloop-count>12</hz:eventloop-count>
             </hz:tpc>
             <hz:namespaces enabled="true">
-                <hz:java-serialization-filter defaults-disabled="true">
+                <hz:class-filter defaults-disabled="true">
                     <hz:blacklist>
                         <hz:class>com.acme.app.BeanComparator</hz:class>
                     </hz:blacklist>
@@ -1174,7 +1174,7 @@
                         <hz:package>com.acme.app</hz:package>
                         <hz:prefix>com.hazelcast.</hz:prefix>
                     </hz:whitelist>
-                </hz:java-serialization-filter>
+                </hz:class-filter>
                 <hz:namespace name="ns1">
                     <hz:jar id="ns1jar">
                         <hz:url>file:./src/test/resources/com/hazelcast/spring/namespaces/testjar.jar</hz:url>

@@ -46,7 +46,7 @@ import static com.hazelcast.internal.util.Preconditions.isNotNull;
 /**
  * Contains the configuration for an {@link IMap}.
  */
-public class MapConfig implements IdentifiedDataSerializable, NamedConfig, Versioned, NamespaceAwareConfig {
+public class MapConfig implements IdentifiedDataSerializable, NamedConfig, Versioned, NamespaceAwareConfig<MapConfig> {
 
     /**
      * The minimum number of backups

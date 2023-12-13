@@ -3988,7 +3988,7 @@ hazelcast:
   #      It will not be possible to add or remove namespaces at runtime.
   #      Its default value is false.
   # It has the following sub-elements:
-  #  * "java-serialization-filter":
+  #  * "class-filter":
   #      Allows to configure blacklisting and whitelisting by class, package or prefix.
   #      If a filtered class has been blacklisted, a SecurityException will be thrown.
   #      If whitelisting is enabled, either by explicit declaration under <whitelist>
@@ -4037,14 +4037,14 @@ hazelcast:
     # Sub attribute of namespaces, enables or disables namespaces.
     enabled: true
     # Sub attribute of namespaces, allows to configure blacklisting and whitelisting by class, package or prefix.
-    java-serialization-filter:
-      # Sub-Attribute of java-serialization-filter, If set to true, the default whitelist will not be used.
+    class-filter:
+      # Sub-Attribute of class-filter, If set to true, the default whitelist will not be used.
       defaults-disabled: true
-      # Sub-Attribute of java-serialization-filter, defines a blacklist of classes, packages or prefixes.
+      # Sub-Attribute of class-filter, defines a blacklist of classes, packages or prefixes.
       blacklist:
         class:
           - com.acme.app.BeanComparator
-      # Sub-Attribute of java-serialization-filter, defines a whitelist of classes, packages or prefixes.
+      # Sub-Attribute of class-filter, defines a whitelist of classes, packages or prefixes.
       whitelist:
         class:
           - java.lang.String

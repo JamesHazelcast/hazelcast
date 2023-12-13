@@ -41,7 +41,7 @@ import static com.hazelcast.internal.util.Preconditions.checkNotNull;
  * @param <T> Type of Collection such as List, Set
  */
 public abstract class CollectionConfig<T extends CollectionConfig>
-        implements IdentifiedDataSerializable, NamedConfig, Versioned, NamespaceAwareConfig {
+        implements IdentifiedDataSerializable, NamedConfig, Versioned, NamespaceAwareConfig<CollectionConfig<T>> {
 
     /**
      * Default maximum size for the Configuration.

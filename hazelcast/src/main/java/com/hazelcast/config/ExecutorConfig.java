@@ -31,7 +31,7 @@ import static com.hazelcast.internal.cluster.Versions.V5_4;
 /**
  * Contains the configuration for an {@link com.hazelcast.core.IExecutorService}.
  */
-public class ExecutorConfig implements IdentifiedDataSerializable, NamedConfig, NamespaceAwareConfig, Versioned {
+public class ExecutorConfig implements IdentifiedDataSerializable, NamedConfig, Versioned, NamespaceAwareConfig<ExecutorConfig> {
 
     /**
      * The number of executor threads per Member for the Executor based on this configuration.

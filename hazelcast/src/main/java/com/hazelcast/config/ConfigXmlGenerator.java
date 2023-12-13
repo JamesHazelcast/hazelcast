@@ -1259,9 +1259,9 @@ public class ConfigXmlGenerator {
             return;
         }
         gen.open("namespaces", "enabled", namespacesConfig.isEnabled());
-        JavaSerializationFilterConfig filterConfig = namespacesConfig.getJavaSerializationFilterConfig();
+        JavaSerializationFilterConfig filterConfig = namespacesConfig.getClassFilterConfig();
         if (filterConfig != null) {
-            gen.open("java-serialization-filter", "defaults-disabled", filterConfig.isDefaultsDisabled());
+            gen.open("class-filter", "defaults-disabled", filterConfig.isDefaultsDisabled());
             appendFilterList(gen, "blacklist", filterConfig.getBlacklist());
             appendFilterList(gen, "whitelist", filterConfig.getWhitelist());
             gen.close();

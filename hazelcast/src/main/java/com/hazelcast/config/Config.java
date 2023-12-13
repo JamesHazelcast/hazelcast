@@ -3240,10 +3240,12 @@ public class Config {
     }
 
     /**
-     * Sets the namespaces configuration .
+     * Sets the namespaces configuration.
+     * Internal API used for Spring configuration.
      *
      * @since 5.4.0
      */
+    @PrivateApi
     public @Nonnull Config setNamespacesConfig(@Nonnull NamespacesConfig namespacesConfig) {
         this.namespacesConfig = checkNotNull(namespacesConfig);
         return this;

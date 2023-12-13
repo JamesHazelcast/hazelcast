@@ -17,6 +17,7 @@
 package com.hazelcast.config;
 
 import com.hazelcast.internal.config.ConfigDataSerializerHook;
+import com.hazelcast.internal.config.ReplicatedMapConfigReadOnly;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
@@ -39,7 +40,7 @@ import static com.hazelcast.internal.util.Preconditions.checkNotNull;
  */
 @SuppressWarnings("checkstyle:methodcount")
 public class ReplicatedMapConfig implements IdentifiedDataSerializable, NamedConfig, Versioned,
-                                            NamespaceAwareConfig {
+                                            NamespaceAwareConfig<ReplicatedMapConfig> {
 
     /**
      * Default value of In-memory format

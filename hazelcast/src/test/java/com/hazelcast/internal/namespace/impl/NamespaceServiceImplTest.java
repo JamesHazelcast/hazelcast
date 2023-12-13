@@ -183,7 +183,7 @@ public class NamespaceServiceImplTest {
                 + "           http://www.hazelcast.com/schema/config/hazelcast-config-5.4.xsd\">\n" + "\n"
                 + "    <cluster-name>cluster</cluster-name>\n\n"
                 + "    <namespaces enabled=\"true\">\n"
-                + "      <java-serialization-filter defaults-disabled=\"true\">\n"
+                + "      <class-filter defaults-disabled=\"true\">\n"
                 + (blacklistLine == null ? ""
                 : "          <blacklist>\n"
                 + "              " + blacklistLine + "\n"
@@ -192,7 +192,7 @@ public class NamespaceServiceImplTest {
                 : "          <whitelist>\n"
                 + "              " + whitelistLine + "\n"
                 + "          </whitelist>\n")
-                + "      </java-serialization-filter>"
+                + "      </class-filter>"
                 + "      <namespace name=\"myNamespace\">\n"
                 + "          <jar>\n"
                 + "              <url>file:///" + stringPath + "</url>\n"

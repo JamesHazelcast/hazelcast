@@ -318,7 +318,7 @@ public class YamlMemberDomConfigProcessor extends MemberDomConfigProcessor {
     protected void handleNamespacesNode(Node node) {
         for (Node n : childElements(node)) {
             String nodeName = cleanNodeName(n);
-            if (matches(nodeName, "java-serialization-filter")) {
+            if (matches(nodeName, "class-filter")) {
                 fillJavaSerializationFilter(n, config.getNamespacesConfig());
             } else if (!matches("enabled", nodeName)) {
                 NamespaceConfig ns = new NamespaceConfig(nodeName);
@@ -945,18 +945,6 @@ public class YamlMemberDomConfigProcessor extends MemberDomConfigProcessor {
             cpSubsystemConfig.addLockConfig(lockConfig);
         }
     }
-
-//    @Override
-//    void handleNamespace(Node node) {
-//        for (Node child : childElements(node)) {
-//            Node named = getNamedItemNode(child, "name");
-//            NamespaceConfig nsConfig = new NamespaceConfig(named.getNodeValue());
-//            Node resources = getNamedItemNode(child, "resources");
-//            for (Node subC : childElements(resources)) {
-//                handleResources(subC, nsConfig);
-//            }
-//        }
-//    }
 
     @Override
     void handleCPMaps(CPSubsystemConfig cpSubsystemConfig, Node node) {

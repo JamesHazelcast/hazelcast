@@ -44,7 +44,7 @@ public class NamespacesConfigReadOnly extends NamespacesConfig {
     }
 
     @Override
-    public void setJavaSerializationFilterConfig(@Nullable JavaSerializationFilterConfig javaSerializationFilterConfig) {
+    public void setClassFilterConfig(@Nullable JavaSerializationFilterConfig classFilterConfig) {
         throw new UnsupportedOperationException("This config is read-only name-spaces");
     }
 }
