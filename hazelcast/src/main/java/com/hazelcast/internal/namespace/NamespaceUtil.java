@@ -48,7 +48,7 @@ public class NamespaceUtil {
      * @see NamespaceService#setupNamespace(String)
      */
     public static void setupNamespace(@Nullable String namespace) {
-        NodeEngine engine = NodeEngineThreadLocalContext.getNamespaceThreadLocalContext();
+        NodeEngine engine = NodeEngineThreadLocalContext.getNodeEngineThreadLocalContext();
         setupNamespace(engine, namespace);
     }
 
@@ -60,7 +60,7 @@ public class NamespaceUtil {
      * @see NamespaceService#cleanupNamespace(String)
      */
     public static void cleanupNamespace(@Nullable String namespace) {
-        NodeEngine engine = NodeEngineThreadLocalContext.getNamespaceThreadLocalContext();
+        NodeEngine engine = NodeEngineThreadLocalContext.getNodeEngineThreadLocalContext();
         cleanupNamespace(engine, namespace);
     }
 
@@ -92,7 +92,7 @@ public class NamespaceUtil {
      * @see NamespaceService#runWithNamespace(String, Runnable)
      */
     public static void runWithNamespace(@Nullable String namespace, Runnable runnable) {
-        NodeEngine engine = NodeEngineThreadLocalContext.getNamespaceThreadLocalContext();
+        NodeEngine engine = NodeEngineThreadLocalContext.getNodeEngineThreadLocalContext();
         runWithNamespace(engine, namespace, runnable);
     }
 
@@ -114,7 +114,7 @@ public class NamespaceUtil {
      * @see NamespaceService#callWithNamespace(String, Callable)
      */
     public static <V> V callWithNamespace(@Nullable String namespace, Callable<V> callable) {
-        NodeEngine engine = NodeEngineThreadLocalContext.getNamespaceThreadLocalContext();
+        NodeEngine engine = NodeEngineThreadLocalContext.getNodeEngineThreadLocalContext();
         return callWithNamespace(engine, namespace, callable);
     }
 

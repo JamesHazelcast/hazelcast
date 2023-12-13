@@ -107,7 +107,7 @@ public class PartitionWideEntryBackupOperation extends AbstractMultipleEntryBack
     @Override
     protected void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
-        NodeEngine engine = NodeEngineThreadLocalContext.getNamespaceThreadLocalContext();
+        NodeEngine engine = NodeEngineThreadLocalContext.getNodeEngineThreadLocalContext();
         String namespace = MapService.lookupNamespace(engine, name);
         NamespaceUtil.setupNamespace(engine, namespace);
         backupProcessor = in.readObject();
@@ -120,7 +120,7 @@ public class PartitionWideEntryBackupOperation extends AbstractMultipleEntryBack
      * overridden, the overriding class <b>must handle Namespace cleanup</b>
      */
     protected void afterReadInternal() {
-        NodeEngine engine = NodeEngineThreadLocalContext.getNamespaceThreadLocalContext();
+        NodeEngine engine = NodeEngineThreadLocalContext.getNodeEngineThreadLocalContext();
         String namespace = MapService.lookupNamespace(engine, name);
         NamespaceUtil.cleanupNamespace(engine, namespace);
     }

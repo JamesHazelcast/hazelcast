@@ -128,7 +128,7 @@ public class CacheEntryProcessorOperation
     protected void readInternal(ObjectDataInput in)
             throws IOException {
         super.readInternal(in);
-        NodeEngine engine = NodeEngineThreadLocalContext.getNamespaceThreadLocalContext();
+        NodeEngine engine = NodeEngineThreadLocalContext.getNodeEngineThreadLocalContext();
         entryProcessor = NamespaceUtil.callWithNamespace(engine,
                 CacheService.lookupNamespace(engine, name), in::readObject);
         final boolean hasArguments = in.readBoolean();

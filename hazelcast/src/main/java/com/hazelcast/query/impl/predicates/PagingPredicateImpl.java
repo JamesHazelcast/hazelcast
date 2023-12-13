@@ -385,7 +385,7 @@ public class PagingPredicateImpl<K, V>
             namespace = null;
         }
 
-        NodeEngine engine = NodeEngineThreadLocalContext.getNamespaceThreadLocalContext();
+        NodeEngine engine = NodeEngineThreadLocalContext.getNodeEngineThreadLocalContext();
         NamespaceUtil.setupNamespace(engine, namespace);
         try {
             predicate = in.readObject();

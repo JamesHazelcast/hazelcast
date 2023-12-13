@@ -73,7 +73,7 @@ public class AddInterceptorOperation extends AbstractNamedOperation
     public void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
         id = in.readString();
-        NodeEngine engine = NodeEngineThreadLocalContext.getNamespaceThreadLocalContext();
+        NodeEngine engine = NodeEngineThreadLocalContext.getNodeEngineThreadLocalContext();
         mapInterceptor = NamespaceUtil.callWithNamespace(engine, MapService.lookupNamespace(engine, name), in::readObject);
     }
 

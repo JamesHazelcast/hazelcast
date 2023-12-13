@@ -110,7 +110,7 @@ public class PostJoinMapOperation extends Operation implements IdentifiedDataSer
             mapName = in.readString();
             int size = in.readInt();
 
-            NodeEngine engine = NodeEngineThreadLocalContext.getNamespaceThreadLocalContext();
+            NodeEngine engine = NodeEngineThreadLocalContext.getNodeEngineThreadLocalContext();
             String namespace = MapService.lookupNamespace(engine, mapName);
             NamespaceUtil.setupNamespace(engine, namespace);
             try {

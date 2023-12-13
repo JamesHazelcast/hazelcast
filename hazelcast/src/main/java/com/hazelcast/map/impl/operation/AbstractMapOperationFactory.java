@@ -51,7 +51,7 @@ public abstract class AbstractMapOperationFactory implements OperationFactory {
      * directly in place of this method.
      */
     protected <T> T callWithNamespaceAwareness(Callable<T> callable) {
-        NodeEngine engine = NodeEngineThreadLocalContext.getNamespaceThreadLocalContext();
+        NodeEngine engine = NodeEngineThreadLocalContext.getNodeEngineThreadLocalContext();
         String namespace = MapService.lookupNamespace(engine, name);
         return NamespaceUtil.callWithNamespace(engine, namespace, callable);
     }

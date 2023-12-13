@@ -25,7 +25,7 @@ import com.hazelcast.config.NamespaceConfig;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.internal.namespace.NamespaceUtil;
 import com.hazelcast.internal.nio.IOUtil;
-import com.hazelcast.internal.util.OsHelper;
+import com.hazelcast.internal.tpcengine.util.OS;
 import com.hazelcast.jet.impl.deployment.MapResourceClassLoader;
 import com.hazelcast.map.EntryProcessor;
 import com.hazelcast.map.IMap;
@@ -470,7 +470,7 @@ public class NamespaceAwareClassLoaderIntegrationTest extends HazelcastTestSuppo
 
     private static String correctResourcePath(Path root, Path path) {
         String classKeyName = classKeyName(root.relativize(path).toString());
-        return OsHelper.ensureUnixSeparators(classKeyName);
+        return OS.ensureUnixSeparators(classKeyName);
     }
 
     private static Class<?> tryLoadClass(HazelcastInstance instance, String namespace, String className) throws ClassNotFoundException  {

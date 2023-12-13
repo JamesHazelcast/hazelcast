@@ -59,7 +59,7 @@ public final class NodeEngineThreadLocalContext {
      *
      * @return This thread's {@link NodeEngine} reference.
      */
-    public static NodeEngine getNamespaceThreadLocalContext() {
+    public static NodeEngine getNodeEngineThreadLocalContext() {
         NodeEngine tlContext = NE_THREAD_LOCAL.get();
         if (tlContext == null) {
             throw new IllegalStateException("NodeEngine context is not available for Namespaces! Current thread: "
@@ -75,7 +75,7 @@ public final class NodeEngineThreadLocalContext {
      *
      * @return This thread's {@link NodeEngine} reference if available, or {@code null}.
      */
-    public static NodeEngine getNamespaceThreadLocalContextOrNull() {
+    public static NodeEngine getNodeEngineThreadLocalContextOrNull() {
         NodeEngine tlContext = NE_THREAD_LOCAL.get();
         if (tlContext == null) {
             return null;

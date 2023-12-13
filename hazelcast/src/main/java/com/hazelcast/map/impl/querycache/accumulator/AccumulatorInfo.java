@@ -194,7 +194,7 @@ public class AccumulatorInfo implements IdentifiedDataSerializable {
         publishable = in.readBoolean();
         coalesce = in.readBoolean();
         populate = in.readBoolean();
-        NodeEngine engine = NodeEngineThreadLocalContext.getNamespaceThreadLocalContext();
+        NodeEngine engine = NodeEngineThreadLocalContext.getNodeEngineThreadLocalContext();
         predicate = NamespaceUtil.callWithNamespace(engine, MapService.lookupNamespace(engine, mapName), in::readObject);
     }
 

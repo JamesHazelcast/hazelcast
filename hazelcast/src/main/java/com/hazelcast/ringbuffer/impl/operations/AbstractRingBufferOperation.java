@@ -141,7 +141,7 @@ public abstract class AbstractRingBufferOperation extends Operation implements N
      */
     public String getUCDNamespace() {
         // Obtain NodeEngine reference and set for use later in operations
-        NodeEngine engine = NodeEngineThreadLocalContext.getNamespaceThreadLocalContext();
+        NodeEngine engine = NodeEngineThreadLocalContext.getNodeEngineThreadLocalContext();
         setNodeEngine(engine);
         return RingbufferService.lookupUcdNamespace(engine, name, getPartitionId());
     }

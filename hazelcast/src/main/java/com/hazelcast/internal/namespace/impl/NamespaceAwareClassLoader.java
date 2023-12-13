@@ -38,7 +38,6 @@ public class NamespaceAwareClassLoader extends ClassLoader {
     private static final MethodHandle FIND_RESOURCE_METHOD_HANDLE;
     private static final MethodHandle FIND_RESOURCES_METHOD_HANDLE;
 
-    private final NamespaceServiceImpl namespaceService;
     // Retain Parent for faster referencing (skips permission checks)
     private final ClassLoader parent;
 
@@ -47,11 +46,11 @@ public class NamespaceAwareClassLoader extends ClassLoader {
             ClassLoader.registerAsParallelCapable();
             Lookup lookup = MethodHandles.lookup();
 
-            FIND_RESOURCE_METHOD_HANDLE = lookup.findSpecial(ClassLoader.class, "findResource",
-                    MethodType.methodType(URL.class, String.class), NamespaceAwareClassLoader.class);
+            FIND_RESOURCE_METHOD_HANDLE = lookup.findVirtual(ClassLoader.class, "findResource",
+                    MethodType.methodType(URL.class, String.class));
 
-            FIND_RESOURCES_METHOD_HANDLE = lookup.findSpecial(ClassLoader.class, "findResources",
-                    MethodType.methodType(Enumeration.class, String.class), NamespaceAwareClassLoader.class);
+            FIND_RESOURCES_METHOD_HANDLE = lookup.findVirtual(ClassLoader.class, "findResources",
+                    MethodType.methodType(Enumeration.class, String.class));
         } catch (ReflectiveOperationException e) {
             throw new ExceptionInInitializerError(e);
         }
@@ -60,7 +59,6 @@ public class NamespaceAwareClassLoader extends ClassLoader {
     public NamespaceAwareClassLoader(ClassLoader parent, Node node) {
         super(parent);
         this.parent = parent;
-        this.namespaceService = (NamespaceServiceImpl) node.getNamespaceService();
     }
 
     @Override

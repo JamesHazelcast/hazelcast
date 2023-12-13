@@ -146,7 +146,7 @@ public class TaskDefinition<V>
             throws IOException {
         type = Type.valueOf(in.readString());
         name = in.readString();
-        NodeEngine engine = NodeEngineThreadLocalContext.getNamespaceThreadLocalContext();
+        NodeEngine engine = NodeEngineThreadLocalContext.getNodeEngineThreadLocalContext();
         String namespace = DistributedScheduledExecutorService.lookupNamespace(engine, name);
         command = NamespaceUtil.callWithNamespace(engine, namespace, in::readObject);
         initialDelay = in.readLong();

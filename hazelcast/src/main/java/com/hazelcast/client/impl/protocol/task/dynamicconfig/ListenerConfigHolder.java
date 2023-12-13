@@ -169,7 +169,7 @@ public class ListenerConfigHolder {
         } else {
             // This method can be invoked by clients, in which case we don't need Namespace context
             //  (and we don't have a NodeEngine instance available for use anyway)
-            NodeEngine engine = NodeEngineThreadLocalContext.getNamespaceThreadLocalContextOrNull();
+            NodeEngine engine = NodeEngineThreadLocalContext.getNodeEngineThreadLocalContextOrNull();
             EventListener eventListener = engine == null
                     ? serializationService.toObject(listenerImplementation)
                     : NamespaceUtil.callWithNamespace(namespace, () -> serializationService.toObject(listenerImplementation));
@@ -214,7 +214,7 @@ public class ListenerConfigHolder {
         Data implementationData = null;
         if (config.getImplementation() != null) {
             // We might be on the client right now, so check our NodeEngine context to determine Namespace awareness needs
-            NodeEngine engine = NodeEngineThreadLocalContext.getNamespaceThreadLocalContextOrNull();
+            NodeEngine engine = NodeEngineThreadLocalContext.getNodeEngineThreadLocalContextOrNull();
             if (engine != null) {
                 implementationData = NamespaceUtil.callWithNamespace(engine, namespace,
                         () -> serializationService.toData(config.getImplementation()));

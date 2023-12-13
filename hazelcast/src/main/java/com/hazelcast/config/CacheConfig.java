@@ -817,7 +817,7 @@ public class CacheConfig<K, V> extends AbstractCacheConfig<K, V> implements Vers
     private void copyListeners(CacheSimpleConfig simpleConfig) throws Exception {
         // This method can be invoked by clients, in which case we don't need Namespace context
         //  (and we don't have a NodeEngine instance available for use anyway)
-        NodeEngine engine = NodeEngineThreadLocalContext.getNamespaceThreadLocalContextOrNull();
+        NodeEngine engine = NodeEngineThreadLocalContext.getNodeEngineThreadLocalContextOrNull();
         ClassLoader loader = engine != null ? NamespaceUtil.getClassLoaderForNamespace(engine, namespace) : null;
         for (CacheSimpleEntryListenerConfig simpleListener : simpleConfig.getCacheEntryListeners()) {
             Factory<? extends CacheEntryListener<? super K, ? super V>> listenerFactory = null;

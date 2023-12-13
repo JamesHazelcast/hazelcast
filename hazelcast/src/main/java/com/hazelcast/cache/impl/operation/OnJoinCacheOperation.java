@@ -103,7 +103,7 @@ public class OnJoinCacheOperation extends Operation implements IdentifiedDataSer
         super.readInternal(in);
         int confSize = in.readInt();
         // Configs can contain listener configs, which need UCD Namespace awareness
-        NodeEngine engine = NodeEngineThreadLocalContext.getNamespaceThreadLocalContext();
+        NodeEngine engine = NodeEngineThreadLocalContext.getNodeEngineThreadLocalContext();
         for (int i = 0; i < confSize; i++) {
             String namespace = null;
             // RU_COMPAT_5_3

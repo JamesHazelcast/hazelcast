@@ -286,7 +286,7 @@ public class PartitionWideEntryOperation extends MapOperation
     @Override
     protected void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
-        NodeEngine engine = NodeEngineThreadLocalContext.getNamespaceThreadLocalContext();
+        NodeEngine engine = NodeEngineThreadLocalContext.getNodeEngineThreadLocalContext();
         String namespace = MapService.lookupNamespace(engine, name);
         NamespaceUtil.setupNamespace(engine, namespace);
         entryProcessor = in.readObject();
@@ -299,7 +299,7 @@ public class PartitionWideEntryOperation extends MapOperation
      * overridden, the overriding class <b>must handle Namespace cleanup</b>
      */
     protected void afterReadInternal() {
-        NodeEngine engine = NodeEngineThreadLocalContext.getNamespaceThreadLocalContext();
+        NodeEngine engine = NodeEngineThreadLocalContext.getNodeEngineThreadLocalContext();
         String namespace = MapService.lookupNamespace(engine, name);
         NamespaceUtil.cleanupNamespace(engine, namespace);
     }

@@ -158,7 +158,7 @@ public class Query implements IdentifiedDataSerializable, Versioned {
     public void readData(ObjectDataInput in) throws IOException {
         this.mapName = in.readString();
 
-        NodeEngine engine = NodeEngineThreadLocalContext.getNamespaceThreadLocalContext();
+        NodeEngine engine = NodeEngineThreadLocalContext.getNodeEngineThreadLocalContext();
         String namespace = MapService.lookupNamespace(engine, mapName);
         NamespaceUtil.setupNamespace(engine, namespace);
         try {

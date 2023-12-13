@@ -23,7 +23,7 @@ import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.internal.namespace.NamespaceService;
 import com.hazelcast.internal.namespace.ResourceDefinition;
-import com.hazelcast.internal.util.OsHelper;
+import com.hazelcast.internal.tpcengine.util.OS;
 import com.hazelcast.jet.config.ResourceType;
 import com.hazelcast.spi.impl.NodeEngineImpl;
 import com.hazelcast.test.annotation.NamespaceTest;
@@ -214,7 +214,7 @@ public class NamespaceServiceImplTest {
     }
 
     private String getCorrectedPathString(Path path) {
-        return OsHelper.ensureUnixSeparators(UrlEscapers.urlFragmentEscaper().escape(path.toAbsolutePath().toString()));
+        return OS.ensureUnixSeparators(UrlEscapers.urlFragmentEscaper().escape(path.toAbsolutePath().toString()));
     }
 
     // "No-op" implementation test

@@ -114,7 +114,7 @@ public class PartitionWideEntryWithPredicateOperationFactory extends PartitionAw
     @Override
     public void readData(ObjectDataInput in) throws IOException {
         name = in.readString();
-        NodeEngine engine = NodeEngineThreadLocalContext.getNamespaceThreadLocalContext();
+        NodeEngine engine = NodeEngineThreadLocalContext.getNodeEngineThreadLocalContext();
         String namespace = MapService.lookupNamespace(engine, name);
         NamespaceUtil.setupNamespace(engine, namespace);
         try {

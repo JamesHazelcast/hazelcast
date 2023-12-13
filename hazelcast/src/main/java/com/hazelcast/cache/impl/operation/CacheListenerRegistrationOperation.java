@@ -76,7 +76,7 @@ public class CacheListenerRegistrationOperation
     protected void readInternal(ObjectDataInput in)
             throws IOException {
         super.readInternal(in);
-        NodeEngine engine = NodeEngineThreadLocalContext.getNamespaceThreadLocalContext();
+        NodeEngine engine = NodeEngineThreadLocalContext.getNodeEngineThreadLocalContext();
         cacheEntryListenerConfiguration = NamespaceUtil.callWithNamespace(engine,
                 CacheService.lookupNamespace(engine, name), in::readObject);
         register = in.readBoolean();
