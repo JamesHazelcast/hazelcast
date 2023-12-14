@@ -27,6 +27,7 @@ import javax.annotation.Nullable;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.ref.WeakReference;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -35,6 +36,8 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.function.Supplier;
 import java.util.zip.InflaterInputStream;
 
@@ -77,6 +80,7 @@ public class MapResourceClassLoader extends JetDelegatingClassLoader {
     protected volatile boolean isShutdown;
     private final ILogger logger = Logger.getLogger(getClass());
     private final @Nullable String namespace;
+    private final ConcurrentMap<String, WeakReference<Class<?>>> CACHE = new ConcurrentHashMap<>(100);
 
     static {
         ClassLoader.registerAsParallelCapable();
@@ -112,6 +116,14 @@ public class MapResourceClassLoader extends JetDelegatingClassLoader {
         if (!childFirst) {
             return super.loadClass(name, resolve);
         }
+        // caching for our resources because synchronized is expensive
+        WeakReference<Class<?>> reference = CACHE.get(name);
+        if (reference != null) {
+            Class<?> clazz = reference.get();
+            if (clazz != null) {
+                return clazz;
+            }
+        }
         synchronized (getClassLoadingLock(name)) {
             Class<?> klass = findLoadedClass(name);
             // first lookup class in own resources
@@ -134,6 +146,7 @@ public class MapResourceClassLoader extends JetDelegatingClassLoader {
             if (resolve) {
                 resolveClass(klass);
             }
+            CACHE.put(name, new WeakReference<>(klass));
             return klass;
         }
     }
