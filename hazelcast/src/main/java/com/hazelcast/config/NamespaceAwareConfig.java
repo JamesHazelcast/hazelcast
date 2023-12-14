@@ -26,6 +26,7 @@ import javax.annotation.Nullable;
  * to associate with all operations pertaining to this config.
  *
  * @since 5.4
+ * @param <T> Implementation type for use in return type of {@link #setNamespace(String)}
  */
 @Beta
 public interface NamespaceAwareConfig<T> {

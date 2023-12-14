@@ -91,7 +91,7 @@ public abstract class AbstractDeploymentTest extends SimpleTestInClusterSupport 
 
         JobConfig jobConfig = new JobConfig();
         URL classUrl = urlFromFile(CLASS_DIRECTORY_FILE);
-        try(URLClassLoader urlClassLoader = new URLClassLoader(new URL[]{classUrl}, null)) {
+        try (URLClassLoader urlClassLoader = new URLClassLoader(new URL[]{classUrl}, null)) {
             Class<?> appearance = urlClassLoader.loadClass("com.sample.pojo.person.Person$Appereance");
             jobConfig.addClass(appearance);
         }

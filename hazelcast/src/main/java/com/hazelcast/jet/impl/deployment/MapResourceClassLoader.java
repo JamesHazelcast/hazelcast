@@ -80,7 +80,7 @@ public class MapResourceClassLoader extends JetDelegatingClassLoader {
     protected volatile boolean isShutdown;
     private final ILogger logger = Logger.getLogger(getClass());
     private final @Nullable String namespace;
-    private final ConcurrentMap<String, WeakReference<Class<?>>> CACHE = new ConcurrentHashMap<>(100);
+    private final ConcurrentMap<String, WeakReference<Class<?>>> classCache = new ConcurrentHashMap<>(100);
 
     static {
         ClassLoader.registerAsParallelCapable();
@@ -117,7 +117,7 @@ public class MapResourceClassLoader extends JetDelegatingClassLoader {
             return super.loadClass(name, resolve);
         }
         // caching for our resources because synchronized is expensive
-        WeakReference<Class<?>> reference = CACHE.get(name);
+        WeakReference<Class<?>> reference = classCache.get(name);
         if (reference != null) {
             Class<?> clazz = reference.get();
             if (clazz != null) {
@@ -146,7 +146,7 @@ public class MapResourceClassLoader extends JetDelegatingClassLoader {
             if (resolve) {
                 resolveClass(klass);
             }
-            CACHE.put(name, new WeakReference<>(klass));
+            classCache.put(name, new WeakReference<>(klass));
             return klass;
         }
     }
