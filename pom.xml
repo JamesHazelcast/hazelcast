@@ -56,7 +56,7 @@
         <maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
         <maven.jar.plugin.version>3.3.0</maven.jar.plugin.version>
         <maven.source.plugin.version>3.3.0</maven.source.plugin.version>
-        <maven.javadoc.plugin.version>3.6.2</maven.javadoc.plugin.version>
+        <maven.javadoc.plugin.version>3.6.3</maven.javadoc.plugin.version>
         <maven.javadoc.plugin.excludePackageNames>
             *.impl:*.impl.*:*.internal:*.internal.*:*.operations:*.proxy:
             com.hazelcast.aws.security:*.handlermigration:*.client.connection.nio:
@@ -75,27 +75,27 @@
         <maven.git.commit.id.plugin.version>2.1.10</maven.git.commit.id.plugin.version>
         <maven.deploy.plugin.version>3.1.1</maven.deploy.plugin.version>
 
-        <maven.surefire.plugin.version>3.2.2</maven.surefire.plugin.version>
+        <maven.surefire.plugin.version>3.2.3</maven.surefire.plugin.version>
         <maven.checkstyle.plugin.version>3.3.1</maven.checkstyle.plugin.version>
         <maven.jacoco.plugin.version>0.8.11</maven.jacoco.plugin.version>
-        <maven.failsafe.plugin.version>3.2.2</maven.failsafe.plugin.version>
+        <maven.failsafe.plugin.version>3.2.3</maven.failsafe.plugin.version>
         <maven.cobertura.plugin.version>2.7</maven.cobertura.plugin.version>
         <maven.enforcer.plugin.version>3.4.1</maven.enforcer.plugin.version>
         <maven.os.plugin.version>1.7.1</maven.os.plugin.version>
         <maven.protobuf.plugin.version>0.6.1</maven.protobuf.plugin.version>
         <maven.resources.plugin.version>3.3.1</maven.resources.plugin.version>
-        <owasp.dependency-check.version>8.4.3</owasp.dependency-check.version>
+        <owasp.dependency-check.version>9.0.5</owasp.dependency-check.version>
         <codehause.license.plugin.version>2.3.0</codehause.license.plugin.version>
 
         <!-- Third-party dependencies (sorted alphabetically) -->
         <!--<affinity.version>3.2.3</affinity.version>-->
         <antlr4.version>4.9.3</antlr4.version>
         <avro.version>1.11.3</avro.version>
-        <aws.sdk.version>1.12.603</aws.sdk.version>
+        <aws.sdk.version>1.12.618</aws.sdk.version>
         <calcite.version>1.35.0</calcite.version>
         <classgraph.version>4.8.165</classgraph.version>
         <debezium.version>1.9.7.Final</debezium.version>
-        <grpc.version>1.59.0</grpc.version>
+        <grpc.version>1.60.0</grpc.version>
         <guava.version>32.1.3-jre</guava.version>
         <hadoop.version>3.3.6</hadoop.version>
         <h2.version>2.2.224</h2.version>
@@ -113,13 +113,13 @@
         <reload4j.version>1.2.25</reload4j.version>
         <mssql.version>12.4.2.jre11</mssql.version>
         <mysql.connector.version>8.2.0</mysql.connector.version>
-        <netty.version>4.1.101.Final</netty.version>
+        <netty.version>4.1.103.Final</netty.version>
         <objenesis.version>3.3</objenesis.version>
         <oracle.version>23.3.0.23.09</oracle.version>
         <osgi.version>4.2.0</osgi.version>
         <parquet.version>1.13.1</parquet.version>
         <picocli.version>4.7.5</picocli.version>
-        <postgresql.version>42.7.0</postgresql.version>
+        <postgresql.version>42.7.1</postgresql.version>
         <prometheus.version>0.20.0</prometheus.version>
 
         <!--
@@ -151,12 +151,12 @@
         <http.core.version>4.4.16</http.core.version>
         <http.client.version>4.5.14</http.client.version>
         <jsr107.tck.version>1.1.1</jsr107.tck.version>
-        <mockito.version>5.7.0</mockito.version>
+        <mockito.version>5.8.0</mockito.version>
         <reflections.version>0.9.10</reflections.version>
         <testcontainers.version>1.19.3</testcontainers.version>
-        <jna.version>5.13.0</jna.version>
+        <jna.version>5.14.0</jna.version>
         <!--  When updating archunit.version, check/remove Java version assumptions in ArchUnitRulesTest.java -->
-        <archunit.version>1.2.0</archunit.version>
+        <archunit.version>1.2.1</archunit.version>
         <errorprone.version>2.23.0</errorprone.version>
         <awaitility.version>4.2.0</awaitility.version>
         <kubernetes-server-mock.version>6.9.2</kubernetes-server-mock.version>
@@ -1553,6 +1553,10 @@
     <distributionManagement>
         <repository>
             <id>release-repository</id>
+            <!-- Irrespective of this configuration, nexus-staging-maven-plugin
+            will *also* deploy to it's own staging destination, configured in
+            //project//plugin[artifactId='nexus-staging-maven-plugin']/configuration/nexusUrl
+            (i.e. Maven central) -->
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
         </repository>
         <snapshotRepository>
@@ -1691,7 +1695,7 @@
             <dependency>
                 <groupId>com.google.http-client</groupId>
                 <artifactId>google-http-client-bom</artifactId>
-                <version>1.43.2</version>
+                <version>1.43.3</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -1897,7 +1901,7 @@
             <dependency>
                 <groupId>com.nimbusds</groupId>
                 <artifactId>nimbus-jose-jwt</artifactId>
-                <version>9.37.1</version>
+                <version>9.37.3</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.woodstox</groupId>
@@ -1932,7 +1936,7 @@
             <dependency>
                 <groupId>com.github.luben</groupId>
                 <artifactId>zstd-jni</artifactId>
-                <version>1.5.5-10</version>
+                <version>1.5.5-11</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
@@ -1954,7 +1958,7 @@
             <dependency>
                 <groupId>org.checkerframework</groupId>
                 <artifactId>checker-qual</artifactId>
-                <version>3.40.0</version>
+                <version>3.41.0</version>
             </dependency>
             <dependency>
                 <groupId>org.antlr</groupId>
@@ -2136,6 +2140,12 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>uk.org.webcompere</groupId>
+            <artifactId>system-stubs-jupiter</artifactId>
+            <version>2.1.5</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
             <scope>test</scope>
@@ -2192,7 +2202,7 @@
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-core</artifactId>
-            <version>10.1.16</version>
+            <version>10.1.17</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

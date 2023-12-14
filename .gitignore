@@ -28,6 +28,7 @@ reports/
 *.jfr
 .mvn/wrapper/maven-wrapper.jar
 hazelcast/src/test/class/**/*.java
+.checkstyle
 
 # Hadoop files
 *.crc

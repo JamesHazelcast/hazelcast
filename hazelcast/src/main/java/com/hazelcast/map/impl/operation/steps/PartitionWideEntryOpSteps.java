@@ -26,7 +26,10 @@ import com.hazelcast.map.impl.operation.EntryOperator;
 import com.hazelcast.map.impl.operation.steps.engine.Step;
 import com.hazelcast.map.impl.operation.steps.engine.State;
 import com.hazelcast.map.impl.record.Record;
+import com.hazelcast.map.impl.recordstore.DefaultRecordStore;
 import com.hazelcast.map.impl.recordstore.RecordStore;
+import com.hazelcast.map.impl.recordstore.StepAwareStorage;
+import com.hazelcast.map.impl.recordstore.Storage;
 import com.hazelcast.query.Predicate;
 import com.hazelcast.query.impl.IndexRegistry;
 import com.hazelcast.query.impl.QueryableEntry;
@@ -44,6 +47,8 @@ public enum PartitionWideEntryOpSteps implements IMapOpStep {
     PROCESS() {
         @Override
         public void runStep(State state) {
+            state.setSizeBefore(state.getRecordStore().size());
+
             /**
              * Tiered storage only supports global
              * indexes no partitioned index is supported.
@@ -129,9 +134,10 @@ public enum PartitionWideEntryOpSteps implements IMapOpStep {
         }
 
         private void processInternal(State state, Data key, Record record) {
+            DefaultRecordStore recordStore = (DefaultRecordStore) state.getRecordStore();
             State singleKeyState = new State(state);
             singleKeyState
-                    .setKey(key)
+                    .setKey(((Data) recordStore.copyToHeapWhenNeeded(key)))
                     .setOldValue(record == null ? null : record.getValue())
                     .setEntryOperator(operator(state.getOperation(),
                             state.getEntryProcessor(), state.getPredicate()));
@@ -230,6 +236,15 @@ public enum PartitionWideEntryOpSteps implements IMapOpStep {
 
         @Override
         public Step nextStep(State state) {
+            Storage storage = state.getRecordStore().getStorage();
+            if (storage instanceof StepAwareStorage) {
+                state.setSizeAfter(storage.size());
+                Step postStep = ((StepAwareStorage) storage).getPostStep(state);
+                if (postStep != null) {
+                    return postStep;
+                }
+            }
+
             return UtilSteps.FINAL_STEP;
         }
     };
